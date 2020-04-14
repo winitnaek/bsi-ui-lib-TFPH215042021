@@ -13,8 +13,8 @@ module.exports = {
     ],
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'myuilib.js',
-        library: 'myuilib',
+        filename: 'bsiuilib.js',
+        library: 'bsiuilib',
         libraryTarget:'umd'
     },
     module: {
