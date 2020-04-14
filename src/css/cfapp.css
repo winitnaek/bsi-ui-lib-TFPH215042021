@@ -1,0 +1,32 @@
+button {
+    background: red;
+    border-radius: 8px;
+    color: white;
+}
+
+.small {
+    height: 40px;
+    width: 80px;
+}
+
+.medium {
+    height: 50px;
+    width: 100px;
+}
+
+.largebtun {
+    height: 60px;
+    width: 120px;
+}
+.zindx{
+    z-index: 99;
+}
+.gridbtn {
+    background-color:none; /* Blue background */
+    border: none; /* Remove borders */
+    font-size: 20px; /* Set a font size */
+    cursor: pointer; /* Mouse pointer on hover */
+}
+.gridbtn:hover {
+    background-color: #1e7e34;
+}

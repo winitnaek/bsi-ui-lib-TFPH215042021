@@ -1,0 +1,10 @@
+<script type="text/template" id="templateAreaNavBarMenu" class="templates">
+    <% for(var i = 0; i < navs.areas.length; i += 1) { %>
+        <li class="nav-item">
+            <a class="nav-link" href="#" onclick="<%-navs.renderFunction%>('<%-navs.anchorId%>', '<%-navs.areas[i].renderName%>')" title="<%-navs.areas[i].popover%>"><i class="<%-navs.areas[i].icon%>"></i> <%-navs.areas[i].title%></a>
+        </li>
+    <% } %>
+</script>
+<script type="text/template" id="templateSeachArea" class="templates">
+    <input class="form-control search" id="searchIdd" maxlength="7"  onkeypress="<%-navs.rf%>('<%-navs.anchorId%>', '<%-navs.renderName%>')" type="text" placeholder="Search" aria-label="Search"/>
+</script>

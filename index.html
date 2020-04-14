@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title id="appTitle"></title>
+  <link rel="stylesheet" href="./res/js/bootstrap-4.0.0-dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./res/js/bootstrap-4.0.0-dist/css/app.css">
+  <!-- Custom styles for this template -->
+  <link href="./res/css/fontawesome-free-5.0.6/web-fonts-with-css/css/fontawesome-all.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="./res/js/jqwidgets/styles/jqx.base.css" type="text/css" />
+  <link rel="stylesheet" href="./res/js/jqwidgets/styles/jqx.energyblue.css" type="text/css" />
+  
+
+
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxcore.js"></script>
+  
+</head>
+
+<body>
+<div class="d-none main-content" id="noVsblAreasAlrt">
+  <div class="alert alert-warning" role="alert">
+    Ensure that at least one application area is
+    <strong>visible</strong>!
+  </div>
+</div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navId">
+  <a id="appName" class="navbar-brand" href="#">
+    <i class="fas fa-home"></i>
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+    aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav mr-auto mt-2 mt-lg-0" id="appAreaSideMenu">
+
+    </ul>
+    <form class="form-inline" id="appSearchArea">
+        
+    </form>
+  </div>
+</nav>
+  <div id="appContent" class="main-content p-5 m-5">
+  </div>
+  <canvas id="theCanvas"></canvas>
+  <script type="text/javascript" src="./res/js/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./res/js/lodash.min.js"></script>
+  <script type="text/javascript" src="./res/js/react.production.min.js"></script>
+  <script type="text/javascript" src="./res/js/react-dom.production.min.js"></script>
+  <script type="text/javascript" src="./res/js/redux.min.js"></script>
+  <script type="text/javascript" src="./res/js/react-redux.min.js"></script>
+  <script type="text/javascript" src="./res/js/redux-thunk.min.js"></script>
+  <script type="text/javascript" src="./res/js/prop-types.min.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxcore.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxdata.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxgrid.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxdata.export.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxgrid.export.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxscrollbar.js"></script>
+
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxdraw.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxchart.core.js"></script>
+
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxmenu.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxcheckbox.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxlistbox.js"></script>
+
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxbuttons.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxbuttongroup.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxradiobutton.js"></script>
+  
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxdropdownlist.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxgrid.sort.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxgrid.pager.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxgrid.selection.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxgrid.edit.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxgrid.columnsresize.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxgrid.filter.js"></script>
+  
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxdatetimeinput.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxcalendar.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxtooltip.js"></script>
+  <script type="text/javascript" src="./res/js/jqwidgets/globalization/globalize.js"></script>
+
+  <script type="text/javascript" src="./res/js/jqwidgets/jqxchart.js"></script>
+  <script type="text/javascript" src="bsitestui.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+      const xhr = payIndex.resolveTemplates()
+        .then(function (templData) {
+          payIndex.init(templData);
+        }).catch(error => {
+          console.error('Error:', error);
+          alert("System Error! Please contact support!");
+          window.location = "index.html";
+        });
+      $("#" + payIndex.nameId).on('click touchstart', function () {
+        payIndex.reloadContent();
+        payIndex.renderWelcomePage(payIndex.contentId);
+      });
+      $("#" + payIndex.nameId).click();
+    });
+    $(function() {
+      $(document).on("AppError", appErrorHandler);
+    });
+    function appErrorHandler(e) {
+          alert(e.type+" occured on "+e.currentTarget.nodeName+", at "+e.time.toLocaleString()+": Details: "+e.status+" : "+e.message);
+          console.log('Error Data');
+          console.log(e.errorData);
+
+    }
+  </script>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+</html>

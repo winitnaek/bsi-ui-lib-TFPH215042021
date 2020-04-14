@@ -1,0 +1,233 @@
+html,
+body {
+  height: 100%!important;
+  padding-bottom: 0px!important;
+  padding-top: 0px!important;
+}
+
+#appContainerIv .card .card-body .list-group .badge  {
+	white-space: normal;
+	margin-left: 10px;
+}
+
+.pb-1, .py-1, .pb-2, .py-2 {
+    display: inline-table;
+	margin-right: 10px;
+}
+
+.card-body {
+    /*background-color: #eeeeee;*/
+}
+
+.container-fluid {
+  min-height: 100%;
+  overflow: hidden;
+}
+
+.custom-select {
+	background-image: none;
+}
+
+.jumbotron-fluid {
+  border-radius: 0.3rem; }
+
+.nav-link.border {
+	border-top: none !important;
+	border-bottom: none !important;
+	border-color: #003764 !important;
+}
+
+.full-page-content {
+  margin-bottom: -9999px;
+  padding-bottom: 9999px;
+  padding-top: 65px;
+}
+
+.app-branding {
+	background-image: url(../app/img/logo_BSI_c.png); /*changed to BSI logo */
+	left: 0;
+	top: 0;
+	height: 50px;
+	width: 150px;
+	background-size: auto 40px;
+	background-repeat: no-repeat;
+	background-position: center; 
+	margin: 0 5px !important;
+}
+
+.nav-border {
+	border-left: 1px solid #003764;
+	height: 50px;
+	padding: 15px !important;
+}
+
+.navbar.no-padding {
+  padding: 0px !important;
+}
+
+.navbar.separator {
+  border-bottom: 1px solid #003764;
+}
+
+.nav-item.pad-bottom-20px {
+  padding-bottom: 20px;
+}
+
+option {
+    min-height: 2em;
+}
+
+.pad-widget {
+  padding-bottom: 40px;
+  padding-top: 40px;
+}
+
+.text-align-center {
+  text-align: center
+}
+
+.text-bsi {
+  color: #4c7392; /*70% BSI Logo Blue (003764)*/
+}
+
+.btn-bsi {
+ background-color: #f8f8f8;
+  border-color: #76bd22;
+  
+}
+
+.btn-bsi:hover {
+  background-color: #9fd164; /*70% BSI Green (76bd22)*/
+  border-color: #f8f8f8;
+}
+
+.btn-bsi:hover .text-bsi { /*new from daniel */
+  color: #f8f8f8; 
+}
+
+
+#widgetView,
+#iconView {
+  display: '';
+}
+
+.badge.wp {
+  top: -45px;
+  right: 20px;
+}
+
+/*
+ * Below style must not be repeated for each and every area!
+ * Use Sass inheritance!
+ */
+.wp-badge-cf:after {
+  content: "cf";
+  color: #4c7392 ;
+  /*background-color: lightgray;*/
+	background-color: #dedede;
+  position: relative;
+  top: -40px;
+  left: -20%;
+  text-align: center;
+  line-height: 1;
+  font-size: .75rem;
+  border-radius: .25rem;
+  padding: .25rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.wp-badge-tf:after {
+  content: "tf";
+  color: #4c7392 ;
+  /*background-color: lightgoldenrodyellow;*/
+	background-color: #ffeabb;
+  position: relative;
+  top: -40px;
+  left: -20%;
+  text-align: center;
+  line-height: 1;
+  font-size: .75rem;
+  border-radius: .25rem;
+  padding: .25rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* theme adjustments START 
+
+.jumbotron {
+ background-color: #8a8a8a !important;
+}*/
+/* theme adjustments END */
+
+/*@media (max-width: 1023.99px) {*/
+@media (max-width: 767px) {
+	.app-branding { width: 110px; }
+
+	.search {
+		width: 5rem !important;
+	}
+	
+	.nav-border {
+		padding-top: 15px !important;
+		padding-left: 20px !important;
+		border-right: 1px solid #003764 !important;
+		border-top: 1px solid #003764 !important;
+	}
+	
+	.nav-link.border {
+		border-top: 1px solid #003764 !important;
+	}
+	
+	.navbar-nav {
+		 margin-right: 0 !important;
+	}
+	
+	.navbar-nav .nav-link {
+		padding-left: 20px;
+	}
+	
+	.navbar-light .navbar-toggler {
+		color: rgba(0, 0, 0, 0.5);
+		border-color: rgba(0, 0, 0, 0.5);
+		margin-right: 10px;
+	}
+
+	nav.nav-expand-md {
+		display: none;
+	}
+
+	#sidebar {    
+		display:none !important;
+	}
+
+	#sidebar-toggler {
+		padding-top: 75px;
+		padding-left: 1%;
+		display: block;
+	}	
+}
+
+@media (min-width: 1024px) {  
+	.search {
+		width: 20rem !important;
+	}
+
+	nav.nav-expand-md {
+		display: "";
+	}
+
+	#sidebar {
+		display: block;
+		position: -webkit-sticky;
+		position: sticky;
+		top: 0 !important;
+		bottom: 0 !important;
+		min-height: 100% !important;
+	}
+
+	#sidebar-toggler {
+		display: none;
+	}	
+}
