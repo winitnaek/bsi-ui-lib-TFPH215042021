@@ -14,7 +14,8 @@
     "start-dev": "NODE_ENV=development webpack --watch --config ./webpack.dev.js",
     "build-prod": "NODE_ENV=buildprod webpack --config ./webpack.prod.js",
     "start-prod": "NODE_ENV=production webpack --watch --config ./webpack.prod.js",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "transpile": "babel src/lib -d dist --copy-files"
   },
   "keywords": [],
   "author": "Vinit Naik",
@@ -26,12 +27,16 @@
     ]
   },
   "dependencies": {
+    "formik": "^1.5.2",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
+    "react-bootstrap-typeahead": "^3.4.6",
+    "react-dates": "^21.8.0",
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
-    "redux-thunk": "^2.2.0"
+    "redux-thunk": "^2.2.0",
+    "yup": "^0.28.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
