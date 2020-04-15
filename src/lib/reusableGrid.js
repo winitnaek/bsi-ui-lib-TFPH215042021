@@ -1,13 +1,10 @@
 import React, { Fragment } from "react";
 import { copyToClipboard } from "./utils/copyToClipboard";
 import ClipboardToast from "./clipboardToast";
-import { Modal, ModalHeader } from "reactstrap";
-import {Col,Row,UncontrolledTooltip,Button,ModalBody,ModalFooter} from "reactstrap";
+import {Col, Row, UncontrolledTooltip} from "reactstrap";
+import ReusableModal from "./reusableModal";
 import DynamicForm from "./dynamicForm";
 import Grid from "../../src/deps/jqwidgets-react/react_jqxgrid";
-const customFormulasChild = "customFormulasChild";
-
-let GridFunctions;
 
 class ReusableGrid extends React.Component {
   constructor(props) {
@@ -257,30 +254,13 @@ class ReusableGrid extends React.Component {
         });
       }
     }
-
-    if (this.state.parentConfig) {
-    }
-    const { noResultsFoundTxt } = this.state;
-    const { griddata } = this.props;
-    const { isOpen } = this.props;
-    const { title, cruddef, isfilterform, pgid } = this.state;
+    const { griddata} = this.props;
+    const { title, cruddef, isfilterform, pgid, subtitle, noResultsFoundTxt, isOpen } = this.state;
     const { deleteRow, handleChange, renderMe, handleSubmit } = this;
     let filter;
-    if (isfilterform) {
-      filter = true;
-    }
+    if (isfilterform) filter = true;
     const close = this.toggle;
-
-    const formProps = {
-      close,
-      handleChange,
-      pgid,
-      permissions,
-      deleteRow,
-      handleSubmit,
-      renderMe,
-      filter
-    };
+    const formProps = {close,handleChange,pgid,permissions,deleteRow,handleSubmit,renderMe,filter};
 
     module.exports = this.editClick;
     window.editClick = this.editClick;
@@ -472,25 +452,24 @@ class ReusableGrid extends React.Component {
             <span> Copy to clipboard </span>
           </UncontrolledTooltip>
         </Row>
-        <Modal isOpen={this.state.isOpen} size="lg" style={styles.modal}>
-          <ModalHeader toggle={e => this.toggle()}>
-            <span> {this.props.title} </span>
-          </ModalHeader>
-          <p style={styles.subTitle}>
-            {" "}
-            {this.props.subtitle && this.props.cruddef.subtitle}{" "}
-          </p>
-          <DynamicForm 
-            formData={formData} //--
-            formProps={formProps} //--
-            fieldData={fieldData} // --
-            tftools={tftools}  // --
-            formMetaData={formMetaData} //--
-            recentUsage={recentUsage} // --
-            autoComplete={autoComplete} // --
-            saveGridData={saveGridData} //--
-          />
-        </Modal>
+        <ReusableModal
+          open={isOpen}
+          close={this.toggle}
+          title={title}
+          cruddef={cruddef}
+          styles={styles}
+         >
+            <DynamicForm 
+              formData={formData}
+              formProps={formProps}
+              fieldData={fieldData}
+              tftools={tftools}
+              formMetaData={formMetaData}
+              recentUsage={recentUsage}
+              autoComplete={autoComplete}
+              saveGridData={saveGridData}
+            />
+        </ReusableModal>
       </Fragment>
     );
   }
