@@ -68,17 +68,22 @@ class ReusableGrid extends React.Component {
       dispathAction(dispatch, setFormData, setIsOpen);
     };
 
-    this.handleChildGrid = pgid => {
-      const {tftools} = this.props;
-      const pgData = tftools.filter(item => {
-        if (item.id === pgid) {
-          return item;
-        }
-      });
-      // This below will need to be refactored to not call back to tf_index
-      //renderTFApplication
-      this.props.gridProps.renderGrid("pageContainer", pgData[0]);
-    };
+    this.handleChildGrid = index => {
+    const {childConfig} = this.state
+     let _id = document.querySelector("div[role='grid']").id;
+     let dataRecord = $("#" + _id).jqxGrid("getrowdata", index);
+     const data = { formData: dataRecord, mode: "", index };
+     const { dispatch, setFormData } = this.props.gridProps;
+     dispatch(setFormData(data));
+     const {tftools} = this.props;
+     const pgData = tftools.filter(item => {
+       if (item.id === childConfig) {
+         return item;
+       }
+     });
+     this.props.gridProps.renderGrid("pageContainer", pgData[0]);
+   };
+
 
     this.handleFilter = e => {
       e.preventDefault();
@@ -195,22 +200,15 @@ class ReusableGrid extends React.Component {
     );
   }
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   console.log(nextProps, this.props)
-  // }
   render() {
     const editCellsRenderer = ndex => {
-      const { childConfig } = this.state.pgid;
-      // this will render child grid else the form will render in a modal
       if (this.state.pgdef.childConfig) {
-        const { childConfig } = this.state.pgdef;
-        return ` <div id='edit-${ndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={handleChildGrid(${JSON.stringify(
-          childConfig
-        )})}> <i class="fas fa-search  fa-1x" color="primary"/> </div>`;
+        return ` <div id='edit-${ndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={handleChildGrid(${ndex})}> <i class="fas fa-search  fa-1x" color="primary"/> </div>`;
       } else {
         return ` <div id='edit-${ndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${ndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
       }
     };
+
 
     let dataAdapter = new $.jqx.dataAdapter(this.state.source);
     let text;
