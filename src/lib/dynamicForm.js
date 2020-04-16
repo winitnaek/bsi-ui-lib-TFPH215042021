@@ -78,6 +78,7 @@ class DynamicForm extends Component {
       };
       const Component = fieldMap[item.fieldtype];
       let error = props.errors.hasOwnProperty(item.id) && props.errors[item.id];
+      let touched = props.touched.hasOwnProperty(item.id) && props.touched[item.id];
       if (item.fieldtype) {
             return (
               <Component
@@ -94,6 +95,7 @@ class DynamicForm extends Component {
                 autoComplete={autoComplete}
                 onChange={item.fieldinfo.typeahead ? props.setFieldValue : props.handleChange}
                 error={error}
+                touched={touched}
                 isReset={this.state.isReset}
               />
             );

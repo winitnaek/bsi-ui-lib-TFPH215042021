@@ -19,7 +19,7 @@ class CustomCheckbox extends Component {
   };
 
   render() {
-    const renderError = this.props.error ? (
+    const renderError = this.props.error && this.props.touched ? (
       <div style={{color:'red', fontSize:12}}>{this.props.error}</div>
     ) : null;
     return (

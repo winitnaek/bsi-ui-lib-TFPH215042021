@@ -3,7 +3,7 @@ import {Input, FormFeedback, Col, FormGroup, Label} from "reactstrap";
 
 class CustomInput extends Component {
   render() {
-    const renderError = this.props.error ? (
+    const renderError = this.props.error && this.props.touched ? (
       <FormFeedback>{this.props.error}</FormFeedback>
     ) : null;
     return (
@@ -18,7 +18,7 @@ class CustomInput extends Component {
             placeholder={this.props.placeholder}
             value={this.props.value}
             onChange={this.props.onChange}
-            invalid={this.props.error}
+            invalid={this.props.error && this.props.touched}
             disabled={this.props.disabled}
           />
           {renderError}

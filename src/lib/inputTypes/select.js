@@ -41,7 +41,7 @@ class CustomSelect extends Component {
   
   render() {
     let defaultSet = false;
-    const renderError = this.props.error ? (
+    const renderError = this.props.error && this.props.touched ? (
       <div style={{color:'red', fontSize:12, paddingTop:4}}>{this.props.error}</div>
     ) : null;
     
@@ -72,7 +72,7 @@ class CustomSelect extends Component {
               disabled={this.props.disabled}
               onSearch={this.onSearchHandler}
               multiple={this.props.fieldinfo.multiselect}
-              error={this.props.error}
+              error={this.props.error && this.props.touched}
               options={this.state.options}
           />
           ):(
@@ -83,7 +83,7 @@ class CustomSelect extends Component {
                 value={this.props.value}
                 disabled={this.props.disabled}
                 onChange={this.props.onChange}
-                invalid={this.props.error}
+                invalid={this.props.error && this.props.touched}
               >
                 {!defaultSet && (
                 <option value="" disabled>
