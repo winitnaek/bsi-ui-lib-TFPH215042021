@@ -18,6 +18,7 @@ class CustomInput extends Component {
             placeholder={this.props.placeholder}
             value={this.props.value}
             onChange={this.props.onChange}
+            onBlur={this.props.onBlur}
             invalid={this.props.error && this.props.touched}
             disabled={this.props.disabled}
           />

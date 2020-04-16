@@ -94,6 +94,7 @@ class DynamicForm extends Component {
                 required={item.validation.required}
                 autoComplete={autoComplete}
                 onChange={item.fieldinfo.typeahead ? props.setFieldValue : props.handleChange}
+                onBlur={props.handleBlur}
                 error={error}
                 touched={touched}
                 isReset={this.state.isReset}
@@ -115,6 +116,7 @@ class DynamicForm extends Component {
           <Formik
             initialValues={initialValues}
             validationSchema={validateSchema}
+            validateOnChange={true}
             onSubmit={(values, actions) => {
               try {
                     let rowid = null;
