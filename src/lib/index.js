@@ -14,3 +14,4 @@ export {default as copyToClipboard} from './utils/copyToClipboard';
 export {default as createYupSchema} from './utils/createYupSchema';
 export {default as updateGrid} from './utils/updateGrid';
 export {default as generateUrl} from './utils/generateUrl';
+export {default as getAdminErrorMessage} from './utils/appErrorEvent';
