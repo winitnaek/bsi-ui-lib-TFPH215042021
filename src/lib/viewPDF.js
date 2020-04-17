@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { Component } from "react";;
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import { PDF_ANCHOR_ID } from '../../base/constants/AppConstants';
-class ViewPDF extends React.Component {
+
+class ViewPDF extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -15,18 +15,17 @@ class ViewPDF extends React.Component {
     this.props.handleHidePDF();
   }
   render() {
+    const {pdfId, view, className, title} = this.props;
     return (
-      <div>
-        <Modal size="lg"  style={{ 'max-width': window.innerWidth-200}} isOpen={this.props.view} toggle={this.toggle} backdrop="static" className={this.props.className}>
-          <ModalHeader toggle={this.toggle}>{this.state.title}</ModalHeader>
+        <Modal size="lg"  style={{ 'max-width': window.innerWidth-200}} isOpen={view} toggle={this.toggle} backdrop="static" className={className}>
+          <ModalHeader toggle={this.toggle}>{title}</ModalHeader>
           <ModalBody>
-            <iframe id={PDF_ANCHOR_ID} width="100%" height={window.innerHeight-200} allowfullscreen webkitallowfullscreen ></iframe>
+            <iframe id={pdfId} width="100%" height={window.innerHeight-200} allowfullscreen webkitallowfullscreen ></iframe>
           </ModalBody>
           <ModalFooter>
             <Button color="secondary" onClick={this.toggle}>Close</Button>
           </ModalFooter>
         </Modal>
-      </div>
     );
   }
 }
