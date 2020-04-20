@@ -10,8 +10,6 @@ class ReusableGrid extends React.Component {
   constructor(props) {
     super(props);
     let metadata = this.props.metadata(this.props.pageid);
-    let permissions = this.props.permissions(this.props.pid);
-    //let gridDataUrl = this.props.dataurl(this.props.pageid);
     let data = this.props.griddata;
     let source = {
       datatype: "json",
@@ -50,11 +48,9 @@ class ReusableGrid extends React.Component {
     };
 
     this.editClick = (index, pgid) => {
-      // this.setState({ isOpen: true });
       let _id = document.querySelector("div[role='grid']").id;
       let dataRecord = $("#" + _id).jqxGrid("getrowdata", index);
       const data = { formData: dataRecord, mode: "Edit", index: index };
-      // store.dispatch(setFormData(data));
 
       const setIsOpen = () => {
         this.setState({ isOpen: true  });
@@ -94,11 +90,6 @@ class ReusableGrid extends React.Component {
         : this.handleNewForm(e).bind(this);
     };
 
-    // this.handleNewForm = e => {
-    //   e.preventDefault();
-    //   const payload = { data:{} , mode: "New" };
-    //   this.props.setFormData(payload)
-    // }
 
     this.handleNewForm = e => {
       e.preventDefault();
