@@ -80,6 +80,12 @@ class ReusableGrid extends React.Component {
      this.props.gridProps.renderGrid("pageContainer", pgData[0]);
    };
 
+    this.handleNewForm = e => {
+      e.preventDefault();
+      const payload = { data: {}, mode: "New" };
+      this.props.gridProps.dispatch(this.props.gridProps.setFormData(payload));
+      this.setState({ isOpen: true });
+    };
 
     this.handleFilter = e => {
       e.preventDefault();
@@ -87,16 +93,9 @@ class ReusableGrid extends React.Component {
       const { parentConfig } = this.state;
       parentConfig
         ? this.handleChildGrid(parentConfig.pgdef.pgid)
-        : this.handleNewForm(e).bind(this);
+        : this.handleNewForm(e)    //.bind(this);
     };
 
-
-    this.handleNewForm = e => {
-      e.preventDefault();
-      const payload = { data: {}, mode: "New" };
-      this.props.gridProps.dispatch(this.props.gridProps.setFormData(payload));
-      this.setState({ isOpen: true });
-    };
 
     this.handleSubmit = (pgid, payload, mode, rowid) => {
       const {saveGridData} = this.props;
@@ -105,7 +104,6 @@ class ReusableGrid extends React.Component {
     };
 
     this.handleFilterFormView = (pgid, payload) => {
-      console.log("You made it back to the reusable grid");
       // this.props.closeForm()
       // this.props.setFilterFormData(payload);
       // this.renderMe(pgid)
@@ -130,13 +128,14 @@ class ReusableGrid extends React.Component {
       deleteGridData.deleteGridData(pgid, rowid);
     };
 
-    this.renderMe = pgid => {
+    this.renderMe = (pgid, values, filter) => {
+      filter && this.props.setFilterFormData(values)
       const {tftools} = this.props;
       let data = tftools.filter(tftool => {
         if (tftool.id == pgid) return tftool;
       });
       renderTFApplication("pageContainer", data[0]);
-      this.props.close();
+      // this.props.close();
     };
 
     this.selectAll = event => {
@@ -200,7 +199,6 @@ class ReusableGrid extends React.Component {
       }
     };
 
-
     let dataAdapter = new $.jqx.dataAdapter(this.state.source);
     let text;
     this.state.pgdef.childConfig ? (text = "View") : (text = "Edit");
@@ -256,7 +254,7 @@ class ReusableGrid extends React.Component {
 
     module.exports = this.handleChildGrid;
     window.handleChildGrid = this.handleChildGrid;
-    const {styles, tftools, metadata, saveGridData, deleteGridData, formData, fieldData,formMetaData, recentUsage, autoComplete} = this.props;
+    const {styles, tftools, saveGridData, formData, fieldData,formMetaData, recentUsage, autoComplete} = this.props;
     return (
       <Fragment>
         <Row>

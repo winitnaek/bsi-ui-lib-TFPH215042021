@@ -19,11 +19,8 @@ class DynamicForm extends Component {
       isReset: false,
     };
     this.handleView = () => {
-      //need to get values to pass
       const { formProps } = this.props;
       const { pgid } = formProps;
-
-      // this.props.setFilterFormData(values);
       let data = this.props.tftools.filter(tftool => {
         if (tftool.id == pgid) return tftool;
       });
@@ -107,7 +104,7 @@ class DynamicForm extends Component {
 
   render() {
     const { formProps, tftools, recentUsage, fieldData, formMetaData, autoComplete, saveGridData } = this.props;
-    const { close, change, permissions, deleteRow, pgid, filter} = formProps;
+    const { close, deleteRow, pgid, filter} = formProps;
     const fieldInfo = fieldData[pgid];
     let initialValues = {};
 
@@ -128,7 +125,7 @@ class DynamicForm extends Component {
                       updateGrid(values, rowid, mode);
                       saveGridData.saveGridData(pgid, values, mode);
                     }else{
-                        this.props.formProps.renderMe(pgid, values);
+                      formProps.renderMe(pgid, values, filter);
                     }
                     close();
                     actions.resetForm({});
@@ -158,7 +155,7 @@ class DynamicForm extends Component {
                     {formMetaData[pgid].formdef.hasRecentUsage && (
                     <Usage pgid={pgid} tftools={tftools} close={close} recentUsage={recentUsage} />
                     )}
-                  </ModalBody>
+                  </ModalBody> 
                   <ModalFooter>
                     <Button color="primary" className="btn btn-primary" onClick={close}> Cancel </Button>
                     <Button onClick={ e=> this.handleReset() }color="secondary" className="btn btn-primary mr-auto" type="reset"> Reset </Button>
@@ -175,7 +172,6 @@ class DynamicForm extends Component {
     };
 
     this.handleDelete = () => {
-      console.log("deleting record");
       const { rowIndex } = this.props.formData.index;
       deleteRow(rowIndex);
       close();
