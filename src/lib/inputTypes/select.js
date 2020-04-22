@@ -15,8 +15,13 @@ class CustomSelect extends Component {
   }
 
   handleChange(selectedOptions) {
-    const values = (selectedOptions.length > 0) ? selectedOptions : '';
-    this.props.onChange(this.props.id, values);
+    if(selectedOptions.length > 0) {
+      if(selectedOptions.length == 1)
+        selectedOptions = selectedOptions[0].toString();
+    }else{
+      selectedOptions = "";
+    }
+    this.props.onChange(this.props.id, selectedOptions);
   }
   
   componentDidMount(){
