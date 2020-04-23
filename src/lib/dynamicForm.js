@@ -19,12 +19,12 @@ class DynamicForm extends Component {
       isReset: false,
     };
     this.handleView = () => {
-      const { formProps } = this.props;
+      const { formProps, renderGrid } = this.props;
       const { pgid } = formProps;
       let data = this.props.tftools.filter(tftool => {
         if (tftool.id == pgid) return tftool;
       });
-      renderTFApplication("pageContainer", data[0]);
+      renderGrid(data[0])
     };
 
     this.handleReset = () => {
@@ -32,7 +32,6 @@ class DynamicForm extends Component {
         isReset: true
       })
     }
-
   }
 
   disabledHandler(id) {
