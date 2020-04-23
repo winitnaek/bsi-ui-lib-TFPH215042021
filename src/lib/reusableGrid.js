@@ -53,9 +53,9 @@ class ReusableGrid extends React.Component {
       const data = { formData: dataRecord, mode: "Edit", index: index };
       const setIsOpen = () => {
         this.setState({ isOpen: true  });
-      }
-      async function dispatchAction(dispatch, setFormData, setIsOpen) {
-        dispatch(setFormData(data));
+      }   
+      async function dispatchAction(setFormData, setIsOpen) {
+        setFormData(data);
         await setIsOpen()
       }
       const { setFormData } = this.props;
