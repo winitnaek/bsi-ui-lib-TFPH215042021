@@ -6,6 +6,9 @@ class CustomRadio extends Component {
     const renderError = this.props.error && this.props.touched ? (
       <div style={{color:'red', fontSize:12}}>{this.props.error}</div>
     ) : null;
+    const renderDescription = this.props.description ? (
+      <div style={{color:'#33b5e5', fontSize:15, paddingTop:4}}>{this.props.description}</div>
+    ) : null;
     return (
       <Col>
           <FormGroup tag="fieldset">
@@ -28,7 +31,7 @@ class CustomRadio extends Component {
                             </Col>
                     );
                   })}   
-                  {renderError}     
+                  {renderError?renderError:renderDescription}     
           </FormGroup>
       </Col>
     );

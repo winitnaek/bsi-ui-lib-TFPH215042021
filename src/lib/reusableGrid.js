@@ -68,9 +68,8 @@ class ReusableGrid extends React.Component {
       const { childConfig } = this.state;
       let _id = document.querySelector("div[role='grid']").id;
       let dataRecord = $("#" + _id).jqxGrid("getrowdata", index);
-      const data = { formData: dataRecord, mode: "", index };
       const { setFilterFormData, tftools, renderGrid } = this.props;
-      setFilterFormData(data);
+      setFilterFormData(dataRecord);
       const pgData = tftools.filter((item) => {
         if (item.id === childConfig) {
           return item;

@@ -85,6 +85,7 @@ class DynamicForm extends Component {
                 name={item.id}
                 id={item.id}
                 placeholder={item.placeholder}
+                description={item.description}
                 disabled={this.disabledHandler(item.id)}
                 value={props.values[item.id]}
                 required={item.validation.required}

@@ -1,10 +1,13 @@
 import React, { Component } from "react";
-import {Input, FormFeedback, Col, FormGroup, Label} from "reactstrap";
+import {Input, FormFeedback, Col, FormGroup, Label, UncontrolledTooltip} from "reactstrap";
 
 class CustomInput extends Component {
   render() {
     const renderError = this.props.error && this.props.touched ? (
       <FormFeedback>{this.props.error}</FormFeedback>
+    ) : null;
+    const renderDescription = this.props.description ? (
+      <div style={{color:'#33b5e5', fontSize:15, paddingTop:4}}>{this.props.description}</div>
     ) : null;
     return (
       <FormGroup>
@@ -22,7 +25,7 @@ class CustomInput extends Component {
             invalid={this.props.error && this.props.touched}
             disabled={this.props.disabled}
           />
-          {renderError}
+          {renderError?renderError:renderDescription}
         </Col>
       </FormGroup>
     );
