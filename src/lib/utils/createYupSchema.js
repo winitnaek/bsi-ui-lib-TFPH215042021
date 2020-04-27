@@ -31,6 +31,12 @@ export function createYupSchema(schema, config) {
       validator = validator[type](...subtypeParams);
     });
   } 
+  if(validation.dependent && validation.type == "date"){
+    validation.dependent.forEach(valdt => {
+      const {message, inputField} = valdt;
+      validator = validator.when(inputField, (field, schema) => field && schema.min(field, message));
+    });
+  } 
   schema[id] = validator;
   return schema;
 }
