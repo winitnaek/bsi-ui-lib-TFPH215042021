@@ -16,6 +16,13 @@ class CustomCheckbox extends Component {
         valueArray.splice(valueArray.indexOf(target.id), 1);
     }
     this.props.onChange(this.props.id, valueArray);
+    if(valueArray.length){
+      if(this.props.fieldsToDisable)
+        this.props.onDisableField(this.props.fieldsToDisable);
+    }
+    else{ 
+      this.props.onDisableField([]);
+    }
   };
 
   render() {

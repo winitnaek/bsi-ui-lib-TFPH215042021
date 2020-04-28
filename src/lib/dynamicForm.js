@@ -17,6 +17,7 @@ class DynamicForm extends Component {
     this.state = {
       showDelete: false,
       isReset: false,
+      disabledFields:[]
     };
     this.handleView = () => {
       const { formProps, renderGrid } = this.props;
@@ -32,14 +33,25 @@ class DynamicForm extends Component {
         isReset: true
       })
     }
+
+    this.onDisableField = fields => {
+      this.setState({
+        disabledFields: fields
+      });
+    }
   }
 
+  
+
   disabledHandler(id) {
+    const {disabledFields} = this.state;
     const {formMetaData, formProps} = this.props;
     try {
+      let row = disabledFields.filter(r => id == r);
+      if(row.length > 0) return true;
       let formflds = formMetaData[formProps.pgid].formdef.formflds;
       if (formflds) {
-        let row = formflds.filter(r => id == r.id);
+        row = formflds.filter(r => id == r.id);
         if (row.length > 0) {
           if (row[0].isReadOnlyOnEdit == true && this.props.formData.mode == "Edit") {
             return true;
@@ -87,6 +99,8 @@ class DynamicForm extends Component {
                 placeholder={item.placeholder}
                 description={item.description}
                 disabled={this.disabledHandler(item.id)}
+                onDisableField={this.onDisableField}
+                fieldsToDisable={item.disable}
                 value={props.values[item.id]}
                 required={item.validation.required}
                 autoComplete={autoComplete}
@@ -103,9 +117,16 @@ class DynamicForm extends Component {
   }
 
   render() {
+    const {disabledFields} = this.state;
     const { formProps, tftools, recentUsage, fieldData, formMetaData, autoComplete, saveGridData } = this.props;
     const { close, deleteRow, pgid, filter} = formProps;
     const fieldInfo = fieldData[pgid];
+    if(disabledFields){
+      for(let i = 0; i < disabledFields.length; i++){
+        fieldInfo.filter(r => disabledFields[i] == r.id)[0].validation.required= false;
+      }
+    }
+
     let initialValues = {};
 
     this.displayForm = () => {
