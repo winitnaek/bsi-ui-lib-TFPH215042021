@@ -117,15 +117,9 @@ class DynamicForm extends Component {
   }
 
   render() {
-    const {disabledFields} = this.state;
     const { formProps, tftools, recentUsage, fieldData, formMetaData, autoComplete, saveGridData } = this.props;
     const { close, deleteRow, pgid, filter} = formProps;
     const fieldInfo = fieldData[pgid];
-    if(disabledFields){
-      for(let i = 0; i < disabledFields.length; i++){
-        fieldInfo.filter(r => disabledFields[i] == r.id)[0].validation.required= false;
-      }
-    }
 
     let initialValues = {};
 

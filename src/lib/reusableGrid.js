@@ -362,8 +362,22 @@ class ReusableGrid extends React.Component {
           )}
         </Row>
         <Row>
-          {" "}
-          <p> {this.state.subtitle} </p>{" "}
+          <p>
+            {this.state.source.localdata && this.state.subtitle}
+            {this.state.source.localdata &&
+              this.props.formFilterData &&
+              this.props.formFilterData.taxCode}
+            {this.state.source.localdata &&
+              this.props.formFilterData &&
+              this.props.formFilterData.companyName}
+          </p>
+        </Row>
+        <Row>
+          <p>
+            {!griddata[0] && noResultsFoundTxt}
+            {this.props.formFilterData && this.props.formFilterData.taxCode}
+            {this.props.formFilterData && this.props.formFilterData.companyName}
+          </p>
         </Row>
         <Row>
           <p> {!griddata[0] && noResultsFoundTxt}</p>
