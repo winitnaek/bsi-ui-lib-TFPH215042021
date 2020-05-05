@@ -15,9 +15,11 @@ class CustomSelect extends Component {
   }
 
   handleChange(selectedOptions) {
+    console.log('selectedOptions');
+    console.log(selectedOptions);
     if(selectedOptions.length > 0) {
       if(selectedOptions.length == 1)
-        selectedOptions = selectedOptions[0].toString();
+        selectedOptions = selectedOptions[0].id;
     }else{
       selectedOptions = "";
     }
@@ -70,7 +72,7 @@ class CustomSelect extends Component {
             <AsyncTypeahead
               id={this.props.id}
               isLoading={this.state.isLoading}
-              labelKey={option => `${option}`}
+              labelKey={option => `${option.label}`}
               defaultInputValue= {this.props.value || ''}
               ref={(typeahead) => this.typeahead = typeahead}
               placeholder={this.props.placeholder}
