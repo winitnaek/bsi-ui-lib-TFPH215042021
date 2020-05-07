@@ -54,11 +54,11 @@ class ReusableGrid extends React.Component {
       const data = { formData: dataRecord, mode: "Edit", index: index };
       console.log(data);
       const setIsOpen = () => {
-        this.setState({ isOpen: true  });
-      }   
+        this.setState({ isOpen: true });
+      };
       async function dispatchAction(setFormData, setIsOpen) {
         setFormData(data);
-        await setIsOpen()
+        await setIsOpen();
       }
       const { setFormData } = this.props;
       dispatchAction(setFormData, setIsOpen);
@@ -102,7 +102,11 @@ class ReusableGrid extends React.Component {
     this.handleFilterForm = (e) => {
       console.log(this.props.formFilterData);
       const { formFilterData } = this.props;
-      const payload= { formData: this.props.formFilterData, mode: "Edit", index: null};
+      const payload = {
+        formData: this.props.formFilterData,
+        mode: "Edit",
+        index: null,
+      };
       const { setFormData } = this.props;
       const setIsOpen = () => {
         this.setState({ isOpen: true });
@@ -231,6 +235,10 @@ class ReusableGrid extends React.Component {
       }
     };
 
+    console.log(this.state.subtitle);
+
+    console.log(this.state.source.localdata);
+
     let dataAdapter = new $.jqx.dataAdapter(this.state.source);
     let text;
     this.state.pgdef.childConfig ? (text = "View") : (text = "Edit");
@@ -314,6 +322,14 @@ class ReusableGrid extends React.Component {
       renderGrid,
       griddata,
     } = this.props;
+    
+    let formatedFilterData = "";
+
+    if(this.props.formFilterData.taxCode) {
+      formatedFilterData = <span style={{fontWeight:"bold"}}>{this.props.formFilterData.taxCode} ( {this.props.formFilterData.name} )</span>
+    } else if(this.props.formFilterData.company) {
+      formatedFilterData = <span style={{fontWeight:"bold"}}>{this.props.formFilterData.company} ( {this.props.formFilterData.companyName} )</span>
+    }
 
     return (
       <Fragment>
@@ -361,27 +377,35 @@ class ReusableGrid extends React.Component {
             </span>
           )}
         </Row>
+        {this.state.griddef.gridtype == "type2" && griddata[0] &&  this.state.pgdef.parentConfig ? (
+          <Row>
+            <p>
+              {this.state.source.localdata && this.state.subtitle}
+              {this.state.source.localdata && formatedFilterData}
+            </p>
+          </Row>
+        ) : null}
+        {this.state.griddef.gridtype == "type2" && griddata[0] && this.state.pgdef.childConfig ? (
+          <Row>
+            <p>
+              {this.state.source.localdata && this.state.subtitle}
+            </p>
+          </Row>
+        ) : null}
+        {!griddata[0] && this.props.formFilterData && this.props.formFilterData.companyName ?( 
         <Row>
           <p>
-            {this.state.source.localdata && this.state.subtitle}
-            {this.state.source.localdata &&
-              this.props.formFilterData &&
-              this.props.formFilterData.taxCode}
-            {this.state.source.localdata &&
-              this.props.formFilterData &&
-              this.props.formFilterData.companyName}
+          {noResultsFoundTxt}<span style={{fontWeight:"bold"}}>{this.props.formFilterData.company} ( {this.props.formFilterData.companyName} )</span>
           </p>
         </Row>
+        ) : null}
+        {!griddata[0] && this.props.formFilterData && this.props.formFilterData.taxCode ?( 
         <Row>
           <p>
-            {!griddata[0] && noResultsFoundTxt}
-            {this.props.formFilterData && this.props.formFilterData.taxCode}
-            {this.props.formFilterData && this.props.formFilterData.companyName}
+          {noResultsFoundTxt}<span style={{fontWeight:"bold"}}>{this.props.formFilterData.taxCode} ( {this.props.formFilterData.name} )</span>
           </p>
         </Row>
-        <Row>
-          <p> {!griddata[0] && noResultsFoundTxt}</p>
-        </Row>
+        ) : null}
         <Row style={styles.rowTop}>
           <Col sm="2" style={styles.iconPaddingLeft}>
             {this.state.allSelected && (
@@ -538,5 +562,4 @@ class ReusableGrid extends React.Component {
     );
   }
 }
-
 export default ReusableGrid;
