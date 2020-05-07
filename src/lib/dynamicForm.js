@@ -6,6 +6,7 @@ import Input from "./inputTypes/input";
 import Select from "./inputTypes/select";
 import Radio from "./inputTypes/radio";
 import Checkbox from "./inputTypes/checkbox";
+import Date from "./inputTypes/date";
 import Usage from "./usage";
 import { Container, ModalBody, ModalFooter } from "reactstrap";
 import { createYupSchema } from "./utils/createYupSchema";
@@ -79,10 +80,10 @@ class DynamicForm extends Component {
     return fieldInfo.map((item, index) => {
       const fieldMap = { 
         text:Input,
-        date:Input,
+        date:Date,
         select:Select,
         checkbox:Checkbox,
-        radio:Radio
+        radio:Radio,
       };
       const Component = fieldMap[item.fieldtype];
       let error = props.errors.hasOwnProperty(item.id) && props.errors[item.id];

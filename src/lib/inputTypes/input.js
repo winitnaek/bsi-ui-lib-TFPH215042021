@@ -1,32 +1,34 @@
 import React, { Component } from "react";
-import {Input, FormFeedback, Col, FormGroup, Label, UncontrolledTooltip} from "reactstrap";
+import {Input, Col, FormGroup} from "reactstrap";
+import {FieldLabel, FieldMessage} from "../field";
 
 class CustomInput extends Component {
   render() {
-    const renderError = this.props.error && this.props.touched ? (
-      <FormFeedback>{this.props.error}</FormFeedback>
-    ) : null;
-    const renderDescription = this.props.description ? (
-      <div style={{color:'#33b5e5', fontSize:15, paddingTop:4}}>{this.props.description}</div>
-    ) : null;
+    const {name,error,touched,description,required,label,
+           disabled,placeholder,value,onChange,onBlur} = this.props;
     return (
       <FormGroup>
-        <Col>
-          <Label>{this.props.label}
-              {this.props.required && !this.props.disabled && <Label style={{color:'red', fontSize: 20}}>{" *"}</Label> }
-          </Label>
-          <Input
-            type={this.props.type}
-            name={this.props.name}
-            placeholder={this.props.placeholder}
-            value={this.props.value}
-            onChange={this.props.onChange}
-            onBlur={this.props.onBlur}
-            invalid={this.props.error && this.props.touched}
-            disabled={this.props.disabled}
-          />
-          {renderError?renderError:renderDescription}
-        </Col>
+          <Col>
+                <FieldLabel 
+                    label={label}
+                    required={required} 
+                />
+                <Input
+                    type={"input"}
+                    name={name}
+                    placeholder={placeholder}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    invalid={error && touched}
+                    disabled={disabled}
+                />
+                <FieldMessage 
+                    error={error} 
+                    touched={touched} 
+                    description={description} 
+                />
+          </Col>
       </FormGroup>
     );
   }

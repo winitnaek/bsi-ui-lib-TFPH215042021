@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import {Input, Col, FormGroup, Label} from "reactstrap";
+import {FieldLabel, FieldMessage} from "../field";
 
 class CustomCheckbox extends Component {
   constructor(props) {
@@ -26,35 +27,36 @@ class CustomCheckbox extends Component {
   };
 
   render() {
-    const renderError = this.props.error && this.props.touched ? (
-      <div style={{color:'red', fontSize:12}}>{this.props.error}</div>
-    ) : null;
-    const renderDescription = this.props.description ? (
-      <div style={{color:'#33b5e5', fontSize:15, paddingTop:4}}>{this.props.description}</div>
-    ) : null;
+    const {error,id,description,required,
+           label,fieldinfo,touched} = this.props;
     return (
       <Col>
           <FormGroup>
-            <Label>{this.props.label}
-                {this.props.required && <Label style={{color:'red', fontSize: 20}}>{" *"}</Label> }
-            </Label>
-            {this.props.fieldinfo.options.map(opt => {
-                    return (
-                            <Col>
-                                <Label check>
-                                    <Input
-                                        type="checkbox"
-                                        name={this.props.id}
-                                        id={opt.id}
-                                        value={opt.id}
-                                        onChange={this.handleChange}
-                                    />{' '}
-                                    {opt.label}
-                                </Label>
-                            </Col>
-                    );
-                  })}
-                   {renderError?renderError:renderDescription}
+              <FieldLabel 
+                    label={label}
+                    required={required} 
+              />
+              {fieldinfo.options.map(opt => {
+                  return (
+                          <Col>
+                              <Label check>
+                                  <Input
+                                      type="checkbox"
+                                      name={id}
+                                      id={opt.id}
+                                      value={opt.id}
+                                      onChange={this.handleChange}
+                                  />{' '}
+                                  {opt.label}
+                              </Label>
+                          </Col>
+                  );
+                })}
+                <FieldMessage 
+                    error={error} 
+                    touched={touched} 
+                    description={description} 
+                />
           </FormGroup>
       </Col>
     );

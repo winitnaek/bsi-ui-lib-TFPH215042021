@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import {Input, FormFeedback, Col, FormGroup, Label} from "reactstrap";
+import {Input, Col, FormGroup, Label} from "reactstrap";
 import {AsyncTypeahead} from "react-bootstrap-typeahead";
+import {FieldLabel, FieldMessage} from "../field";
 
 class CustomSelect extends Component {
   constructor(props) {
@@ -15,13 +16,14 @@ class CustomSelect extends Component {
   }
 
   handleChange(selectedOptions) {
+    const {onChange, id} = this.props;
     if(selectedOptions.length > 0) {
       if(selectedOptions.length == 1)
         selectedOptions = selectedOptions[0].toString();
     }else{
       selectedOptions = "";
     }
-    this.props.onChange(this.props.id, selectedOptions);
+    onChange(id, selectedOptions);
   }
   
   componentDidMount(){
@@ -29,10 +31,10 @@ class CustomSelect extends Component {
   }
 
   onSearchHandler(query){
-    const {autoComplete} = this.props;
-    if(this.props.fieldinfo.isasync){
+    const {autoComplete, fieldinfo, id} = this.props;
+    if(fieldinfo.isasync){
       this.setState({isLoading: true});
-      autoComplete.getAutoCompleteData(this.props.id, query)
+      autoComplete.getAutoCompleteData(id, query)
       .then((options) => {
         this.setState({
           isLoading: false,
@@ -40,74 +42,73 @@ class CustomSelect extends Component {
         });
       });
     }else {
-        this.setState({options: this.props.fieldinfo.options})
+        this.setState({options: fieldinfo.options})
     }
   }
   
-  render() {
-    let defaultSet = false;
-    const renderError = this.props.error && this.props.touched ? (
-      <div style={{color:'red', fontSize:15, paddingTop:4}}>{this.props.error}</div>
-    ) : null;
-    const renderDescription = this.props.description ? (
-      <div style={{color:'#33b5e5', fontSize:15, paddingTop:4}}>{this.props.description}</div>
-    ) : null;
-    
-    if (this.props.isReset) {
-      if(this.state.defaultSelected)
-        this.typeahead && this.typeahead.getInstance()._updateSelected([this.state.defaultSelected]);
+  render() {   
+    const {defaultSelected, isLoading, options} = this.state;
+    const {name,error,touched,description,required,label,value,
+           fieldinfo,disabled,placeholder,onChange,isReset} = this.props;
+    if (isReset) {
+      if(defaultSelected)
+        this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
       else
         this.typeahead && this.typeahead.getInstance().clear(); 
     }
-
     return (
       <FormGroup>
         <Col>
-          <Label>{this.props.label}
-              {this.props.required && <Label style={{color:'red', fontSize: 20}}>{" *"}</Label> }
-          </Label>
-          {(this.props.fieldinfo.typeahead) ? (
-            <AsyncTypeahead
-              id={this.props.id}
-              isLoading={this.state.isLoading}
-              labelKey={option => `${option}`}
-              defaultInputValue= {this.props.value || ''}
-              ref={(typeahead) => this.typeahead = typeahead}
-              placeholder={this.props.placeholder}
-              onChange={this.handleChange}
-              onInputChange={this.handleInputChange}
-              value={this.props.value}
-              disabled={this.props.disabled}
-              onSearch={this.onSearchHandler}
-              multiple={this.props.fieldinfo.multiselect}
-              error={this.props.error && this.props.touched}
-              options={this.state.options}
-          />
+            <FieldLabel 
+                label={label}
+                required={required} 
+            />
+            {(fieldinfo.typeahead) ? (
+              <AsyncTypeahead
+                id={id}
+                isLoading={isLoading}
+                labelKey={option => `${option}`}
+                defaultInputValue= {value || ''}
+                ref={(typeahead) => this.typeahead = typeahead}
+                placeholder={placeholder}
+                onChange={this.handleChange}
+                onInputChange={this.handleInputChange}
+                value={value}
+                disabled={disabled}
+                onSearch={this.onSearchHandler}
+                multiple={fieldinfo.multiselect}
+                error={error && touched}
+                options={options}
+            />
           ):(
               <Input
                 type="select"
-                name={this.props.name}
-                placeholder={this.props.placeholder}
-                value={this.props.value}
-                disabled={this.props.disabled}
-                onChange={this.props.onChange}
-                invalid={this.props.error && this.props.touched}
+                name={name}
+                placeholder={placeholder}
+                value={value}
+                disabled={disabled}
+                onChange={onChange}
+                invalid={error && touched}
               >
                 {!defaultSet && (
                 <option value="" disabled>
-                  {this.props.placeholder}
+                  {placeholder}
                 </option>
               )}
-                  {this.props.fieldinfo.options.map(opt => {
-                    return (
-                      <option key={opt} value={opt}>
-                        {opt}
-                      </option>
-                    );
-                  })}
+              {fieldinfo.options.map(opt => {
+                return (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                );
+              })}
               </Input>
           )}
-          {renderError?renderError:renderDescription}
+          <FieldMessage 
+                error={error} 
+                touched={touched} 
+                description={description} 
+          />
         </Col>
       </FormGroup>
     );
