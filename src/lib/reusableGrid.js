@@ -52,7 +52,6 @@ class ReusableGrid extends React.Component {
       let _id = document.querySelector("div[role='grid']").id;
       let dataRecord = $("#" + _id).jqxGrid("getrowdata", index);
       const data = { formData: dataRecord, mode: "Edit", index: index };
-      console.log(data);
       const setIsOpen = () => {
         this.setState({ isOpen: true });
       };
@@ -83,7 +82,6 @@ class ReusableGrid extends React.Component {
       const parentConfig = this.state.parentConfig.pgdef.pgid;
       const pgData = tftools.filter((item) => {
         if (item.id === parentConfig) {
-          console.log(item);
           return item;
         }
       });
@@ -91,7 +89,6 @@ class ReusableGrid extends React.Component {
     };
 
     this.handleNewForm = (e) => {
-      console.log("Made it to handle new form");
       e.preventDefault();
       const payload = { data: {}, mode: "New" };
       const { setFormData } = this.props;
@@ -100,10 +97,9 @@ class ReusableGrid extends React.Component {
     };
 
     this.handleFilterForm = (e) => {
-      console.log(this.props.formFilterData);
       const { formFilterData } = this.props;
       const payload = {
-        formData: this.props.formFilterData,
+        formData: formFilterData,
         mode: "Edit",
         index: null,
       };
@@ -163,8 +159,6 @@ class ReusableGrid extends React.Component {
       if (filter) {
         setFilterFormData(values);
         setFormData({ formData: values, mode: "Edit", index: null });
-
-        console.log(values);
         this.setState({ filterFormData: values });
       }
 
@@ -234,10 +228,6 @@ class ReusableGrid extends React.Component {
         return ` <div id='edit-${ndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${ndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
       }
     };
-
-    console.log(this.state.subtitle);
-
-    console.log(this.state.source.localdata);
 
     let dataAdapter = new $.jqx.dataAdapter(this.state.source);
     let text;
