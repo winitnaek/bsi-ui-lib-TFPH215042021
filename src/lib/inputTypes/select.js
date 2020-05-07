@@ -48,7 +48,7 @@ class CustomSelect extends Component {
   
   render() {   
     const {defaultSelected, isLoading, options} = this.state;
-    const {name,error,touched,description,required,label,value,
+    const {name,error,touched,description,required,label,value,defaultSet,
            fieldinfo,disabled,placeholder,onChange,isReset} = this.props;
     if (isReset) {
       if(defaultSelected)
