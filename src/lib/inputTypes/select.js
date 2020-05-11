@@ -9,7 +9,7 @@ class CustomSelect extends Component {
     this.state = {
         isLoading: false,
         options: [],
-        defaultSelected: ''
+        defaultSelected: {id: '', label: ''}
     }
     this.handleChange = this.handleChange.bind(this);
     this.onSearchHandler = this.onSearchHandler.bind(this);
@@ -19,7 +19,7 @@ class CustomSelect extends Component {
     const {onChange, id} = this.props;
     if(selectedOptions.length > 0) {
       if(selectedOptions.length == 1)
-        selectedOptions = selectedOptions[0].id;
+        selectedOptions = selectedOptions[0];
     }else{
       selectedOptions = "";
     }
@@ -49,7 +49,7 @@ class CustomSelect extends Component {
   render() {   
     const {defaultSelected, isLoading, options} = this.state;
     const {name,error,touched,description,required,label,value,defaultSet,
-           fieldinfo,disabled,placeholder,onChange,isReset} = this.props;
+           fieldinfo,disabled,placeholder,onChange,isReset,id} = this.props;
     if (isReset) {
       if(defaultSelected)
         this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
@@ -67,13 +67,12 @@ class CustomSelect extends Component {
               <AsyncTypeahead
                 id={id}
                 isLoading={isLoading}
-                labelKey={option => `${option}`}
-                defaultInputValue= {value || ''}
+                labelKey={option => `${option.label}`}
+                defaultInputValue= {value.label || ''}
                 ref={(typeahead) => this.typeahead = typeahead}
                 placeholder={placeholder}
                 onChange={this.handleChange}
                 onInputChange={this.handleInputChange}
-                value={value}
                 disabled={disabled}
                 onSearch={this.onSearchHandler}
                 multiple={fieldinfo.multiselect}
