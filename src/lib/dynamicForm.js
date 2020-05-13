@@ -50,7 +50,7 @@ class DynamicForm extends Component {
     try {
       let row = disabledFields.filter(r => id == r);
       if(row.length > 0) return true;
-      let formflds = formMetaData[formProps.pgid].formdef.formflds;
+      let formflds = formMetaData.formdef.formflds;
       if (formflds) {
         row = formflds.filter(r => id == r.id);
         if (row.length > 0) {
@@ -120,7 +120,7 @@ class DynamicForm extends Component {
   render() {
     const { formProps, tftools, recentUsage, fieldData, formMetaData, autoComplete, saveGridData } = this.props;
     const { close, deleteRow, pgid, filter} = formProps;
-    const fieldInfo = fieldData[pgid];
+    const fieldInfo = fieldData;
 
     let initialValues = {};
 
@@ -168,7 +168,7 @@ class DynamicForm extends Component {
                     <Form onSubmit={this.props.submit} style={{display: "flex", margin: "0 auto", width: "70%", flexWrap: "wrap"}} id="myform">
                         <Col>{this.renderFormElements(props, fieldInfo, autoComplete)}</Col>
                     </Form>
-                    {formMetaData[pgid].formdef.hasRecentUsage && (
+                    {formMetaData.formdef && formMetaData.formdef.hasRecentUsage && (
                     <Usage pgid={pgid} tftools={tftools} close={close} recentUsage={recentUsage} />
                     )}
                   </ModalBody> 
