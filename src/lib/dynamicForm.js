@@ -91,7 +91,8 @@ class DynamicForm extends Component {
       if (item.fieldtype) {
             return (
               <Component
-                key={index}
+                index={index}
+                fieldHeader={item.fieldHeader}
                 type={item.fieldtype}
                 label={item.label}
                 fieldinfo={item.fieldinfo}

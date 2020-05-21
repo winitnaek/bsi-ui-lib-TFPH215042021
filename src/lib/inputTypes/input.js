@@ -1,18 +1,16 @@
 import React, { Component } from "react";
 import {Input, Col, FormGroup} from "reactstrap";
-import {FieldLabel, FieldMessage} from "../field";
+import {FieldLabel, FieldMessage, FieldHeader} from "../field";
 
 class CustomInput extends Component {
   render() {
-    const {name,error,touched,description,required,label,
-           disabled,placeholder,value,onChange,onBlur} = this.props;
+    const {name,error,touched,description,required,label,fieldHeader,
+           disabled,placeholder,value,onChange,onBlur,index} = this.props;
     return (
       <FormGroup>
           <Col>
-                <FieldLabel 
-                    label={label}
-                    required={required} 
-                />
+                {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
+                {label && <FieldLabel label={label} required={required} />}
                 <Input
                     type={"input"}
                     name={name}

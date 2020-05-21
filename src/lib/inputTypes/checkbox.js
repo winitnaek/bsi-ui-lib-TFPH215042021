@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import {Input, Col, FormGroup, Label} from "reactstrap";
-import {FieldLabel, FieldMessage} from "../field";
+import {FieldLabel, FieldMessage, FieldHeader} from "../field";
 
 class CustomCheckbox extends Component {
   constructor(props) {
@@ -27,15 +27,13 @@ class CustomCheckbox extends Component {
   };
 
   render() {
-    const {error,id,description,required,
-           label,fieldinfo,touched} = this.props;
+    const {error,id,description,required,fieldHeader,
+           label,fieldinfo,touched,index} = this.props;
     return (
       <Col>
           <FormGroup>
-              <FieldLabel 
-                    label={label}
-                    required={required} 
-              />
+              {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
+              {label && <FieldLabel label={label} required={required} />}
               {fieldinfo.options.map(opt => {
                   return (
                           <Col>

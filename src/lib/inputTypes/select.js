@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import {Input, Col, FormGroup, Label} from "reactstrap";
 import {AsyncTypeahead} from "react-bootstrap-typeahead";
-import {FieldLabel, FieldMessage} from "../field";
+import {FieldLabel, FieldMessage, FieldHeader} from "../field";
 
 class CustomSelect extends Component {
   constructor(props) {
@@ -48,8 +48,8 @@ class CustomSelect extends Component {
   
   render() {   
     const {defaultSelected, isLoading, options} = this.state;
-    const {name,error,touched,description,required,label,value,defaultSet,
-           fieldinfo,disabled,placeholder,onChange,isReset,id} = this.props;
+    const {name,error,touched,description,required,label,value,defaultSet,index,
+           fieldinfo,disabled,placeholder,onChange,isReset,id,fieldHeader} = this.props;
     if (isReset) {
       if(defaultSelected)
         this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
@@ -59,15 +59,13 @@ class CustomSelect extends Component {
     return (
       <FormGroup>
         <Col>
-            <FieldLabel 
-                label={label}
-                required={required} 
-            />
+            {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
+            {label && <FieldLabel label={label} required={required} />}
             {(fieldinfo.typeahead) ? (
               <AsyncTypeahead
                 id={id}
                 isLoading={isLoading}
-                labelKey={option => `${option.label}`}
+                labelindex={option => `${option.label}`}
                 defaultInputValue= {value.label || ''}
                 ref={(typeahead) => this.typeahead = typeahead}
                 placeholder={placeholder}
@@ -96,7 +94,7 @@ class CustomSelect extends Component {
               )}
               {fieldinfo.options.map(opt => {
                 return (
-                  <option key={opt} value={opt}>
+                  <option index={opt} value={opt}>
                     {opt}
                   </option>
                 );

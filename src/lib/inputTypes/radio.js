@@ -1,18 +1,16 @@
 import React, { Component } from "react";
 import {Input, Col, FormGroup, Label} from "reactstrap";
-import {FieldLabel, FieldMessage} from "../field";
+import {FieldLabel, FieldMessage, FieldHeader} from "../field";
 
 class CustomRadio extends Component {
   render() {
-    const {error,touched,description,
-           required, label,onChange} = this.props;
+    const {error,touched,description,fieldHeader,
+           required, label,onChange,index} = this.props;
     return (
       <Col>
           <FormGroup tag="fieldset">
-              <FieldLabel 
-                  label={label}
-                  required={required} 
-              />
+              {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
+              {label && <FieldLabel label={label} required={required} />}
               {fieldinfo.options.map(opt => {
                       return (
                               <Col>
