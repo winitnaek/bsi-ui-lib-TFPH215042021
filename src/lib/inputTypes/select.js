@@ -65,8 +65,8 @@ class CustomSelect extends Component {
               <AsyncTypeahead
                 id={id}
                 isLoading={isLoading}
-                labelindex={option => `${option.label}`}
-                defaultInputValue= {value.label || ''}
+                labelKey={option => `${option.label ? option.label : ''}`}
+                defaultInputValue= {value && value.label? value.label :''}
                 ref={(typeahead) => this.typeahead = typeahead}
                 placeholder={placeholder}
                 onChange={this.handleChange}

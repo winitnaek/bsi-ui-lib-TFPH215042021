@@ -29,7 +29,7 @@ export class FieldHeader extends Component {
     render() {
         const {fieldHeader,index} = this.props;
         return (
-            <div style={{height: 25, fontSize: 15,borderRadius: 5, color: "#777b7e", backgroundColor: "#ebecf0", fontWeight: "bold", marginTop: index==0?0:65, marginBottom: 15, borderBottomColor: '#d3d3d3', borderBottomWidth: 1, borderBottomStyle: "solid" }}>
+            <div style={{height: 25, fontSize: 15,borderRadius: 5, color: "#777b7e", backgroundColor: "#ebecf0", fontWeight: "bold", marginTop: index==0?25:65, marginBottom: 15, borderBottomColor: '#d3d3d3', borderBottomWidth: 1, borderBottomStyle: "solid" }}>
                 {fieldHeader}
             </div>
         )
