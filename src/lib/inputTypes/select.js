@@ -61,7 +61,8 @@ class CustomSelect extends Component {
         <Col>
             {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
             {label && <FieldLabel label={label} required={required} />}
-            {(fieldinfo.typeahead) ? (
+            
+            {(fieldinfo && fieldinfo.typeahead) ? (
               <AsyncTypeahead
                 id={id}
                 isLoading={isLoading}
@@ -92,14 +93,16 @@ class CustomSelect extends Component {
                   {placeholder}
                 </option>
               )}
-              {fieldinfo.options.map(opt => {
+
+              {fieldinfo && fieldinfo.options && 
+              fieldinfo.options.map(opt => {
                 return (
                   <option index={opt} value={opt}>
                     {opt}
                   </option>
                 );
               })}
-              </Input>
+            </Input>
           )}
           <FieldMessage 
                 error={error} 

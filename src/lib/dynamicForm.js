@@ -94,7 +94,7 @@ class DynamicForm extends Component {
                 fieldHeader={item.fieldHeader}
                 type={item.fieldtype}
                 label={item.label}
-                fieldinfo={item.fieldinfo}
+                fieldinfo={item.fieldinfo && item.fieldinfo}
                 name={item.id}
                 id={item.id}
                 placeholder={item.placeholder}
@@ -103,9 +103,9 @@ class DynamicForm extends Component {
                 onDisableField={this.onDisableField}
                 fieldsToDisable={item.disable}
                 value={props.values[item.id]}
-                required={item.validation.required}
+                required={item.validation && item.validation.required}
                 autoComplete={autoComplete}
-                onChange={item.fieldinfo.typeahead ? props.setFieldValue : props.handleChange}
+                onChange={item.fieldinfo && item.fieldinfo.typeahead ? props.setFieldValue : props.handleChange}
                 onBlur={props.handleBlur}
                 error={error}
                 touched={touched}
