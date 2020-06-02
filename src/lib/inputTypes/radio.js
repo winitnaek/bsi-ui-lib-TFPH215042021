@@ -19,9 +19,9 @@ class CustomRadio extends Component {
                   <FieldLabel label={label} required={required} />}
               {fieldinfo && fieldinfo.options && 
                   fieldinfo.options.map(opt => {
-                    return this.RadioItem(opt.id,opt.value,opt.label,onChange);
+                    return this.RadioItem(id,opt.id,opt.value,opt.label,onChange);
                   })}
-              {!fieldinfo && this.RadioItem(id,value,label,onChange)} 
+              {!fieldinfo && this.RadioItem(id,null,value,label,onChange)} 
               <FieldMessage 
                   error={error} 
                   touched={touched} 
@@ -31,14 +31,14 @@ class CustomRadio extends Component {
       </Col>
     );
   }
-  RadioItem(id,value,label,onChange){
+  RadioItem(id,cid,value,label,onChange){
     return (
       <Col>
           <Label check>
               <Input
                   type="radio"
                   name={id}
-                  id={id}
+                  id={cid?cid:id}
                   value={value}
                   onChange={onChange}
               />{' '}

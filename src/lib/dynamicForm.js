@@ -34,6 +34,10 @@ class DynamicForm extends Component {
       })
     }
 
+    this.renderMe = (pgid, values, filter) => {
+      this.props.renderMe(pgid, values, filter);
+    }
+
     this.onDisableField = fields => {
       this.setState({
         disabledFields: fields
@@ -123,6 +127,14 @@ class DynamicForm extends Component {
     const fieldInfo = fieldData;
 
     let initialValues = {};
+
+    if (this.props.filterFormData) {
+      initialValues = this.props.filterFormData
+    }
+  
+  function handleGridRender(pgid, values, filter) {
+    renderMe(pgid, values, filter)
+  }
 
     this.displayForm = () => {
       return (
@@ -227,7 +239,7 @@ class DynamicForm extends Component {
                   )}
                   <Button type="submit" color="success">
                     {" "}
-                    {this.props.filter ? " View " : " Submit "}
+                    {this.props.filter   || this.props.formMetaData.griddef.isfilterform ? " View " : " Submit "}
                   </Button>
                 </ModalFooter>
               </Container>
