@@ -164,9 +164,9 @@ class DynamicForm extends Component {
             }
           }}
           onReset={() => {
-            fieldInfo.forEach((item) => {
-              if (item.fieldtype != "select" && item.fieldinfo.options) {
-                item.fieldinfo.options.forEach((subItem) => {
+            fieldInfo && fieldInfo.forEach((item) => {
+              if (item.fieldtype == "radio" || item.fieldtyle == "checkbox") {
+                item.fieldinfo.options && item.fieldinfo.options.forEach((subItem) => {
                   document.getElementById(subItem.id).checked = false;
                 });
               }
