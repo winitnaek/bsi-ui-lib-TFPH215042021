@@ -7,6 +7,7 @@ import Select from "./inputTypes/select";
 import Radio from "./inputTypes/radio";
 import Checkbox from "./inputTypes/checkbox";
 import Date from "./inputTypes/date";
+import FileUpload from "./inputTypes/fileUpload";
 import Usage from "./usage";
 import { createYupSchema } from "./utils/createYupSchema";
 import * as yup from "yup";
@@ -87,6 +88,7 @@ class DynamicForm extends Component {
         select:Select,
         checkbox:Checkbox,
         radio:Radio,
+        fileUpload:FileUpload,
       };
       const Component = fieldMap[item.fieldtype];
       let error = props.errors.hasOwnProperty(item.id) && props.errors[item.id];
