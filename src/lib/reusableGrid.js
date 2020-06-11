@@ -140,12 +140,12 @@ class ReusableGrid extends React.Component {
     this.deleteRow = (index) => {
       let _id = document.querySelector("div[role='grid']").id;
       const rowid = $("#" + _id).jqxGrid("getrowid", index);
-      $("#" + _id).jqxGrid("deleterow", rowid);
       // need to uncomment below when hooking up to api
       // this.props.deleteGridData(pgid, rowid)
       const { pgid } = this.state;
       const { deleteGridData } = this.props;
-      deleteGridData.deleteGridData(pgid, rowid);
+      deleteGridData.deleteGridData(pgid,this.props.formData.data,"Edit");
+      $("#" + _id).jqxGrid("deleterow", rowid);
     };
 
     this.renderMe = (pgid, values, filter) => {
@@ -225,7 +225,22 @@ class ReusableGrid extends React.Component {
     );
   }
 
+  addColLinks(columns){
+    return columns.map((column) => { 
+      if (column.link) {
+        column = {
+          text: column.text, datafield: column.datafield, align: column.align, cellsalign: column.cellsalign, cellsformat: 'c2', 
+          cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
+                return `<a href='#' id='${datafield}-${ndex}' class='click' onClick={editClick(${ndex})}><div style="padding-left:4px">${value}</div></a>`;
+          }
+        }
+      }
+      return column; 
+  });
+}
+
   render() {
+    console.log("--------props ", this.props);
     const editCellsRenderer = (ndex) => {
       if (this.state.pgdef.childConfig) {
         return ` <div id='edit-${ndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={handleChildGrid(${ndex})}> <i class="fas fa-search  fa-1x" color="primary"/> </div>`;
@@ -248,8 +263,8 @@ class ReusableGrid extends React.Component {
     // Check to see if permissions allow for edit & delete.  If no, then remove column
     let permissions = this.props.permissions(this.props.pid);
     const { columns, numOfRows, showClipboard } = this.state;
-    let newColumns = columns;
-
+    
+    let newColumns = this.addColLinks(columns);
     if (this.state.recordEdit) {
       newColumns = [...newColumns, editColumn];
 

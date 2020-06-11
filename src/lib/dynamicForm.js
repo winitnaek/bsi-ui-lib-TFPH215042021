@@ -123,11 +123,23 @@ class DynamicForm extends Component {
     });
   }
 
+  componentDidMount () {
+    const hasDelete = this.props.formMetaData.formdef.hasDelete;
+    const mode = this.props.formData.mode
+    let isEdit = false;
+    if (mode === "Edit") {
+      isEdit = true
+    }
+    const hasDeletePermission = this.props.formProps.permissions.DELETE
+    if (hasDelete && isEdit && hasDeletePermission) {
+      this.setState({ showDelete: true})
+    }
+  }
+
   render() {
     const { formProps, tftools, recentUsage, fieldData, formMetaData, autoComplete, saveGridData } = this.props;
     const { close, deleteRow, pgid, filter} = formProps;
     const fieldInfo = fieldData;
-
     let initialValues = {};
 
     if (this.props.filterFormData) {
@@ -139,6 +151,14 @@ class DynamicForm extends Component {
   }
 
     this.displayForm = () => {
+      const hasDelete = this.props.formMetaData.formdef.hasDelete;
+      const mode = this.props.formData.mode
+      let isEdit = false;
+    if (mode === "Edit") {
+      isEdit = true
+    }
+    const hasDeletePermission = this.props.formProps.permissions.DELETE
+
       return (
         <Formik
           initialValues={initialValues}
@@ -221,8 +241,7 @@ class DynamicForm extends Component {
                     className="btn btn-primary"
                     onClick={close}
                   >
-                    {" "}
-                    Cancel{" "}
+                    Cancel
                   </Button>
                   <Button
                     onClick={(e) => this.handleReset()}
@@ -233,8 +252,8 @@ class DynamicForm extends Component {
                     {" "}
                     Reset{" "}
                   </Button>
-                  {this.props.showDelete && this.props.deletePermission && (
-                    <Button onClick={(e) => this.props.delete()} color="danger">
+                  {this.state.showDelete && (
+                    <Button onClick={(e) => this.handleDelete()} color="danger">
                       {" "}
                       Delete{" "}
                     </Button>
