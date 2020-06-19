@@ -129,32 +129,8 @@ class DynamicForm extends Component {
             error={error}
             touched={touched}
             isReset={this.state.isReset}
-          />
-        );
-        return (
-          <Component
-            index={index}
-            fieldHeader={item.fieldHeader}
-            type={item.fieldtype}
-            label={item.label}
-            fieldinfo={item.fieldinfo}
-            name={item.id}
-            id={item.id}
-            placeholder={item.placeholder}
-            description={item.description}
             dependentFields={item.dependentFields}
-            disabled={this.disabledHandler(item.id)}
-            onDisableField={this.onDisableField}
-            fieldsToDisable={item.disable}
-            value={props.values[item.id]}
-            required={item.validation.required}
-            autoComplete={autoComplete}
-            onChange={item.fieldinfo.typeahead ? props.setFieldValue : props.handleChange}
             updateFieldData={this.updateFieldData}
-            onBlur={props.handleBlur}
-            error={error}
-            touched={touched}
-            isReset={this.state.isReset}
           />
         );
       }
@@ -249,14 +225,14 @@ class DynamicForm extends Component {
                       width: '70%',
                       flexWrap: 'wrap'
                     }}
-                    id='myform'
+                    id="myform"
                   >
                     <Col>{this.renderFormElements(props, fieldInfo, autoComplete)}</Col>
                   </Form>
                   {formMetaData.formdef && formMetaData.formdef.note && (
                     <FormGroup row>
                       <Col sm={2} style={{ marginLeft: '15px' }}>
-                        <Label for='toolsFile'></Label>
+                        <Label for="toolsFile"></Label>
                       </Col>
                       <Col sm={9}>
                         <Label style={{ fontWeight: 'bold' }}>{formMetaData.formdef.note}</Label>
@@ -268,25 +244,25 @@ class DynamicForm extends Component {
                   )}
                 </ModalBody>
                 <ModalFooter>
-                  <Button color='primary' className='btn btn-primary' onClick={close}>
+                  <Button color="primary" className="btn btn-primary" onClick={close}>
                     Cancel
                   </Button>
                   <Button
                     onClick={e => this.handleReset()}
-                    color='secondary'
-                    className='btn btn-primary mr-auto'
-                    type='reset'
+                    color="secondary"
+                    className="btn btn-primary mr-auto"
+                    type="reset"
                   >
                     {' '}
                     Reset{' '}
                   </Button>
                   {this.state.showDelete && (
-                    <Button onClick={e => this.handleDelete()} color='danger'>
+                    <Button onClick={e => this.handleDelete()} color="danger">
                       {' '}
                       Delete{' '}
                     </Button>
                   )}
-                  <Button type='submit' color='success'>
+                  <Button type="submit" color="success">
                     {' '}
                     {this.props.filter || this.props.formMetaData.griddef.isfilterform ? ' View ' : ' Submit '}
                   </Button>
