@@ -194,11 +194,12 @@ class ReusableGrid extends React.Component {
     if (!this.props.griddata) {
       this.setState({ noResultsFoundTxt: metadata.griddef.noResultsFoundTxt });
     }
-    if(this.state.griddef.isfilterform && !this.props.formFilterData.filter) {
-      this.setState({
-        isOpen: true
-      })
-    }
+    // Below code is commented as the popup modal was reopening by default.
+    // if (this.state.griddef.isfilterform && !this.props.formFilterData.filter) {
+    //   this.setState({
+    //     isOpen: true
+    //   });
+    // }
   }
 
   exportToExcel() {
