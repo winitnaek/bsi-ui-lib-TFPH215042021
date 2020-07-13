@@ -20,7 +20,7 @@ class CustomSelect extends Component {
   handleChange(selectedOptions) {
     const { onChange, id } = this.props;
     if (selectedOptions.length > 0) {
-      if (selectedOptions.length == 1) selectedOptions = selectedOptions[0];
+      if (selectedOptions.length == 1) selectedOptions = selectedOptions[0].id;
     } else {
       selectedOptions = '';
     }
