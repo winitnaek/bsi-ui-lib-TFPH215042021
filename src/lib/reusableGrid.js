@@ -514,6 +514,8 @@ class ReusableGrid extends React.Component {
             selectionmode="multiplerows"
             style={styles.gridStyle}
             virtualmode={false}
+            sortable={true}
+            filterable={true} 
           />
         </Row>
 
