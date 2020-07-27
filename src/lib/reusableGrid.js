@@ -5,6 +5,7 @@ import { Col, Row, UncontrolledTooltip } from "reactstrap";
 import ReusableModal from "./reusableModal";
 import DynamicForm from "./dynamicForm";
 import Grid from "../../src/deps/jqwidgets-react/react_jqxgrid";
+import ViewPDF from "./viewPDF";
 
 class ReusableGrid extends React.Component {
   constructor(props) {
@@ -46,6 +47,7 @@ class ReusableGrid extends React.Component {
       numOfRows: 0,
       source: source,
       isOpen: false,
+      viewPdfMode: false
     };
 
     this.editClick = (index, pgid) => {
@@ -53,7 +55,7 @@ class ReusableGrid extends React.Component {
       let dataRecord = $("#" + _id).jqxGrid("getrowdata", index);
       const data = { formData: dataRecord, mode: "Edit", index: index };
       const setIsOpen = () => {
-        this.setState({ isOpen: true });
+        this.setState({ isOpen: true, index });
       };
       async function dispatchAction(setFormData, setIsOpen) {
         setFormData(data);
@@ -88,13 +90,19 @@ class ReusableGrid extends React.Component {
       renderGrid(pgData[0]);
     };
 
-    this.handleNewForm = (e) => {
+    this.handleNewForm = (e, formProps) => {
       e.preventDefault();
-      const payload = { data: {}, mode: "New" };
+      const {values={}}=formProps||{}
+      const payload = { data:values, mode: "New" };
       const { setFormData } = this.props;
       setFormData(payload);
       this.setState({ isOpen: true });
     };
+  this.handlePdfView = ()=>{
+    this.setState({
+      viewPdfMode: !this.state.viewPdfMode
+    })
+  }
 
     this.handleFilterForm = (e) => {
       const { formFilterData } = this.props;
@@ -244,6 +252,9 @@ class ReusableGrid extends React.Component {
     console.log("--------props ", this.props);
     const editCellsRenderer = (ndex) => {
       if (this.state.pgdef.childConfig) {
+        if(this.state.recordEdit){
+          return ` <div id='edit-${ndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${ndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
+        }
         return ` <div id='edit-${ndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={handleChildGrid(${ndex})}> <i class="fas fa-search  fa-1x" color="primary"/> </div>`;
       } else {
         return ` <div id='edit-${ndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${ndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
@@ -266,7 +277,7 @@ class ReusableGrid extends React.Component {
     const { columns, numOfRows, showClipboard } = this.state;
     
     let newColumns = this.addColLinks(columns);
-    if (this.state.recordEdit) {
+    if (this.state.recordEdit || this.state.pgdef.childConfig) {
       newColumns = [...newColumns, editColumn];
 
       // this is temporary code to override permissions
@@ -396,7 +407,7 @@ class ReusableGrid extends React.Component {
             </p>
           </Row>
         ) : null}
-        {this.state.griddef.gridtype == "type2" && griddata[0] && this.state.pgdef.childConfig ? (
+        {this.state.griddef.gridtype == "type2" && griddata[0] && this.state.pgdef.childConfig && !this.state.pgdef.parentConfig ? (
           <Row>
             <p>
               {this.state.source.localdata && this.state.subtitle}
@@ -548,6 +559,8 @@ class ReusableGrid extends React.Component {
             <span> Copy to clipboard </span>
           </UncontrolledTooltip>
         </Row>
+        <ViewPDF view={this.state.viewPdfMode} handleHidePDF={this.handlePdfView} />
+
         <ReusableModal
           open={isOpen}
           close={this.toggle}
@@ -567,6 +580,10 @@ class ReusableGrid extends React.Component {
             recentUsage={recentUsage}
             autoComplete={autoComplete}
             saveGridData={saveGridData}
+            handleChildGrid={()=>handleChildGrid(this.state.index)}
+            handleSaveAs={this.handleNewForm}
+            handleCancel={this.handleFilterForm}
+            handlePdfView={this.handlePdfView}
           />
         </ReusableModal>
       </Fragment>
