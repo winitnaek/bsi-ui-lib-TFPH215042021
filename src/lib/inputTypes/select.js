@@ -89,6 +89,8 @@ class CustomSelect extends Component {
       if (defaultSelected) this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
       else this.typeahead && this.typeahead.getInstance().clear();
     }
+    const fieldValue =  value && value.label ? (value.label) : (typeof value !== 'object' && value || '')
+    
     return (
       <FormGroup>
         <Col>
@@ -100,7 +102,7 @@ class CustomSelect extends Component {
               id={id}
               isLoading={isLoading}
               labelKey={option => `${option.label ? option.label : ''}`}
-              defaultInputValue={value && value.label ? value.label : ''}
+              defaultInputValue={fieldValue}
               ref={typeahead => (this.typeahead = typeahead)}
               placeholder={placeholder}
               onChange={this.handleChange}
@@ -131,8 +133,8 @@ class CustomSelect extends Component {
                 fieldinfo.options &&
                 fieldinfo.options.map(opt => {
                   return (
-                    <option index={opt} value={opt}>
-                      {opt}
+                    <option index={opt.id || opt} value={opt.id || opt}>
+                      {opt.label || opt}
                     </option>
                   );
                 })}

@@ -1,17 +1,21 @@
 import React, { Component } from "react";
 import {Input, Col, FormGroup, Label} from "reactstrap";
 import {FieldLabel, FieldMessage, FieldHeader} from "../field";
+import moment from 'moment';
 
 class CustomDate extends Component {
   constructor(){
     super();
-    this.getValue=(value)=>{
-      if(value === 'new Date()'){
-        const dateValue = eval(value)
-        return dateValue.toISOString().split('T')[0];
+    this.getValue = value => {
+      if (value) {
+        if (value === "new Date()") {
+          return moment().format("yyyy-MM-DD");
+        } else {
+          return moment(value).format("yyyy-MM-DD");
+        }
       }
       return value;
-    }
+    };
   }
   render() {
     const {name,error,touched,description,required,label,fieldHeader,

@@ -15,7 +15,7 @@ class ReusableGrid extends React.Component {
     let source = {
       datatype: "json",
       datafields: metadata.griddef.dataFields,
-      localdata: data,
+      localdata: data
     };
 
     this.state = {
@@ -47,7 +47,8 @@ class ReusableGrid extends React.Component {
       numOfRows: 0,
       source: source,
       isOpen: false,
-      viewPdfMode: false
+      viewPdfMode: false,
+      isSaveSuccess: false
     };
 
     this.editClick = (index, pgid) => {
@@ -65,13 +66,13 @@ class ReusableGrid extends React.Component {
       dispatchAction(setFormData, setIsOpen);
     };
 
-    this.handleChildGrid = (index) => {
+    this.handleChildGrid = index => {
       const { childConfig } = this.state;
       let _id = document.querySelector("div[role='grid']").id;
       let dataRecord = $("#" + _id).jqxGrid("getrowdata", index);
       const { setFilterFormData, tftools, renderGrid } = this.props;
       setFilterFormData(dataRecord);
-      const pgData = tftools.filter((item) => {
+      const pgData = tftools.filter(item => {
         if (item.id === childConfig) {
           return item;
         }
@@ -82,7 +83,7 @@ class ReusableGrid extends React.Component {
     this.handleParentGrid = () => {
       const { tftools, renderGrid } = this.props;
       const parentConfig = this.state.parentConfig.pgdef.pgid;
-      const pgData = tftools.filter((item) => {
+      const pgData = tftools.filter(item => {
         if (item.id === parentConfig) {
           return item;
         }
@@ -92,24 +93,24 @@ class ReusableGrid extends React.Component {
 
     this.handleNewForm = (e, formProps) => {
       e.preventDefault();
-      const {values={}}=formProps||{}
-      const payload = { data:values, mode: "New" };
+      const { values = {} } = formProps || {};
+      const payload = { data: values, mode: "New" };
       const { setFormData } = this.props;
       setFormData(payload);
       this.setState({ isOpen: true });
     };
-  this.handlePdfView = ()=>{
-    this.setState({
-      viewPdfMode: !this.state.viewPdfMode
-    })
-  }
+    this.handlePdfView = () => {
+      this.setState({
+        viewPdfMode: !this.state.viewPdfMode
+      });
+    };
 
-    this.handleFilterForm = (e) => {
+    this.handleFilterForm = e => {
       const { formFilterData } = this.props;
       const payload = {
         formData: formFilterData,
         mode: "Edit",
-        index: null,
+        index: null
       };
       const { setFormData } = this.props;
       const setIsOpen = () => {
@@ -122,13 +123,11 @@ class ReusableGrid extends React.Component {
       dispatchAction(setFormData, setIsOpen);
     };
 
-    this.handleFilter = (e) => {
+    this.handleFilter = e => {
       e.preventDefault();
       // Either Render Parent Grid or Toggle isOpen to Open Modal
       const { parentConfig } = this.state;
-      parentConfig
-        ? this.handleChildGrid(parentConfig.pgdef.pgid)
-        : this.handleFilterForm(e);
+      parentConfig ? this.handleChildGrid(parentConfig.pgdef.pgid) : this.handleFilterForm(e);
     };
 
     this.handleSubmit = (pgid, payload, mode, rowid) => {
@@ -141,28 +140,27 @@ class ReusableGrid extends React.Component {
       this.props.help(this.state.pgid);
     };
 
-    this.toggle = () => {
-      this.setState({ isOpen: false });
+    this.toggle = isSaveSuccess => {
+      this.setState({ isOpen: false, isSaveSuccess }, () => {
+        window.setTimeout(() => {
+          this.setState({ isSaveSuccess: false });
+        }, 2000);
+      });
     };
 
-    this.deleteRow = (index) => {
+    this.deleteRow = index => {
       let _id = document.querySelector("div[role='grid']").id;
       const rowid = $("#" + _id).jqxGrid("getrowid", index);
       // need to uncomment below when hooking up to api
       // this.props.deleteGridData(pgid, rowid)
       const { pgid } = this.state;
       const { deleteGridData } = this.props;
-      deleteGridData.deleteGridData(pgid,this.props.formData.data,"Edit");
+      deleteGridData.deleteGridData(pgid, this.props.formData.data, "Edit");
       $("#" + _id).jqxGrid("deleterow", rowid);
     };
 
     this.renderMe = (pgid, values, filter) => {
-      const {
-        setFilterFormData,
-        setFormData,
-        tftools,
-        renderGrid,
-      } = this.props;
+      const { setFilterFormData, setFormData, tftools, renderGrid } = this.props;
 
       if (filter) {
         setFilterFormData(values);
@@ -170,27 +168,27 @@ class ReusableGrid extends React.Component {
         this.setState({ filterFormData: values });
       }
 
-      let data = tftools.filter((tftool) => {
+      let data = tftools.filter(tftool => {
         if (tftool.id == pgid) return tftool;
       });
       renderGrid(data[0]);
     };
 
-    this.selectAll = (event) => {
+    this.selectAll = event => {
       event.preventDefault();
       this.setState({ allSelected: true });
       let _id = document.querySelector("div[role='grid']").id;
       $("#" + _id).jqxGrid("selectallrows");
     };
 
-    this.unselectAll = (event) => {
+    this.unselectAll = event => {
       event.preventDefault();
       this.setState({ allSelected: false });
       let _id = document.querySelector("div[role='grid']").id;
       $("#" + _id).jqxGrid("clearselection");
     };
 
-    this.toggleSelectAll = (event) => {
+    this.toggleSelectAll = event => {
       event.preventDefault();
       if (this.state.allSelected) {
         this.unselectAll(event);
@@ -224,7 +222,7 @@ class ReusableGrid extends React.Component {
     this.setState(
       {
         showClipboard: true,
-        numOfRows: numOfRows,
+        numOfRows: numOfRows
       },
       () => {
         window.setTimeout(() => {
@@ -234,25 +232,29 @@ class ReusableGrid extends React.Component {
     );
   }
 
-  addColLinks(columns){
-    return columns.map((column) => { 
+  addColLinks(columns) {
+    return columns.map(column => {
       if (column.link) {
         column = {
-          text: column.text, datafield: column.datafield, align: column.align, cellsalign: column.cellsalign, cellsformat: 'c2', 
+          text: column.text,
+          datafield: column.datafield,
+          align: column.align,
+          cellsalign: column.cellsalign,
+          cellsformat: "c2",
           cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
-                return `<a href='#' id='${datafield}-${ndex}' class='click' onClick={editClick(${ndex})}><div style="padding-left:4px">${value}</div></a>`;
+            return `<a href='#' id='${datafield}-${ndex}' class='click' onClick={editClick(${ndex})}><div style="padding-left:4px">${value}</div></a>`;
           }
-        }
+        };
       }
-      return column; 
-  });
-}
+      return column;
+    });
+  }
 
   render() {
     console.log("--------props ", this.props);
-    const editCellsRenderer = (ndex) => {
+    const editCellsRenderer = ndex => {
       if (this.state.pgdef.childConfig) {
-        if(this.state.recordEdit){
+        if (this.state.recordEdit) {
           return ` <div id='edit-${ndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${ndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
         }
         return ` <div id='edit-${ndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={handleChildGrid(${ndex})}> <i class="fas fa-search  fa-1x" color="primary"/> </div>`;
@@ -269,13 +271,13 @@ class ReusableGrid extends React.Component {
       datafield: "edit",
       align: "center",
       width: "5%",
-      cellsrenderer: editCellsRenderer,
+      cellsrenderer: editCellsRenderer
     };
 
     // Check to see if permissions allow for edit & delete.  If no, then remove column
     let permissions = this.props.permissions(this.props.pid);
-    const { columns, numOfRows, showClipboard } = this.state;
-    
+    const { columns, numOfRows, showClipboard, isSaveSuccess } = this.state;
+
     let newColumns = this.addColLinks(columns);
     if (this.state.recordEdit || this.state.pgdef.childConfig) {
       newColumns = [...newColumns, editColumn];
@@ -287,31 +289,23 @@ class ReusableGrid extends React.Component {
           SAVE: true,
           DELETE: true,
           RUN: true,
-          AUDIT: false,
+          AUDIT: false
         };
       }
 
       if (!permissions.SAVE) {
-        newColumns = newColumns.filter((item) => {
+        newColumns = newColumns.filter(item => {
           return item.text !== "Edit";
         });
       }
 
       if (!permissions.DELETE) {
-        newColumns = newColumns.filter((item) => {
+        newColumns = newColumns.filter(item => {
           return item.text !== "Delete";
         });
       }
     }
-    const {
-      title,
-      cruddef,
-      isfilterform,
-      pgid,
-      subtitle,
-      noResultsFoundTxt,
-      isOpen,
-    } = this.state;
+    const { title, cruddef, isfilterform, pgid, subtitle, noResultsFoundTxt, isOpen } = this.state;
     const { deleteRow, handleChange, renderMe, handleSubmit } = this;
     let filter;
     if (isfilterform) filter = true;
@@ -324,7 +318,7 @@ class ReusableGrid extends React.Component {
       deleteRow,
       handleSubmit,
       renderMe,
-      filter,
+      filter
     };
 
     module.exports = this.editClick;
@@ -342,15 +336,23 @@ class ReusableGrid extends React.Component {
       recentUsage,
       autoComplete,
       renderGrid,
-      griddata,
+      griddata
     } = this.props;
-    
+
     let formatedFilterData = "";
 
-    if(this.props.formFilterData.taxCode) {
-      formatedFilterData = <span style={{fontWeight:"bold"}}>{this.props.formFilterData.taxCode} ( {this.props.formFilterData.name} )</span>
-    } else if(this.props.formFilterData.company) {
-      formatedFilterData = <span style={{fontWeight:"bold"}}>{this.props.formFilterData.company} ( {this.props.formFilterData.companyName} )</span>
+    if (this.props.formFilterData.taxCode) {
+      formatedFilterData = (
+        <span style={{ fontWeight: "bold" }}>
+          {this.props.formFilterData.taxCode} ( {this.props.formFilterData.name} )
+        </span>
+      );
+    } else if (this.props.formFilterData.company) {
+      formatedFilterData = (
+        <span style={{ fontWeight: "bold" }}>
+          {this.props.formFilterData.company} ( {this.props.formFilterData.companyName} )
+        </span>
+      );
     }
 
     return (
@@ -360,11 +362,7 @@ class ReusableGrid extends React.Component {
 
           <span style={styles.helpMargin}>
             <span id="help">
-              <i
-                className="fas fa-question-circle  fa-lg"
-                onClick={this.OpenHelp}
-                style={styles.helpicon}
-              />
+              <i className="fas fa-question-circle  fa-lg" onClick={this.OpenHelp} style={styles.helpicon} />
             </span>
             <UncontrolledTooltip placement="right" target="help">
               <span> {this.state.helpLabel} </span>
@@ -375,22 +373,14 @@ class ReusableGrid extends React.Component {
             <span>
               {this.state.parentConfig ? (
                 <span id="filter">
-                  <i
-                    class="fas fa-arrow-up"
-                    style={styles.filtericon}
-                    onClick={this.handleParentGrid}
-                  />
+                  <i class="fas fa-arrow-up" style={styles.filtericon} onClick={this.handleParentGrid} />
                   <UncontrolledTooltip placement="right" target="filter">
                     Return to prior screen
                   </UncontrolledTooltip>
                 </span>
               ) : (
                 <span id="filter">
-                  <i
-                    class="fas fa-filter fa-lg"
-                    style={styles.filtericon}
-                    onClick={this.handleFilter}
-                  />
+                  <i class="fas fa-filter fa-lg" style={styles.filtericon} onClick={this.handleFilter} />
                   <UncontrolledTooltip placement="right" target="filter">
                     Modify Selection Criteria
                   </UncontrolledTooltip>
@@ -399,7 +389,7 @@ class ReusableGrid extends React.Component {
             </span>
           )}
         </Row>
-        {this.state.griddef.gridtype == "type2" && griddata[0] &&  this.state.pgdef.parentConfig ? (
+        {this.state.griddef.gridtype == "type2" && griddata[0] && this.state.pgdef.parentConfig ? (
           <Row>
             <p>
               {this.state.source.localdata && this.state.subtitle}
@@ -407,33 +397,40 @@ class ReusableGrid extends React.Component {
             </p>
           </Row>
         ) : null}
-        {this.state.griddef.gridtype == "type2" && griddata[0] && this.state.pgdef.childConfig && !this.state.pgdef.parentConfig ? (
+        {this.state.griddef.gridtype == "type2" &&
+        griddata[0] &&
+        this.state.pgdef.childConfig &&
+        !this.state.pgdef.parentConfig ? (
+          <Row>
+            <p>{this.state.source.localdata && this.state.subtitle}</p>
+          </Row>
+        ) : null}
+        {!griddata[0] && this.props.formFilterData && this.props.formFilterData.companyName ? (
           <Row>
             <p>
-              {this.state.source.localdata && this.state.subtitle}
+              {noResultsFoundTxt}
+              <span style={{ fontWeight: "bold" }}>
+                {this.props.formFilterData.company} ( {this.props.formFilterData.companyName} )
+              </span>
             </p>
           </Row>
         ) : null}
-        {!griddata[0] && this.props.formFilterData && this.props.formFilterData.companyName ?( 
-        <Row>
-          <p>
-          {noResultsFoundTxt}<span style={{fontWeight:"bold"}}>{this.props.formFilterData.company} ( {this.props.formFilterData.companyName} )</span>
-          </p>
-        </Row>
-        ) : null}
-        {!griddata[0] && this.props.formFilterData && this.props.formFilterData.taxCode ?( 
-        <Row>
-          <p>
-          {noResultsFoundTxt}<span style={{fontWeight:"bold"}}>{this.props.formFilterData.taxCode} ( {this.props.formFilterData.name} )</span>
-          </p>
-        </Row>
+        {!griddata[0] && this.props.formFilterData && this.props.formFilterData.taxCode ? (
+          <Row>
+            <p>
+              {noResultsFoundTxt}
+              <span style={{ fontWeight: "bold" }}>
+                {this.props.formFilterData.taxCode} ( {this.props.formFilterData.name} )
+              </span>
+            </p>
+          </Row>
         ) : null}
         <Row style={styles.rowTop}>
           <Col sm="2" style={styles.iconPaddingLeft}>
             {this.state.allSelected && (
               <span>
                 <span id="selectAll" style={{ marginRight: "10px" }}>
-                  <a href="" onClick={(e) => this.unselectAll(e)}>
+                  <a href="" onClick={e => this.unselectAll(e)}>
                     <i className="fas fa-check-square  fa-2x" />
                   </a>
                 </span>
@@ -446,7 +443,7 @@ class ReusableGrid extends React.Component {
             {!this.state.allSelected && (
               <span>
                 <span id="unselectAll" style={{ marginRight: "10px" }}>
-                  <a href="" onClick={(e) => this.selectAll(e)}>
+                  <a href="" onClick={e => this.selectAll(e)}>
                     <i className="far fa-square  fa-2x" />
                   </a>
                 </span>
@@ -457,7 +454,7 @@ class ReusableGrid extends React.Component {
             )}
 
             <span id="unselectAll">
-              <a href="" onClick={(e) => this.toggleSelectAll(e)}>
+              <a href="" onClick={e => this.toggleSelectAll(e)}>
                 <span>
                   <i className="fas fa-redo-alt fa-2x" />
                 </span>
@@ -468,17 +465,30 @@ class ReusableGrid extends React.Component {
             </UncontrolledTooltip>
           </Col>
           <Col sm="9">
-            {showClipboard && (
-              <ClipboardToast numOfRows={this.state.numOfRows} />
+            {showClipboard && <ClipboardToast numOfRows={this.state.numOfRows} />}
+            {isSaveSuccess && (
+              <Row>
+                <Col
+                  sm="12"
+                  md={{ size: 6, offset: 3 }}
+                  style={{
+                    backgroundColor: "#c1d7d9",
+                    borderRadius: 10,
+                    textAlign: "center",
+                    height: 30,
+                    paddingTop: 3
+                  }}
+                >
+                  Saved successfully
+                </Col>
+              </Row>
             )}
           </Col>
           <Col sm="1" style={styles.iconPaddingRight}>
             {this.state.hasAddNew && (
               <span
                 style={
-                  (this.state.hasAddNew && this.state.actiondel) == true
-                    ? { paddingLeft: 10 }
-                    : { paddingLeft: 46 }
+                  (this.state.hasAddNew && this.state.actiondel) == true ? { paddingLeft: 10 } : { paddingLeft: 46 }
                 }
               >
                 <span id="addNew">
@@ -494,9 +504,7 @@ class ReusableGrid extends React.Component {
             {this.state.actiondel ? (
               <span
                 style={
-                  (this.state.hasAddNew && this.state.actiondel) == true
-                    ? { paddingLeft: 5 }
-                    : { paddingLeft: 46 }
+                  (this.state.hasAddNew && this.state.actiondel) == true ? { paddingLeft: 5 } : { paddingLeft: 46 }
                 }
               >
                 <span id="delAll">
@@ -526,7 +534,7 @@ class ReusableGrid extends React.Component {
             style={styles.gridStyle}
             virtualmode={false}
             sortable={true}
-            filterable={true} 
+            filterable={true}
           />
         </Row>
 
@@ -537,24 +545,14 @@ class ReusableGrid extends React.Component {
           <UncontrolledTooltip placement="right" target="exportToExcel">
             <span> Export to Excel </span>
           </UncontrolledTooltip>
-          <a
-            href="#"
-            id="exportToCsv"
-            onClick={() => this.exportToCsv()}
-            style={styles.gridLinkStyle}
-          >
+          <a href="#" id="exportToCsv" onClick={() => this.exportToCsv()} style={styles.gridLinkStyle}>
             <i class="fas fa-pen-square fa-lg fa-2x"></i>
           </a>
           <UncontrolledTooltip placement="right" target="exportToCsv">
             <span> Export to CSV </span>
           </UncontrolledTooltip>
 
-          <a
-            href="#"
-            id="copyToClipboard"
-            onClick={(e) => this.copyToClipboardHandler(e)}
-            style={styles.gridLinkStyle}
-          >
+          <a href="#" id="copyToClipboard" onClick={e => this.copyToClipboardHandler(e)} style={styles.gridLinkStyle}>
             <i class="far fa-copy fa-lg fa-2x"></i>
           </a>
           <UncontrolledTooltip placement="right" target="copyToClipboard">
@@ -563,13 +561,7 @@ class ReusableGrid extends React.Component {
         </Row>
         <ViewPDF view={this.state.viewPdfMode} handleHidePDF={this.handlePdfView} />
 
-        <ReusableModal
-          open={isOpen}
-          close={this.toggle}
-          title={title}
-          cruddef={cruddef}
-          styles={styles}
-        >
+        <ReusableModal open={isOpen} close={this.toggle} title={title} cruddef={cruddef} styles={styles}>
           <DynamicForm
             formData={formData}
             renderMe={this.renderMe}
@@ -582,7 +574,7 @@ class ReusableGrid extends React.Component {
             recentUsage={recentUsage}
             autoComplete={autoComplete}
             saveGridData={saveGridData}
-            handleChildGrid={()=>handleChildGrid(this.state.index)}
+            handleChildGrid={() => handleChildGrid(this.state.index)}
             handleSaveAs={this.handleNewForm}
             handleCancel={this.handleFilterForm}
             handlePdfView={this.handlePdfView}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Formik, Form } from 'formik';
-import { Col, Button, Row, Label, Container, ModalBody, ModalFooter, FormGroup } from 'reactstrap';
+import { Col, Button, Row, Label, Container, UncontrolledTooltip, ModalBody, ModalFooter, FormGroup } from 'reactstrap';
 import { updateGrid } from './utils/updateGrid.js';
 import Input from './inputTypes/input';
 import Select from './inputTypes/select';
@@ -11,6 +11,7 @@ import FileUpload from './inputTypes/fileUpload';
 import Usage from './usage';
 import { createYupSchema } from './utils/createYupSchema';
 import * as yup from 'yup';
+import moment from 'moment';
 
 class DynamicForm extends Component {
   constructor(props) {
@@ -66,21 +67,8 @@ class DynamicForm extends Component {
       })
     }
 
-    this.handleCancel=()=>{
-      const { formProps} = this.props;
-      const { close} = formProps;
-      const {saveAsMode}=this.state;
-      if(!saveAsMode){
-        close();
-      }else{
-        this.setState({
-          saveAsMode: false
-        }, this.props.handleCancel)
       }
     
-    }
-  }
-
   disabledHandler(id) {
     const { disabledFields } = this.state;
     const { formMetaData, formProps } = this.props;
@@ -220,12 +208,17 @@ class DynamicForm extends Component {
                 rowid = this.props.formData.index;
               }
               if (!filter) {
+                for (let key in values) {
+                  if (values[key] === "new Date()") {
+                    values[key] = moment().format("MM/DD/yyyy");
+                  }
+                }
                 updateGrid(values, rowid, mode);
                 saveGridData.saveGridData(pgid, values, mode);
               } else {
                 formProps.renderMe(pgid, values, filter);
               }
-              close();
+              close(true);
               actions.resetForm({});
             } catch (error) {
               console.log("Form Error >>>>>>  ", error);
@@ -276,7 +269,7 @@ class DynamicForm extends Component {
                   )}
                 </ModalBody>
                 <ModalFooter>
-                  <Button color="primary" className="btn btn-primary" onClick={this.handleCancel}>
+                  <Button color="primary" className="btn btn-primary" onClick={() => close(false)}>
                     Cancel
                   </Button>
                   <Button onClick={this.handleReset} color="secondary" className="btn btn-primary mr-auto" type="reset">
@@ -297,8 +290,11 @@ class DynamicForm extends Component {
                   </Button>
 
                   {hasSaveAs && !saveAsMode && mode === "Edit" ? (
-                    <Button color="success" onClick={e => this.handleSaveAs(e, props)}>
-                      Save As
+                    <Button id="saveAsNew" color="success" onClick={e => this.handleSaveAs(e, props)}>
+                      Save As New
+                      <UncontrolledTooltip placement="right" target="saveAsNew">
+                    <span> Save As  A New Record </span>
+                  </UncontrolledTooltip>
                     </Button>
                   ) : null}
 
@@ -318,7 +314,7 @@ class DynamicForm extends Component {
     this.handleDelete = () => {
       const { rowIndex } = this.props.formData.index;
       deleteRow(rowIndex);
-      close();
+      close(false);
     };
 
     if (this.props.formData.mode == "Edit") {
