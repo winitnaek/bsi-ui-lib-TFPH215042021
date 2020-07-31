@@ -116,7 +116,7 @@ class CustomSelect extends Component {
               id={id}
               isLoading={isLoading}
               labelKey={option => `${option.label ? option.label : ''}`}
-              defaultInputValue={fieldValue}
+              defaultInputValue={value && value.label ? (value.label) : ''}
               ref={typeahead => (this.typeahead = typeahead)}
               placeholder={placeholder}
               onChange={this.handleChange}
