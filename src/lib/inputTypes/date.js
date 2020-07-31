@@ -7,12 +7,9 @@ class CustomDate extends Component {
   constructor(){
     super();
     this.getValue = value => {
-      if (value) {
-        if (value === "new Date()") {
-          return moment().format("yyyy-MM-DD");
-        } else {
-          return moment(value).format("yyyy-MM-DD");
-        }
+      const momentObj = moment(value);
+      if (momentObj.isValid()) {
+          return momentObj.format("yyyy-MM-DD");
       }
       return value;
     };

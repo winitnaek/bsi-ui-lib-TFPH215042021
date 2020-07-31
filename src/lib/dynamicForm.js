@@ -52,23 +52,25 @@ class DynamicForm extends Component {
 
     this.updateFieldData = this.updateFieldData.bind(this);
 
-    this.handleViewAll = (event, {values}) => {
+    this.handleViewAll = (event, { values }) => {
       event.preventDefault();
-      const {formProps, formData}=this.props;
+      const { formProps, formData } = this.props;
       this.props.handleChildGrid();
     };
 
-    this.handleSaveAs = (e, props)=>{
+    this.handleSaveAs = (e, props) => {
       e.preventDefault();
-      this.setState({
-        saveAsMode: true
-      },()=>{
-        this.props.handleSaveAs(e, props)
-      })
-    }
+      this.setState(
+        {
+          saveAsMode: true
+        },
+        () => {
+          this.props.handleSaveAs(e, props);
+        }
+      );
+    };
+  }
 
-      }
-    
   disabledHandler(id) {
     const { disabledFields } = this.state;
     const { formMetaData, formProps } = this.props;
@@ -160,13 +162,16 @@ class DynamicForm extends Component {
     const hasDelete = this.props.formMetaData.formdef.hasDelete;
     const mode = this.props.formData.mode;
     let isEdit = false;
-    if (mode === 'Edit') {
+    if (mode === "Edit") {
       isEdit = true;
     }
+    
     const hasDeletePermission = this.props.formProps.permissions && this.props.formProps.permissions.DELETE;
-    if (hasDelete && isEdit && hasDeletePermission) {
-      this.setState({ showDelete: true });
-    }
+
+    this.setState({ 
+      showDelete: hasDelete && isEdit && hasDeletePermission
+    });
+
   }
 
   render() {
@@ -185,13 +190,13 @@ class DynamicForm extends Component {
     }
 
     this.displayForm = () => {
-      const {hasDelete, hasViewPDF, hasSaveAs, viewAllBtnText} = this.props.formMetaData.formdef;
+      const { hasDelete, hasViewPDF, hasSaveAs, viewAllBtnText } = this.props.formMetaData.formdef;
       const mode = this.props.formData.mode;
       let isEdit = false;
       if (mode === "Edit") {
         isEdit = true;
       }
-      const {saveAsMode}=this.state;
+      const { saveAsMode } = this.state;
       const hasDeletePermission = this.props.formProps.permissions && this.props.formProps.permissions.DELETE;
 
       return (
@@ -293,8 +298,8 @@ class DynamicForm extends Component {
                     <Button id="saveAsNew" color="success" onClick={e => this.handleSaveAs(e, props)}>
                       Save As New
                       <UncontrolledTooltip placement="right" target="saveAsNew">
-                    <span> Save As  A New Record </span>
-                  </UncontrolledTooltip>
+                        <span> Save As A New Record </span>
+                      </UncontrolledTooltip>
                     </Button>
                   ) : null}
 
@@ -320,8 +325,12 @@ class DynamicForm extends Component {
     if (this.props.formData.mode == "Edit") {
       initialValues = this.props.formData.data;
     } else {
-      fieldInfo.forEach((item, index) => {
-        initialValues[item.id] = item.value || "";
+      fieldInfo.forEach(item => {
+        const { fieldtype, value, id } = item;
+        if (fieldtype === "date" && value === "new Date()") {
+          item.value = moment().format("yyyy-MM-DD");
+        }
+        initialValues[id] = item.value || "";
       });
     }
 
