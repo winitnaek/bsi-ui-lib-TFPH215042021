@@ -6,9 +6,11 @@ import { FieldLabel, FieldMessage, FieldHeader } from '../field';
 class CustomSelect extends Component {
   constructor(props) {
     super(props);
+    const { fieldinfo = {} } = this.props;
+    const { options = [] } = fieldinfo;
     this.state = {
       isLoading: false,
-      options: [],
+      options,
       defaultSelected: { id: '', label: '' }
     };
     this.handleChange = this.handleChange.bind(this);
@@ -46,18 +48,31 @@ class CustomSelect extends Component {
   }
 
   componentDidMount() {
-    this.setState({ defaultSelected: this.props.value });
+    const { options = [] } = this.state;
+    let { defaultSelected } = this.state;
+    const { value } = this.props;
+    defaultSelected = options.find(option => option && option.id === value) || defaultSelected;
+    this.setState({ defaultSelected }, () => {
+      if(defaultSelected.id && defaultSelected.label){
+        this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
+  }
+    });
   }
 
   onSearchHandler(query) {
-    const { autoComplete, fieldinfo, id } = this.props;
+    const { autoComplete, fieldinfo, id, updateFieldData } = this.props;
     if (fieldinfo.isasync) {
       this.setState({ isLoading: true });
       autoComplete.getAutoCompleteData(id, query).then(options => {
-        this.setState({
+        this.setState(
+          {
           isLoading: false,
           options: options
-        });
+          },
+          () => {
+            updateFieldData(id, options);
+          }
+        );
       });
     } else {
       this.setState({ options: fieldinfo.options });
@@ -89,7 +104,6 @@ class CustomSelect extends Component {
       if (defaultSelected) this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
       else this.typeahead && this.typeahead.getInstance().clear();
     }
-    const fieldValue =  value && value.label ? (value.label) : (typeof value !== 'object' && value || '')
     
     return (
       <FormGroup>
@@ -115,7 +129,7 @@ class CustomSelect extends Component {
             />
           ) : (
             <Input
-              type='select'
+              type="select"
               name={name}
               placeholder={placeholder}
               value={value}
@@ -124,7 +138,7 @@ class CustomSelect extends Component {
               invalid={error && touched}
             >
               {!defaultSet && (
-                <option value='' disabled>
+                <option value="" disabled>
                   {placeholder}
                 </option>
               )}
