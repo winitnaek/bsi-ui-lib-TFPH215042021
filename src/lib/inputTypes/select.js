@@ -11,7 +11,7 @@ class CustomSelect extends Component {
     this.state = {
       isLoading: false,
       options,
-      defaultSelected: { id: '', label: '' }
+      defaultSelected: { id: "", label: "" }
     };
     this.handleChange = this.handleChange.bind(this);
     this.onSearchHandler = this.onSearchHandler.bind(this);
@@ -24,9 +24,9 @@ class CustomSelect extends Component {
     if (selectedOptions.length > 0) {
       if (selectedOptions.length == 1) selectedOptions = selectedOptions[0].id;
     } else {
-      selectedOptions = '';
+      selectedOptions = "";
     }
-    this.updateDependentField((selectedOptions && selectedOptions.label) || '');
+    this.updateDependentField((selectedOptions && selectedOptions.label) || "");
     onChange(id, selectedOptions);
   }
 
@@ -48,17 +48,42 @@ class CustomSelect extends Component {
   }
 
   componentDidMount() {
-    const { options = [] } = this.state;
+    let { options = [] } = this.state;
     let { defaultSelected } = this.state;
-    const { value } = this.props;
-    defaultSelected = options.find(option => option && option.id === value) || defaultSelected;
-    this.setState({ defaultSelected }, () => {
-      if(defaultSelected.id && defaultSelected.label){
-        this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
-  }
-    });
-  }
-
+    // for first time load options is empty, so the value will not populate in form as defautlSelection is null.
+    // Step-1 request for the autoComplete options.
+    // Step-2 find if the value is present in id or label.
+    // Step-3 populate the value in the field. 
+    const { value, fieldinfo, autoComplete, id , updateFieldData} = this.props;
+    if (value && !options.lenght && fieldinfo.isasync) {
+      this.setState({ isLoading: true });
+      autoComplete.getAutoCompleteData(id, value).then(results => {
+        options = results;
+        defaultSelected = options.find(option => option && option.id === value || option.label === value) || defaultSelected;
+        this.setState(
+          {
+            isLoading: false,
+            options: options,
+            defaultSelected
+          },
+          () => {
+            if (defaultSelected.id && defaultSelected.label) {
+              this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
+            }
+            updateFieldData(id, options);
+          }
+        );
+      });
+    }else{
+      defaultSelected = options.find(option => option && option.id === value) || defaultSelected;
+      this.setState({ defaultSelected }, () => {
+        if (defaultSelected.id && defaultSelected.label) {
+          this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
+        }
+      });
+    }
+   
+}
   onSearchHandler(query) {
     const { autoComplete, fieldinfo, id, updateFieldData } = this.props;
     if (fieldinfo.isasync) {
@@ -66,8 +91,8 @@ class CustomSelect extends Component {
       autoComplete.getAutoCompleteData(id, query).then(options => {
         this.setState(
           {
-          isLoading: false,
-          options: options
+            isLoading: false,
+            options: options
           },
           () => {
             updateFieldData(id, options);
@@ -104,7 +129,7 @@ class CustomSelect extends Component {
       if (defaultSelected) this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
       else this.typeahead && this.typeahead.getInstance().clear();
     }
-    
+
     return (
       <FormGroup>
         <Col>
@@ -115,8 +140,8 @@ class CustomSelect extends Component {
             <AsyncTypeahead
               id={id}
               isLoading={isLoading}
-              labelKey={option => `${option.label ? option.label : ''}`}
-              defaultInputValue={value && value.label ? (value.label) : ''}
+              labelKey={option => `${option.label ? option.label : ""}`}
+              defaultInputValue={value && value.label ? value.label : ""}
               ref={typeahead => (this.typeahead = typeahead)}
               placeholder={placeholder}
               onChange={this.handleChange}

@@ -285,11 +285,11 @@ class DynamicForm extends Component {
                       Delete
                     </Button>
                   )}
-                  {hasViewPDF && (
+                  {hasViewPDF && mode === "Edit" ? (
                     <Button onClick={this.props.handlePdfView} color="success">
                       View PDF
                     </Button>
-                  )}
+                  ): null}
                   <Button type="submit" color="success">
                     {this.props.filter || this.props.formMetaData.griddef.isfilterform ? " View " : " Save "}
                   </Button>

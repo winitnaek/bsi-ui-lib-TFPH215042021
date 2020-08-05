@@ -4,6 +4,7 @@ import ClipboardToast from "./clipboardToast";
 import { Col, Row, UncontrolledTooltip } from "reactstrap";
 import ReusableModal from "./reusableModal";
 import DynamicForm from "./dynamicForm";
+import ConfirmModal from "./confirmModal";
 import Grid from "../../src/deps/jqwidgets-react/react_jqxgrid";
 import ViewPDF from "./viewPDF";
 
@@ -40,6 +41,7 @@ class ReusableGrid extends React.Component {
       childConfig: metadata.pgdef.childConfig,
       parentConfig: metadata.pgdef.parentConfig,
       isfilter: metadata.griddef.isfilter,
+      hasFilter: metadata.griddef.hasFilter,
       mockData: [],
       child: this.props.child,
       allSelected: false,
@@ -48,7 +50,8 @@ class ReusableGrid extends React.Component {
       source: source,
       isOpen: false,
       viewPdfMode: false,
-      isSaveSuccess: false
+      isSaveSuccess: false,
+      showConfirm:false
     };
 
     this.editClick = (index, pgid) => {
@@ -126,7 +129,7 @@ class ReusableGrid extends React.Component {
     this.handleFilter = e => {
       e.preventDefault();
       // Either Render Parent Grid or Toggle isOpen to Open Modal
-      const { parentConfig } = this.state;
+      const { parentConfig  } = this.state;
       parentConfig ? this.handleChildGrid(parentConfig.pgdef.pgid) : this.handleFilterForm(e);
     };
 
@@ -149,14 +152,45 @@ class ReusableGrid extends React.Component {
     };
 
     this.deleteRow = index => {
+      const { pgid, index: rowIndex } = this.state;
       let _id = document.querySelector("div[role='grid']").id;
-      const rowid = $("#" + _id).jqxGrid("getrowid", index);
+      const rowid = $("#" + _id).jqxGrid("getrowid", index || rowIndex);
       // need to uncomment below when hooking up to api
       // this.props.deleteGridData(pgid, rowid)
-      const { pgid } = this.state;
       const { deleteGridData } = this.props;
       deleteGridData.deleteGridData(pgid, this.props.formData.data, "Edit");
       $("#" + _id).jqxGrid("deleterow", rowid);
+    };
+
+    this.deleteAll = () => {
+      this.setState({
+        showConfirm: true
+      });
+    };
+
+    this.handleOk = () => {
+      let _id = document.querySelector("div[role='grid']").id;
+      const { deleteGridData } = this.props;
+      const {pgid}=this.state;
+      const griddata = $("#" + _id).jqxGrid("getdatainformation");
+      const rows = [];
+      for (let i = 0; i < griddata.rowscount; i++){
+        rows.push($("#" + _id).jqxGrid("getrenderedrowdata", i));
+      }
+
+     // TODO: Check with API team which method to call to delete all rows
+      deleteGridData.deleteGridData(pgid, rows, "Edit");
+ 
+      $("#" + _id).jqxGrid("clear");
+      this.setState({
+        showConfirm: false
+      });
+    };
+
+    this.handleCancel = () => {
+      this.setState({
+        showConfirm: false
+      });
     };
 
     this.renderMe = (pgid, values, filter) => {
@@ -252,6 +286,11 @@ class ReusableGrid extends React.Component {
 
   render() {
     console.log("--------props ", this.props);
+
+    let metadata = this.props.metadata(this.props.pageid);
+    const {pgdef}=this.state;
+    const {hasDeleteAll}=pgdef;
+
     const editCellsRenderer = ndex => {
       if (this.state.pgdef.childConfig) {
         if (this.state.recordEdit) {
@@ -368,6 +407,14 @@ class ReusableGrid extends React.Component {
               <span> {this.state.helpLabel} </span>
             </UncontrolledTooltip>
           </span>
+          {this.state.hasFilter ? (
+            <span id="filter">
+              <i class="fas fa-filter fa-lg" style={styles.filtericon} onClick={this.handleFilterForm} />
+              <UncontrolledTooltip placement="right" target="filter">
+                Modify Selection Criteria
+              </UncontrolledTooltip>
+            </span>
+          ) : null}
 
           {this.state.isfilter && (
             <span>
@@ -443,7 +490,7 @@ class ReusableGrid extends React.Component {
             {!this.state.allSelected && (
               <span>
                 <span id="unselectAll" style={{ marginRight: "10px" }}>
-                  <a href="" onClick={e => this.selectAll(e)}>
+                  <a href="" onClick={this.selectAll}>
                     <i className="far fa-square  fa-2x" />
                   </a>
                 </span>
@@ -558,6 +605,16 @@ class ReusableGrid extends React.Component {
           <UncontrolledTooltip placement="right" target="copyToClipboard">
             <span> Copy to clipboard </span>
           </UncontrolledTooltip>
+          {hasDeleteAll ? (
+            <Fragment>
+              <a href="#" id="deleteAll" onClick={this.deleteAll} style={styles.gridLinkStyle}>
+                <i class="fas fa-trash fa-lg fa-2x"></i>
+              </a>
+              <UncontrolledTooltip placement="right" target="deleteAll">
+                <span>Delete All</span>
+              </UncontrolledTooltip>
+            </Fragment>
+          ) : null}
         </Row>
         <ViewPDF view={this.state.viewPdfMode} handleHidePDF={this.handlePdfView} />
 
@@ -580,6 +637,14 @@ class ReusableGrid extends React.Component {
             handlePdfView={this.handlePdfView}
           />
         </ReusableModal>
+        {metadata.confirmdef ? (
+          <ConfirmModal
+            showConfirm={this.state.showConfirm}
+            {...metadata.confirmdef}
+            handleOk={this.handleOk}
+            handleCancel={this.handleCancel}
+          />
+        ) : null}
       </Fragment>
     );
   }
