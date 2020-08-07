@@ -310,6 +310,8 @@ class ReusableGrid extends React.Component {
       datafield: "edit",
       align: "center",
       width: "5%",
+      filterable:false,
+      resizable: false,
       cellsrenderer: editCellsRenderer
     };
 
@@ -582,6 +584,10 @@ class ReusableGrid extends React.Component {
             virtualmode={false}
             sortable={true}
             filterable={true}
+            columnsresize={true} 
+            showfilterrow={true}
+            columnsautoresize={true}
+            columnsresize={true}
           />
         </Row>
 
