@@ -85,10 +85,15 @@ class CustomSelect extends Component {
    
 }
   onSearchHandler(query) {
-    const { autoComplete, fieldinfo, id, updateFieldData } = this.props;
+    const { autoComplete, fieldinfo, id, updateFieldData, formValues } = this.props;
     if (fieldinfo.isasync) {
       this.setState({ isLoading: true });
-      autoComplete.getAutoCompleteData(id, query).then(options => {
+      
+      let formData = {};
+      if(fieldinfo.isDependentOnFormData){
+        formData = formValues
+      }
+      autoComplete.getAutoCompleteData(id, query, formData).then(options => {
         this.setState(
           {
             isLoading: false,
