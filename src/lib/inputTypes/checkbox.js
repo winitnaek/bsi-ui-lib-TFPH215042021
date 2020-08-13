@@ -9,33 +9,50 @@ class CustomCheckbox extends Component {
     this.CheckBoxItem = this.CheckBoxItem.bind(this);
   }
   componentDidMount() {
-    const { value, fieldsToDisable, onDisableField } = this.props;
-    if (value && value.length && fieldsToDisable && fieldsToDisable.length) {
+    const { value, fieldsToDisable = [], onDisableField, fieldinfo } = this.props;
+    const isSingleCheck = this.isSingleCheckBox(fieldinfo);
+    if ((isSingleCheck && value) || (value && value.length && fieldsToDisable && fieldsToDisable.length)) {
       onDisableField(fieldsToDisable);
     }
   }
+  isSingleCheckBox(fieldinfo){
+    return fieldinfo && fieldinfo.options && fieldinfo.options.length === 1;
+  }
   
   handleChange(event) {
-    const target = event.currentTarget;
-    let valueArray = this.props.value || [];
-    if (target.checked) {
-      if (valueArray.indexOf(target.id) === -1) {
-        // Check for duplicate entry
-        valueArray.push(target.id);
+    const { currentTarget: target } = event;
+    const { fieldinfo, value, onChange, id, fieldsToDisable, onDisableField } = this.props;
+    let valueArray = value || [];
+
+    if (this.isSingleCheckBox(fieldinfo)) {
+      valueArray = target.checked;
+      onChange(id, valueArray);
+    } else {
+      if (target.checked) {
+        if (valueArray.indexOf(target.id) === -1) {
+          // Check for duplicate entry
+          valueArray.push(target.id);
+        }
+      } else {
+        valueArray.splice(valueArray.indexOf(target.id), 1);
+      }
+      onChange(id, valueArray);
+    }
+
+    if (valueArray.length || valueArray) {
+      if (fieldsToDisable) {
+        onDisableField(fieldsToDisable);
       }
     } else {
-      valueArray.splice(valueArray.indexOf(target.id), 1);
-    }
-    this.props.onChange(this.props.id, valueArray);
-    if (valueArray.length) {
-      if (this.props.fieldsToDisable) this.props.onDisableField(this.props.fieldsToDisable);
-    } else {
-      this.props.onDisableField([]);
+      onDisableField([]);
     }
   }
 
   render() {
     const { error, id, description, required, fieldHeader, value, label, fieldinfo, touched, index } = this.props;
+
+    const isChecked = (this.isSingleCheckBox(fieldinfo) && value);
+    
     return (
       <Col>
         <FormGroup>
@@ -44,7 +61,7 @@ class CustomCheckbox extends Component {
           {fieldinfo &&
             fieldinfo.options &&
             fieldinfo.options.map(opt => {
-              return this.CheckBoxItem(opt.id, opt.value, opt.label, value.indexOf(opt.id) !== -1, this.handleChange);
+              return this.CheckBoxItem(opt.id, opt.value, opt.label, (isChecked || (value && value.indexOf(opt.id) !==1)), this.handleChange);
             })}
           {!fieldinfo && this.RadioItem(id, value, label, this.handleChange)}
           <FieldMessage error={error} touched={touched} description={description} />
