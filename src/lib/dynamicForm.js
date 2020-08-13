@@ -145,7 +145,11 @@ class DynamicForm extends Component {
             formValues={props.values}
             required={item.validation && item.validation.required}
             autoComplete={autoComplete}
-            onChange={item.fieldinfo && item.fieldinfo.typeahead ? props.setFieldValue : props.handleChange}
+            onChange={
+              (item.fieldinfo && item.fieldinfo.typeahead) || item.fieldtype === "checkbox"
+                ? props.setFieldValue
+                : props.handleChange
+            }
             onBlur={props.handleBlur}
             error={error}
             touched={touched}
