@@ -288,8 +288,8 @@ class ReusableGrid extends React.Component {
     console.log("--------props ", this.props);
 
     let metadata = this.props.metadata(this.props.pageid);
-    const {pgdef}=this.state;
-    const {hasDeleteAll}=pgdef;
+    const { pgdef } = this.state;
+    const { hasDeleteAll } = pgdef;
 
     const editCellsRenderer = ndex => {
       if (this.state.pgdef.childConfig) {

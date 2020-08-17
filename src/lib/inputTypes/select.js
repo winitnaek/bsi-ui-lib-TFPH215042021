@@ -50,12 +50,12 @@ class CustomSelect extends Component {
   componentDidMount() {
     let { options = [] } = this.state;
     let { defaultSelected } = this.state;
-    // for first time load options is empty, so the value will not populate in form as defautlSelection is null.
+    // for first time load options if empty, so the value will not populate in form as defautlSelection is null.
     // Step-1 request for the autoComplete options.
     // Step-2 find if the value is present in id or label.
     // Step-3 populate the value in the field. 
     const { value, fieldinfo, autoComplete, id , updateFieldData} = this.props;
-    if (value && !options.lenght && fieldinfo.isasync) {
+    if (value && !options.length && fieldinfo.isasync) {
       this.setState({ isLoading: true });
       autoComplete.getAutoCompleteData(id, value).then(results => {
         options = results;
