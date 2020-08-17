@@ -8,6 +8,11 @@ export function createYupSchema(schema, config) {
     return schema;
   }
   let validator = yup[validation.type]();
+
+  if (typeof validator.typeError === "function") {
+    validator = validator.typeError(config.errmsg);
+  }
+  
   if(validation.required)
     validator = validator["required"](...[config.errmsg]);
   if(validation.constraint){
