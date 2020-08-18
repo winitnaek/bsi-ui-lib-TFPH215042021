@@ -31,8 +31,16 @@ class CustomSelect extends Component {
   }
 
   handleSelectFieldChange(event) {
-    const { onChange } = this.props;
-    this.updateDependentField(event.target.value);
+    const { onChange, fieldinfo } = this.props;
+    const { value } = event.target;
+    const { options } = this.state;
+    const defaultSelected = options.find(option => option.id === value);
+    if (defaultSelected.id && defaultSelected.label) {
+      this.setState({
+        defaultSelected
+      });
+    }
+    this.updateDependentField(value);
     onChange(event);
   }
 
@@ -53,13 +61,14 @@ class CustomSelect extends Component {
     // for first time load options if empty, so the value will not populate in form as defautlSelection is null.
     // Step-1 request for the autoComplete options.
     // Step-2 find if the value is present in id or label.
-    // Step-3 populate the value in the field. 
-    const { value, fieldinfo, autoComplete, id , updateFieldData} = this.props;
+    // Step-3 populate the value in the field.
+    const { value, fieldinfo, autoComplete, id, updateFieldData } = this.props;
     if (value && !options.length && fieldinfo.isasync) {
       this.setState({ isLoading: true });
       autoComplete.getAutoCompleteData(id, value).then(results => {
         options = results;
-        defaultSelected = options.find(option => option && option.id === value || option.label === value) || defaultSelected;
+        defaultSelected =
+          options.find(option => (option && option.id === value) || option.label === value) || defaultSelected;
         this.setState(
           {
             isLoading: false,
@@ -74,24 +83,25 @@ class CustomSelect extends Component {
           }
         );
       });
-    }else{
-      defaultSelected = options.find(option => option && option.id === value) || defaultSelected;
+    } else {
+      defaultSelected =
+        options.find(option => option && (option.id === value || option.label === value || option === value)) ||
+        defaultSelected;
       this.setState({ defaultSelected }, () => {
         if (defaultSelected.id && defaultSelected.label) {
           this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
         }
       });
     }
-   
-}
+  }
   onSearchHandler(query) {
     const { autoComplete, fieldinfo, id, updateFieldData, formValues } = this.props;
     if (fieldinfo.isasync) {
       this.setState({ isLoading: true });
-      
+
       let formData = {};
-      if(fieldinfo.isDependentOnFormData){
-        formData = formValues
+      if (fieldinfo.isDependentOnFormData) {
+        formData = formValues;
       }
       autoComplete.getAutoCompleteData(id, query, formData).then(options => {
         this.setState(
@@ -162,7 +172,7 @@ class CustomSelect extends Component {
               type="select"
               name={name}
               placeholder={placeholder}
-              value={value}
+              value={defaultSelected.id || value}
               disabled={disabled}
               onChange={this.handleSelectFieldChange}
               invalid={error && touched}

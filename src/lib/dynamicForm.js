@@ -223,8 +223,11 @@ class DynamicForm extends Component {
                     values[key] = moment().format("MM/DD/yyyy");
                   }
                 }
-                updateGrid(values, rowid, mode);
-                saveGridData.saveGridData(pgid, values, mode);
+                // updateGrid(values, rowid, mode);
+                saveGridData.saveGridData(pgid, values, mode).then(({status})=>{
+                 if(status === 'SUCCESS') {
+                   formProps.renderMe(pgid, values);}
+                });
               } else {
                 formProps.renderMe(pgid, values, filter);
               }
