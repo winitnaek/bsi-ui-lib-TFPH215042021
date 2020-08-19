@@ -332,6 +332,20 @@ class DynamicForm extends Component {
 
     if (this.props.formData.mode == "Edit") {
       initialValues = this.props.formData.data;
+      fieldInfo.forEach(field => {
+        const { fieldinfo={}, id, fieldtype } = field;
+        const {options}=fieldinfo;
+
+        if (fieldtype === "select" && options && initialValues.hasOwnProperty(id)) {
+          for (let i = options.length-1; i >=0; i--) {
+            const { id: optionId, label } = options[i];
+            if (initialValues[id] === label) {
+              initialValues[id] = optionId;
+              break;
+            }
+          }
+        }
+      });
     } else {
       fieldInfo.forEach(item => {
         const { fieldtype, value, id } = item;
