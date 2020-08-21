@@ -17,12 +17,16 @@ class DynamicForm extends Component {
   constructor(props) {
     super(props);
     const { fieldData } = props;
+    //let recentUsage = [];
+    
+    /**/
     this.state = {
       showDelete: false,
       isReset: false,
       disabledFields: [],
       fieldData,
-      saveAsMode: false
+      saveAsMode: false,
+      recentUsageData:[]
     };
 
     this.handleView = () => {
@@ -176,7 +180,19 @@ class DynamicForm extends Component {
     this.setState({ 
       showDelete: hasDelete && isEdit && hasDeletePermission
     });
-
+    this.props
+    .recentUsage(
+      this.props.formProps.pgid,
+      this.props.formData.data,
+      this.props.formData.mode
+    )
+    .then(recentUsage=> {
+      console.log(recentUsage);
+      this.setState({recentUsageData:recentUsage});
+    })
+    .catch((error) => {
+      throw error;
+    });
   }
 
   render() {
@@ -277,8 +293,8 @@ class DynamicForm extends Component {
                       </Col>
                     </FormGroup>
                   )}
-                  {formMetaData.formdef && formMetaData.formdef.hasRecentUsage && (
-                    <Usage pgid={pgid} tftools={tftools} close={close} recentUsage={recentUsage} />
+                  {formMetaData.formdef && formMetaData.formdef.hasRecentUsage &&(
+                    <Usage pgid={pgid} tftools={tftools} pgtitle={formMetaData.pgdef.pgtitle} mode={this.props.formData.mode} data={this.props.formData.data} close={close} recentUsage={this.props.recentUsage} />
                   )}
                 </ModalBody>
                 <ModalFooter>
@@ -288,7 +304,7 @@ class DynamicForm extends Component {
                   <Button onClick={this.handleReset} color="secondary" className="btn btn-primary mr-auto" type="reset">
                     Reset
                   </Button>
-                  {this.state.showDelete && !saveAsMode && (
+                  {this.state.showDelete && !saveAsMode && this.state.recentUsageData && !this.state.recentUsageData.usageDataStr && (
                     <Button onClick={this.handleDelete} color="danger">
                       Delete
                     </Button>
