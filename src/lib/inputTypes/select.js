@@ -34,7 +34,8 @@ class CustomSelect extends Component {
     const { onChange, fieldinfo } = this.props;
     const { value } = event.target;
     const { options } = this.state;
-    const defaultSelected = options.find(option => option.id === value);
+    let { defaultSelected } = this.state;
+     defaultSelected = options.find(option => option.id === value) || defaultSelected;
     if (defaultSelected.id && defaultSelected.label) {
       this.setState({
         defaultSelected
