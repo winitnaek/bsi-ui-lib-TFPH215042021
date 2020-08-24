@@ -35,12 +35,23 @@ class CustomSelect extends Component {
     const { value } = event.target;
     const { options } = this.state;
     let { defaultSelected } = this.state;
-     defaultSelected = options.find(option => option.id === value) || defaultSelected;
+    let hasMappedFields = false;
+    options.forEach(option=>{
+      if(option.id === value){
+        defaultSelected = option;
+      }
+
+      hasMappedFields = !hasMappedFields && option.mappedFieldsToShow;
+    })
+     
     if (defaultSelected.id && defaultSelected.label) {
       this.setState({
         defaultSelected
       });
     }
+
+    hasMappedFields && this.props.showMappedFields(defaultSelected);
+    
     this.updateDependentField(value);
     onChange(event);
   }

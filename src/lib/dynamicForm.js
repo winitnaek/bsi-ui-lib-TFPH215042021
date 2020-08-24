@@ -18,7 +18,7 @@ class DynamicForm extends Component {
     super(props);
     const { fieldData } = props;
     //let recentUsage = [];
-    
+
     /**/
     this.state = {
       showDelete: false,
@@ -26,7 +26,7 @@ class DynamicForm extends Component {
       disabledFields: [],
       fieldData,
       saveAsMode: false,
-      recentUsageData:[]
+      recentUsageData: []
     };
 
     this.handleView = () => {
@@ -73,6 +73,36 @@ class DynamicForm extends Component {
         }
       );
     };
+
+    this.showMappedFields = ({ mappedFieldsToShow = [] }) => {
+      const { fieldData } = this.state;
+      const updatedFieldData = fieldData.map((field, key) => {
+        const { fieldHeader, id } = field;
+        if (field.hasOwnProperty('hide')) {
+          field.hide = mappedFieldsToShow.indexOf(id) === -1;
+          if (fieldData[key + 1]) {
+            fieldData[key + 1].fieldHeader = field.hide && fieldHeader ? fieldHeader : '';
+          }
+        }
+
+        return field;
+      });
+
+      this.setState({
+        fieldData: updatedFieldData
+      });
+    };
+
+    this.getFilteredValues = values => {
+      const { fieldData } = this.state;
+      fieldData.forEach(field => {
+        const { id, hide } = field;
+        if (hide) {
+          delete values[id];
+        }
+      });
+      return values;
+    };
   }
 
   disabledHandler(id) {
@@ -85,16 +115,16 @@ class DynamicForm extends Component {
       if (formflds) {
         row = formflds.filter(r => id == r.id);
         if (row.length > 0) {
-          if (row[0].isReadOnlyOnEdit == true && this.props.formData.mode == "Edit") {
+          if (row[0].isReadOnlyOnEdit == true && this.props.formData.mode == 'Edit') {
             return true;
-          } else if (row[0].isReadOnlyOnNew == true && this.props.formData.mode != "Edit") {
+          } else if (row[0].isReadOnlyOnNew == true && this.props.formData.mode != 'Edit') {
             return true;
           }
         }
       }
       return false;
     } catch (error) {
-      console.log("error", error);
+      console.log('error', error);
     }
   }
 
@@ -130,7 +160,7 @@ class DynamicForm extends Component {
       const Component = fieldMap[item.fieldtype];
       let error = props.errors.hasOwnProperty(item.id) && props.errors[item.id];
       let touched = props.touched.hasOwnProperty(item.id) && props.touched[item.id];
-      if (item.fieldtype) {
+      if (item.fieldtype && !item.hide) {
         return (
           <Component
             index={index}
@@ -150,7 +180,7 @@ class DynamicForm extends Component {
             required={item.validation && item.validation.required}
             autoComplete={autoComplete}
             onChange={
-              (item.fieldinfo && item.fieldinfo.typeahead) || item.fieldtype === "checkbox"
+              (item.fieldinfo && item.fieldinfo.typeahead) || item.fieldtype === 'checkbox'
                 ? props.setFieldValue
                 : props.handleChange
             }
@@ -160,10 +190,11 @@ class DynamicForm extends Component {
             isReset={this.state.isReset}
             dependentFields={item.dependentFields}
             updateFieldData={this.updateFieldData}
+            showMappedFields={this.showMappedFields}
           />
         );
       }
-      return "";
+      return '';
     });
   }
 
@@ -171,28 +202,24 @@ class DynamicForm extends Component {
     const hasDelete = this.props.formMetaData.formdef.hasDelete;
     const mode = this.props.formData.mode;
     let isEdit = false;
-    if (mode === "Edit") {
+    if (mode === 'Edit') {
       isEdit = true;
     }
-    
+
     const hasDeletePermission = this.props.formProps.permissions && this.props.formProps.permissions.DELETE;
 
-    this.setState({ 
+    this.setState({
       showDelete: hasDelete && isEdit && hasDeletePermission
     });
     this.props
-    .recentUsage(
-      this.props.formProps.pgid,
-      this.props.formData.data,
-      this.props.formData.mode
-    )
-    .then(recentUsage=> {
-      console.log(recentUsage);
-      this.setState({recentUsageData:recentUsage});
-    })
-    .catch((error) => {
-      throw error;
-    });
+      .recentUsage(this.props.formProps.pgid, this.props.formData.data || {}, this.props.formData.mode)
+      .then(recentUsage => {
+        console.log(recentUsage);
+        this.setState({ recentUsageData: recentUsage });
+      })
+      .catch(error => {
+        throw error;
+      });
   }
 
   render() {
@@ -214,7 +241,7 @@ class DynamicForm extends Component {
       const { hasDelete, hasViewPDF, hasSaveAs, viewAllBtnText } = this.props.formMetaData.formdef;
       const mode = this.props.formData.mode;
       let isEdit = false;
-      if (mode === "Edit") {
+      if (mode === 'Edit') {
         isEdit = true;
       }
       const { saveAsMode } = this.state;
@@ -230,19 +257,21 @@ class DynamicForm extends Component {
               let rowid = null;
               const { mode } = this.props.formData;
 
-              if (mode === "Edit") {
+              if (mode === 'Edit') {
                 rowid = this.props.formData.index;
               }
               if (!filter) {
                 for (let key in values) {
-                  if (values[key] === "new Date()") {
-                    values[key] = moment().format("MM/DD/yyyy");
+                  if (values[key] === 'new Date()') {
+                    values[key] = moment().format('MM/DD/yyyy');
                   }
                 }
                 // updateGrid(values, rowid, mode);
-                saveGridData.saveGridData(pgid, values, mode).then(({status})=>{
-                 if(status === 'SUCCESS') {
-                   formProps.renderMe(pgid, values);}
+                const formValues = this.getFilteredValues(Object.assign({}, values));
+                saveGridData.saveGridData(pgid, formValues, mode).then(({ status }) => {
+                  if (status === 'SUCCESS') {
+                    formProps.renderMe(pgid, formValues);
+                  }
                 });
               } else {
                 formProps.renderMe(pgid, values, filter);
@@ -250,7 +279,7 @@ class DynamicForm extends Component {
               close(true);
               actions.resetForm({});
             } catch (error) {
-              console.log("Form Error >>>>>>  ", error);
+              console.log('Form Error >>>>>>  ', error);
               actions.setSubmitting(false);
               actions.setErrors({ submit: error.message });
             }
@@ -258,7 +287,7 @@ class DynamicForm extends Component {
           onReset={() => {
             fieldInfo &&
               fieldInfo.forEach(item => {
-                if (item.fieldtype == "radio" || item.fieldtyle == "checkbox") {
+                if (item.fieldtype == 'radio' || item.fieldtyle == 'checkbox') {
                   item.fieldinfo.options &&
                     item.fieldinfo.options.forEach(subItem => {
                       document.getElementById(subItem.id).checked = false;
@@ -274,61 +303,72 @@ class DynamicForm extends Component {
                   <Form
                     onSubmit={this.props.submit}
                     style={{
-                      display: "flex",
-                      margin: "0 auto",
-                      width: "70%",
-                      flexWrap: "wrap"
+                      display: 'flex',
+                      margin: '0 auto',
+                      width: '70%',
+                      flexWrap: 'wrap'
                     }}
-                    id="myform"
+                    id='myform'
                   >
                     <Col>{this.renderFormElements(props, fieldInfo, autoComplete)}</Col>
                   </Form>
                   {formMetaData.formdef && formMetaData.formdef.note && (
                     <FormGroup row>
-                      <Col sm={2} style={{ marginLeft: "15px" }}>
-                        <Label for="toolsFile"></Label>
+                      <Col sm={2} style={{ marginLeft: '15px' }}>
+                        <Label for='toolsFile'></Label>
                       </Col>
                       <Col sm={9}>
-                        <Label style={{ fontWeight: "bold" }}>{formMetaData.formdef.note}</Label>
+                        <Label style={{ fontWeight: 'bold' }}>{formMetaData.formdef.note}</Label>
                       </Col>
                     </FormGroup>
                   )}
-                  {formMetaData.formdef && formMetaData.formdef.hasRecentUsage &&(
-                    <Usage pgid={pgid} tftools={tftools} pgtitle={formMetaData.pgdef.pgtitle} mode={this.props.formData.mode} data={this.props.formData.data} close={close} recentUsage={this.props.recentUsage} />
+                  {formMetaData.formdef && formMetaData.formdef.hasRecentUsage && (
+                    <Usage
+                      pgid={pgid}
+                      tftools={tftools}
+                      pgtitle={formMetaData.pgdef.pgtitle}
+                      mode={this.props.formData.mode}
+                      data={this.props.formData.data || {}}
+                      close={close}
+                      recentUsage={this.props.recentUsage}
+                    />
                   )}
                 </ModalBody>
                 <ModalFooter>
-                  <Button color="primary" className="btn btn-primary" onClick={() => close(false)}>
+                  <Button color='primary' className='btn btn-primary' onClick={() => close(false)}>
                     Cancel
                   </Button>
-                  <Button onClick={this.handleReset} color="secondary" className="btn btn-primary mr-auto" type="reset">
+                  <Button onClick={this.handleReset} color='secondary' className='btn btn-primary mr-auto' type='reset'>
                     Reset
                   </Button>
-                  {this.state.showDelete && !saveAsMode && this.state.recentUsageData && !this.state.recentUsageData.usageDataStr && (
-                    <Button onClick={this.handleDelete} color="danger">
-                      Delete
-                    </Button>
-                  )}
-                  {hasViewPDF && mode === "Edit" ? (
-                    <Button onClick={this.props.handlePdfView} color="success">
+                  {this.state.showDelete &&
+                    !saveAsMode &&
+                    this.state.recentUsageData &&
+                    !this.state.recentUsageData.usageDataStr && (
+                      <Button onClick={this.handleDelete} color='danger'>
+                        Delete
+                      </Button>
+                    )}
+                  {hasViewPDF && mode === 'Edit' ? (
+                    <Button onClick={this.props.handlePdfView} color='success'>
                       View PDF
                     </Button>
-                  ): null}
-                  <Button type="submit" color="success">
-                    {this.props.filter || this.props.formMetaData.griddef.isfilterform ? " View " : " Save "}
+                  ) : null}
+                  <Button type='submit' color='success'>
+                    {this.props.filter || this.props.formMetaData.griddef.isfilterform ? ' View ' : ' Save '}
                   </Button>
 
-                  {hasSaveAs && !saveAsMode && mode === "Edit" ? (
-                    <Button id="saveAsNew" color="success" onClick={e => this.handleSaveAs(e, props)}>
+                  {hasSaveAs && !saveAsMode && mode === 'Edit' ? (
+                    <Button id='saveAsNew' color='success' onClick={e => this.handleSaveAs(e, props)}>
                       Save As New
-                      <UncontrolledTooltip placement="right" target="saveAsNew">
+                      <UncontrolledTooltip placement='right' target='saveAsNew'>
                         <span> Save As A New Record </span>
                       </UncontrolledTooltip>
                     </Button>
                   ) : null}
 
                   {viewAllBtnText && (
-                    <Button color="success" onClick={e => this.handleViewAll(e, props)}>
+                    <Button color='success' onClick={e => this.handleViewAll(e, props)}>
                       {viewAllBtnText}
                     </Button>
                   )}
@@ -346,14 +386,14 @@ class DynamicForm extends Component {
       close(false);
     };
 
-    if (this.props.formData.mode == "Edit") {
+    if (this.props.formData.mode == 'Edit') {
       initialValues = this.props.formData.data;
       fieldInfo.forEach(field => {
-        const { fieldinfo={}, id, fieldtype } = field;
-        const {options}=fieldinfo;
+        const { fieldinfo = {}, id, fieldtype } = field;
+        const { options } = fieldinfo;
 
-        if (fieldtype === "select" && options && initialValues.hasOwnProperty(id)) {
-          for (let i = options.length-1; i >=0; i--) {
+        if (fieldtype === 'select' && options && initialValues.hasOwnProperty(id)) {
+          for (let i = options.length - 1; i >= 0; i--) {
             const { id: optionId, label } = options[i];
             if (initialValues[id] === label) {
               initialValues[id] = optionId;
@@ -365,10 +405,10 @@ class DynamicForm extends Component {
     } else {
       fieldInfo.forEach(item => {
         const { fieldtype, value, id } = item;
-        if (fieldtype === "date" && value === "new Date()") {
-          item.value = moment().format("yyyy-MM-DD");
+        if (fieldtype === 'date' && value === 'new Date()') {
+          item.value = moment().format('yyyy-MM-DD');
         }
-        initialValues[id] = item.value || "";
+        initialValues[id] = item.value || '';
       });
     }
 
