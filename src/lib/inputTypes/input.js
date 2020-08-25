@@ -5,7 +5,7 @@ import {FieldLabel, FieldMessage, FieldHeader} from "../field";
 class CustomInput extends Component {
   render() {
     const {name,error,touched,description,required,label,fieldHeader,
-           disabled,placeholder,value,onChange,onBlur,index} = this.props;
+           disabled,placeholder,value,onChange,onBlur,index,maxLength} = this.props;
     return (
       <FormGroup>
           <Col>
@@ -20,6 +20,7 @@ class CustomInput extends Component {
                     onBlur={onBlur}
                     invalid={error && touched}
                     disabled={disabled}
+                    maxLength={maxLength}
                 />
                 <FieldMessage 
                     error={error} 

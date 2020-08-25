@@ -149,6 +149,7 @@ class DynamicForm extends Component {
             formValues={props.values}
             required={item.validation && item.validation.required}
             autoComplete={autoComplete}
+            maxLength={item.fieldlength.maxlength}
             onChange={
               (item.fieldinfo && item.fieldinfo.typeahead) || item.fieldtype === "checkbox"
                 ? props.setFieldValue
