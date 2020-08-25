@@ -5,6 +5,7 @@ import { Col, Row, UncontrolledTooltip } from "reactstrap";
 import ReusableModal from "./reusableModal";
 import DynamicForm from "./dynamicForm";
 import ConfirmModal from "./confirmModal";
+import ReusableAlert from "./reusableAlert";
 import Grid from "../../src/deps/jqwidgets-react/react_jqxgrid";
 import ViewPDF from "./viewPDF";
 
@@ -51,7 +52,13 @@ class ReusableGrid extends React.Component {
       isOpen: false,
       viewPdfMode: false,
       isSaveSuccess: false,
-      showConfirm:false
+      showConfirm: false,
+      alertInfo: {
+        showAlert: false,
+        aheader: "",
+        abody: "",
+        abtnlbl: "Ok"
+      }
     };
 
     this.editClick = (index, pgid) => {
@@ -129,7 +136,7 @@ class ReusableGrid extends React.Component {
     this.handleFilter = e => {
       e.preventDefault();
       // Either Render Parent Grid or Toggle isOpen to Open Modal
-      const { parentConfig  } = this.state;
+      const { parentConfig } = this.state;
       parentConfig ? this.handleChildGrid(parentConfig.pgdef.pgid) : this.handleFilterForm(e);
     };
 
@@ -171,16 +178,16 @@ class ReusableGrid extends React.Component {
     this.handleOk = () => {
       let _id = document.querySelector("div[role='grid']").id;
       const { deleteGridData } = this.props;
-      const {pgid}=this.state;
+      const { pgid } = this.state;
       const griddata = $("#" + _id).jqxGrid("getdatainformation");
       const rows = [];
-      for (let i = 0; i < griddata.rowscount; i++){
+      for (let i = 0; i < griddata.rowscount; i++) {
         rows.push($("#" + _id).jqxGrid("getrenderedrowdata", i));
       }
 
-     // TODO: Check with API team which method to call to delete all rows
+      // TODO: Check with API team which method to call to delete all rows
       deleteGridData.deleteGridData(pgid, rows, "Edit");
- 
+
       $("#" + _id).jqxGrid("clear");
       this.setState({
         showConfirm: false
@@ -191,6 +198,23 @@ class ReusableGrid extends React.Component {
       this.setState({
         showConfirm: false
       });
+    };
+
+    this.mapToolUsage = (id, successMessage, errorMessage) => {
+      const { mapToolUsage } = this.props;
+      const { pgid } = this.state;
+      // TODO: Check for request payload format
+      mapToolUsage.createDefaultMapping(pgid, { id }).then(res => {
+        const { alertInfo } = this.state;
+        this.setState({
+          alertInfo: Object.assign({}, alertInfo, { abody: successMessage, showAlert: true })
+        });
+      });
+    };
+
+    this.handleAlertOk = () => {
+      const { pgid, filterFormData } = this.state;
+      this.renderMe(pgid, filter, false);
     };
 
     this.renderMe = (pgid, values, filter) => {
@@ -288,8 +312,8 @@ class ReusableGrid extends React.Component {
     console.log("--------props ", this.props);
 
     let metadata = this.props.metadata(this.props.pageid);
-    const { pgdef } = this.state;
-    const { hasDeleteAll } = pgdef;
+    const { pgdef, source } = this.state;
+    const { hasDeleteAll, extraLinks } = pgdef;
 
     const editCellsRenderer = ndex => {
       if (this.state.pgdef.childConfig) {
@@ -302,15 +326,14 @@ class ReusableGrid extends React.Component {
       }
     };
 
-    let dataAdapter = new $.jqx.dataAdapter(this.state.source);
-    let text;
-    this.state.pgdef.childConfig ? (text = "View") : (text = "Edit");
+    let dataAdapter = new $.jqx.dataAdapter(source);
+    let text = pgdef.childConfig ? "View" : "Edit";
     const editColumn = {
       text: text,
       datafield: "edit",
       align: "center",
       width: "5%",
-      filterable:false,
+      filterable: false,
       resizable: false,
       cellsrenderer: editCellsRenderer
     };
@@ -584,7 +607,7 @@ class ReusableGrid extends React.Component {
             virtualmode={false}
             sortable={true}
             filterable={true}
-            columnsresize={true} 
+            columnsresize={true}
             showfilterrow={true}
             columnsautoresize={true}
             columnsresize={true}
@@ -592,20 +615,20 @@ class ReusableGrid extends React.Component {
         </Row>
 
         <Row style={styles.gridRowStyle}>
-          <a href="#" id="exportToExcel" onClick={() => this.exportToExcel()}>
+          <a href="#" id="exportToExcel" onClick={this.exportToExcel}>
             <i class="fas fa-table fa-lg fa-2x"></i>
           </a>
           <UncontrolledTooltip placement="right" target="exportToExcel">
             <span> Export to Excel </span>
           </UncontrolledTooltip>
-          <a href="#" id="exportToCsv" onClick={() => this.exportToCsv()} style={styles.gridLinkStyle}>
+          <a href="#" id="exportToCsv" onClick={this.exportToCsv} style={styles.gridLinkStyle}>
             <i class="fas fa-pen-square fa-lg fa-2x"></i>
           </a>
           <UncontrolledTooltip placement="right" target="exportToCsv">
             <span> Export to CSV </span>
           </UncontrolledTooltip>
 
-          <a href="#" id="copyToClipboard" onClick={e => this.copyToClipboardHandler(e)} style={styles.gridLinkStyle}>
+          <a href="#" id="copyToClipboard" onClick={this.copyToClipboardHandler} style={styles.gridLinkStyle}>
             <i class="far fa-copy fa-lg fa-2x"></i>
           </a>
           <UncontrolledTooltip placement="right" target="copyToClipboard">
@@ -621,6 +644,23 @@ class ReusableGrid extends React.Component {
               </UncontrolledTooltip>
             </Fragment>
           ) : null}
+          {extraLinks
+            ? extraLinks.map(({ id, description, icon, successMessage, errorMessage }) => (
+                <Fragment>
+                  <a
+                    href="#"
+                    id={id}
+                    onClick={() => this.mapToolUsage(id, successMessage, errorMessage)}
+                    style={styles.gridLinkStyle}
+                  >
+                    <i class={`fas ${icon} fa-lg fa-2x`}></i>
+                  </a>
+                  <UncontrolledTooltip placement="right" target={id}>
+                    <span>{description}</span>
+                  </UncontrolledTooltip>
+                </Fragment>
+              ))
+            : null}
         </Row>
         <ViewPDF view={this.state.viewPdfMode} handleHidePDF={this.handlePdfView} />
 
@@ -650,6 +690,9 @@ class ReusableGrid extends React.Component {
             handleOk={this.handleOk}
             handleCancel={this.handleCancel}
           />
+        ) : null}
+        {this.state.alertInfo.showAlert ? (
+          <ReusableAlert {...this.state.alertInfo} handleClick={this.handleAlertOk} />
         ) : null}
       </Fragment>
     );
