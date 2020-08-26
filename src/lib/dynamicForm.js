@@ -74,25 +74,6 @@ class DynamicForm extends Component {
       );
     };
 
-    this.showMappedFields = ({ mappedFieldsToShow = [] }) => {
-      const { fieldData } = this.state;
-      const updatedFieldData = fieldData.map((field, key) => {
-        const { fieldHeader, id } = field;
-        if (field.hasOwnProperty('hide')) {
-          field.hide = mappedFieldsToShow.indexOf(id) === -1;
-          if (fieldData[key + 1]) {
-            fieldData[key + 1].fieldHeader = field.hide && fieldHeader ? fieldHeader : '';
-          }
-        }
-
-        return field;
-      });
-
-      this.setState({
-        fieldData: updatedFieldData
-      });
-    };
-
     this.getFilteredValues = values => {
       const { fieldData } = this.state;
       fieldData.forEach(field => {
@@ -147,6 +128,7 @@ class DynamicForm extends Component {
         isReset: false
       });
     }
+    const {values}=props;
 
     return fieldInfo.map((item, index) => {
       const fieldMap = {
@@ -160,7 +142,22 @@ class DynamicForm extends Component {
       const Component = fieldMap[item.fieldtype];
       let error = props.errors.hasOwnProperty(item.id) && props.errors[item.id];
       let touched = props.touched.hasOwnProperty(item.id) && props.touched[item.id];
-      if (item.fieldtype && !item.hide) {
+      let show = true;
+
+      if(item.show){
+        const keys = Object.keys(item.show);
+        for(let length=keys.length-1;length>=0;length--  ){
+          const key = keys[length];
+          const showForValues = item.show[key];
+          show = show && showForValues.indexOf(values[key]) !== -1
+        }
+        const nextField = fieldInfo[index + 1];
+        if (nextField) {
+          nextField.fieldHeader = (!show && item.nextFieldHeader) || '';
+        }
+      }
+
+      if (item.fieldtype && show) {
         return (
           <Component
             index={index}
