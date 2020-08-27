@@ -188,7 +188,6 @@ class DynamicForm extends Component {
             isReset={this.state.isReset}
             dependentFields={item.dependentFields}
             updateFieldData={this.updateFieldData}
-            showMappedFields={this.showMappedFields}
           />
         );
       }
