@@ -30,6 +30,7 @@ class ReusableGrid extends React.Component {
       dataFields: metadata.griddef.dataFields,
       title: metadata.pgdef.pgtitle,
       subtitle: metadata.pgdef.pgsubtitle,
+      caption: metadata.pgdef.caption,
       addNewLabel: metadata.pgdef.addNewLabel,
       recordEdit: metadata.griddef.recordEdit,
       recordDelete: metadata.griddef.recordDelete,
@@ -424,14 +425,17 @@ class ReusableGrid extends React.Component {
         <Row>
           <h1 style={styles.pagetitle}>{this.state.title}</h1>
 
-          <span style={styles.helpMargin}>
-            <span id="help">
-              <i className="fas fa-question-circle  fa-lg" onClick={this.OpenHelp} style={styles.helpicon} />
+          {this.state.helpLabel && (
+            <span style={styles.helpMargin}>
+              <span id="help">
+                <i className="fas fa-question-circle  fa-lg" onClick={this.OpenHelp} style={styles.helpicon} />
+              </span>
+              <UncontrolledTooltip placement="right" target="help">
+                <span> {this.state.helpLabel} </span>
+              </UncontrolledTooltip>
             </span>
-            <UncontrolledTooltip placement="right" target="help">
-              <span> {this.state.helpLabel} </span>
-            </UncontrolledTooltip>
-          </span>
+          )}
+
           {this.state.hasFilter ? (
             <span id="filter">
               <i class="fas fa-filter fa-lg" style={styles.filtericon} onClick={this.handleFilterForm} />
@@ -477,6 +481,11 @@ class ReusableGrid extends React.Component {
             <p>{this.state.source.localdata && this.state.subtitle}</p>
           </Row>
         ) : null}
+        {this.state.caption && (
+          <Row>
+            <p className="text-center w-100 m-0">{this.state.caption}</p>
+          </Row>
+        )}
         {!griddata[0] && this.props.formFilterData && this.props.formFilterData.companyName ? (
           <Row>
             <p>
