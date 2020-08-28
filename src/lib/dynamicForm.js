@@ -26,7 +26,8 @@ class DynamicForm extends Component {
       disabledFields: [],
       fieldData,
       saveAsMode: false,
-      recentUsageData: []
+      recentUsageData: [],
+      type2PgIds:["customTaxFormulas"]
     };
 
     this.handleView = () => {
@@ -55,7 +56,7 @@ class DynamicForm extends Component {
     };
 
     this.updateFieldData = this.updateFieldData.bind(this);
-
+    this.populateIdForEntity=this.populateIdForEntity.bind(this);
     this.handleViewAll = (event, { values }) => {
       event.preventDefault();
       const { formProps, formData } = this.props;
@@ -121,7 +122,12 @@ class DynamicForm extends Component {
       fieldData: updatedFieldData
     });
   }
-
+  populateIdForEntity(initialValues, pageId) {
+    if (pageId == this.state.type2PgIds[0]) {
+      initialValues.taxCode = this.props.formFilterData.taxCode;
+    }
+    return initialValues;
+  }
   renderFormElements(props, fieldInfo, autoComplete) {
     if (this.state.isReset) {
       this.setState({
@@ -197,6 +203,7 @@ class DynamicForm extends Component {
 
   componentDidMount() {
     const hasDelete = this.props.formMetaData.formdef.hasDelete;
+    const hasUsage = this.props.formMetaData.formdef.hasRecentUsage;
     const mode = this.props.formData.mode;
     let isEdit = false;
     if (mode === 'Edit') {
@@ -208,15 +215,17 @@ class DynamicForm extends Component {
     this.setState({
       showDelete: hasDelete && isEdit && hasDeletePermission
     });
+    if (hasUsage) {
     this.props
-      .recentUsage(this.props.formProps.pgid, this.props.formData.data || {}, this.props.formData.mode)
-      .then(recentUsage => {
+      .recentUsage(this.props.formProps.pgid,this.props.formData.data || {},this.props.formData.mode)
+      .then((recentUsage) => {
         console.log(recentUsage);
         this.setState({ recentUsageData: recentUsage });
       })
-      .catch(error => {
+      .catch((error) => {
         throw error;
       });
+    }
   }
 
   render() {
@@ -243,7 +252,10 @@ class DynamicForm extends Component {
       }
       const { saveAsMode } = this.state;
       const hasDeletePermission = this.props.formProps.permissions && this.props.formProps.permissions.DELETE;
-
+      const pgId = this.props.formProps.pgid;
+      if (mode === "New" && this.state.type2PgIds.includes(pgId)) {
+        initialValues = this.populateIdForEntity(initialValues, pgId);
+      }
       return (
         <Formik
           initialValues={initialValues}
@@ -265,9 +277,14 @@ class DynamicForm extends Component {
                 }
                 // updateGrid(values, rowid, mode);
                 const formValues = this.getFilteredValues(Object.assign({}, values));
-                saveGridData.saveGridData(pgid, formValues, mode).then(({ status }) => {
-                  if (status === 'SUCCESS') {
+                saveGridData.saveGridData(pgid, formValues, mode).then((saveStatus) => {
+                  if (saveStatus.status === 'SUCCESS') {
                     formProps.renderMe(pgid, formValues);
+                    let message = saveStatus.message;
+                    alert(message);
+                  }else if(saveStatus.status === 'ERROR'){
+                    let message = saveStatus.message;
+                    alert(message);
                   }
                 });
               } else {

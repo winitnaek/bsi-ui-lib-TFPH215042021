@@ -166,8 +166,16 @@ class ReusableGrid extends React.Component {
       // need to uncomment below when hooking up to api
       // this.props.deleteGridData(pgid, rowid)
       const { deleteGridData } = this.props;
-      deleteGridData.deleteGridData(pgid, this.props.formData.data, "Edit");
-      $("#" + _id).jqxGrid("deleterow", rowid);
+      deleteGridData
+      .deleteGridData(pgid, this.props.formData.data, "Edit")
+      .then((deleteStatus) => {
+        if (deleteStatus.status === "SUCCESS") {
+          $("#" + _id).jqxGrid("deleterow", rowid);
+          alert(deleteStatus.message);
+        } else if (deleteStatus.status === "ERROR") {
+          alert(deleteStatus.message);
+        }
+      });
     };
 
     this.deleteAll = () => {
@@ -557,7 +565,8 @@ class ReusableGrid extends React.Component {
                     borderRadius: 10,
                     textAlign: "center",
                     height: 30,
-                    paddingTop: 3
+                    paddingTop: 3,
+                    display:'none'
                   }}
                 >
                   Saved successfully
@@ -690,6 +699,7 @@ class ReusableGrid extends React.Component {
             handleSaveAs={this.handleNewForm}
             handleCancel={this.handleFilterForm}
             handlePdfView={this.handlePdfView}
+            formFilterData={this.props.formFilterData}
           />
         </ReusableModal>
         {metadata.confirmdef ? (
