@@ -85,6 +85,25 @@ class DynamicForm extends Component {
       });
       return values;
     };
+
+    this.handleGenerate = this.handleGenerate.bind(this);
+  }
+
+  handleGenerate(e, formValues) {
+    const { formHandlerService, formProps, fieldData } = this.props;
+    const { pgid } = formProps;
+    const payload = {};
+    fieldData.forEach(({id}) => {
+      payload[id] = formValues[id];
+    });
+    formHandlerService.generate(pgid, payload).then(response => {
+      if (response.status === 'SUCCESS') {
+        formProps.renderMe(pgid, formValues, response);
+      } else if (response.status === 'ERROR') {
+        let message = response.message;
+        alert(message);
+      }
+    });
   }
 
   disabledHandler(id) {
@@ -250,7 +269,9 @@ class DynamicForm extends Component {
         hasSaveAs,
         viewAllBtnText,
         hideReset,
-        submitButtonText
+        submitButtonText,
+        hasGenerate,
+        generateButtonText
       } = this.props.formMetaData.formdef;
       const mode = this.props.formData.mode;
       let isEdit = false;
@@ -265,6 +286,7 @@ class DynamicForm extends Component {
       }
       return (
         <Formik
+          enableReinitialize
           initialValues={initialValues}
           validationSchema={validateSchema}
           validateOnChange={true}
@@ -379,16 +401,23 @@ class DynamicForm extends Component {
                         Delete
                       </Button>
                     )}
+                  {hasGenerate && (
+                    <Button onClick={e => this.handleGenerate(e, props.values)} color='success'>
+                      {generateButtonText}
+                    </Button>
+                  )}
                   {hasViewPDF && mode === 'Edit' ? (
                     <Button onClick={this.props.handlePdfView} color='success'>
                       View PDF
                     </Button>
                   ) : null}
-                  <Button type='submit' color='success'>
-                    {this.props.filter || this.props.formMetaData.griddef.isfilterform
-                      ? submitButtonText || ' View '
-                      : ' Save '}
-                  </Button>
+                  {!hasGenerate && (
+                    <Button type='submit' color='success'>
+                      {this.props.filter || this.props.formMetaData.griddef.isfilterform
+                        ? submitButtonText || ' View '
+                        : ' Save '}
+                    </Button>
+                  )}
 
                   {hasSaveAs && !saveAsMode && mode === 'Edit' ? (
                     <Button id='saveAsNew' color='success' onClick={e => this.handleSaveAs(e, props)}>
@@ -440,7 +469,7 @@ class DynamicForm extends Component {
         if (fieldtype === 'date' && value === 'new Date()') {
           item.value = moment().format('yyyy-MM-DD');
         }
-        initialValues[id] = item.value || '';
+        initialValues[id] = initialValues[id] || item.value || '';
       });
     }
 
