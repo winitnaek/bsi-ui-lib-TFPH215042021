@@ -414,10 +414,14 @@ class ReusableGrid extends React.Component {
 
     let formatedFilterData = "";
 
+   
+
     if (this.props.formFilterData.taxCode) {
+      let name   = this.props.formFilterData.name;
+      let txName = this.props.formFilterData.taxName?this.props.formFilterData.taxName.split('-')[1]:'';
       formatedFilterData = (
         <span style={{ fontWeight: "bold" }}>
-          {this.props.formFilterData.taxCode} ( {this.props.formFilterData.name} )
+          {this.props.formFilterData.taxCode}
         </span>
       );
     } else if (this.props.formFilterData.company) {
