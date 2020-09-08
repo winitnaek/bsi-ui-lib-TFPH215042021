@@ -61,7 +61,7 @@ class CustomCheckbox extends Component {
           {fieldinfo &&
             fieldinfo.options &&
             fieldinfo.options.map(opt => {
-              return this.CheckBoxItem(opt.id, opt.value, opt.label, (isChecked || (value && value.indexOf(opt.id) !==1)), this.handleChange);
+              return this.CheckBoxItem(opt.id, opt.value, opt.label, (isChecked || (value && value.indexOf(opt.id) !== -1)), this.handleChange);
             })}
           {!fieldinfo && this.RadioItem(id, value, label, this.handleChange)}
           <FieldMessage error={error} touched={touched} description={description} />

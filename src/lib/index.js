@@ -1,4 +1,6 @@
 export {default as DynamicForm} from './dynamicForm.js';
+export {default as CustomCheckbox} from './inputTypes/checkbox';
+export {default as CustomFile} from './inputTypes/fileUpload';
 export {default as ReusableGrid} from './reusableGrid.js';
 export {default as ConfirmModal} from './confirmModal.js';
 export {default as ReusableAlert} from './reusableAlert.js';
