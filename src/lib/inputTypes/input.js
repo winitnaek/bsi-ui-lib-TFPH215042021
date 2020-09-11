@@ -5,12 +5,12 @@ import {FieldLabel, FieldMessage, FieldHeader} from "../field";
 class CustomInput extends Component {
   render() {
     const {name,error,touched,description,required,label,fieldHeader,
-           disabled,placeholder,value,onChange,onBlur,index,maxLength} = this.props;
+           disabled,placeholder,value,onChange,onBlur,index,maxLength,hidden} = this.props;
     return (
       <FormGroup>
           <Col>
                 {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
-                {label && <FieldLabel label={label} required={required} />}
+                {label && <FieldLabel label={label} required={required} hidden={hidden?"hidden":""}/>}
                 <Input
                     type={"input"}
                     name={name}
@@ -21,6 +21,7 @@ class CustomInput extends Component {
                     invalid={error && touched}
                     disabled={disabled}
                     maxLength={maxLength}
+                    hidden={hidden?"hidden":""}
                 />
                 <FieldMessage 
                     error={error} 

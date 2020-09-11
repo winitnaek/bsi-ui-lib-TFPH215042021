@@ -27,7 +27,7 @@ class DynamicForm extends Component {
       fieldData,
       saveAsMode: false,
       recentUsageData: [],
-      type2PgIds: ['customTaxFormulas']
+      type2PgIds: ['customTaxFormulas','worksiteCompanies']
     };
 
     this.handleView = () => {
@@ -144,6 +144,9 @@ class DynamicForm extends Component {
   populateIdForEntity(initialValues, pageId) {
     if (pageId == this.state.type2PgIds[0]) {
       initialValues.taxCode = this.props.formFilterData.taxCode;
+    }else if (pageId == this.state.type2PgIds[1]) {
+      initialValues.company = this.props.formFilterData.company;
+      initialValues.companyName = this.props.formFilterData.companyName;
     }
     return initialValues;
   }
@@ -202,6 +205,7 @@ class DynamicForm extends Component {
             required={item.validation && item.validation.required}
             autoComplete={autoComplete}
             maxLength={item.fieldlength.maxlength}
+            hidden={item.hidden}
             onChange={
               (item.fieldinfo && item.fieldinfo.typeahead) || item.fieldtype === 'checkbox'
                 ? props.setFieldValue
