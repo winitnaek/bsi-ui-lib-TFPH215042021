@@ -637,13 +637,13 @@ class ReusableGrid extends React.Component {
         </Row>
 
         <Row style={styles.gridRowStyle}>
-          <a href="#" id="exportToExcel" onClick={this.exportToExcel}>
+          <a href="#" id="exportToExcel" onClick={this.exportToExcel.bind(this)}>
             <i class="fas fa-table fa-lg fa-2x"></i>
           </a>
           <UncontrolledTooltip placement="right" target="exportToExcel">
             <span> Export to Excel </span>
           </UncontrolledTooltip>
-          <a href="#" id="exportToCsv" onClick={this.exportToCsv} style={styles.gridLinkStyle}>
+          <a href="#" id="exportToCsv" onClick={this.exportToCsv.bind(this)} style={styles.gridLinkStyle}>
             <i class="fas fa-pen-square fa-lg fa-2x"></i>
           </a>
           <UncontrolledTooltip placement="right" target="exportToCsv">
