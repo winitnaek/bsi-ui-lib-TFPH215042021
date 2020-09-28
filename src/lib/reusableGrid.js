@@ -77,18 +77,15 @@ class ReusableGrid extends React.Component {
       dispatchAction(setFormData, setIsOpen);
     };
 
-    this.handleChildGrid = index => {
-      const { childConfig } = this.state;
-      let _id = document.querySelector("div[role='grid']").id;
-      let dataRecord = $("#" + _id).jqxGrid("getrowdata", index);
+    this.handleChildGrid = (childId, rowIndex) => {
       const { setFilterFormData, tftools, renderGrid } = this.props;
+      if (rowIndex !== undefined) {
+        let _id = document.querySelector("div[role='grid']").id;
+        let dataRecord = $("#" + _id).jqxGrid("getrowdata", rowIndex);
       setFilterFormData(dataRecord);
-      const pgData = tftools.filter(item => {
-        if (item.id === childConfig) {
-          return item;
         }
-      });
-      renderGrid(pgData[0]);
+      const pgData = tftools.find(tool=>tool.id === childId);
+      renderGrid(pgData);
     };
 
     this.handleParentGrid = () => {
@@ -166,9 +163,7 @@ class ReusableGrid extends React.Component {
       // need to uncomment below when hooking up to api
       // this.props.deleteGridData(pgid, rowid)
       const { deleteGridData } = this.props;
-      deleteGridData
-      .deleteGridData(pgid, this.props.formData.data, "Edit")
-      .then((deleteStatus) => {
+      deleteGridData.deleteGridData(pgid, this.props.formData.data, "Edit").then(deleteStatus => {
         if (deleteStatus.status === "SUCCESS") {
           $("#" + _id).jqxGrid("deleterow", rowid);
           alert(deleteStatus.message);
@@ -323,36 +318,29 @@ class ReusableGrid extends React.Component {
     let metadata = this.props.metadata(this.props.pageid);
     const { pgdef, source } = this.state;
     const { hasDeleteAll, extraLinks } = pgdef;
-
-    const editCellsRenderer = ndex => {
-      if (this.state.pgdef.childConfig) {
-        if (this.state.recordEdit) {
-          return ` <div id='edit-${ndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${ndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
-        }
-        return ` <div id='edit-${ndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={handleChildGrid(${ndex})}> <i class="fas fa-search  fa-1x" color="primary"/> </div>`;
-      } else {
-        return ` <div id='edit-${ndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${ndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
-      }
-    };
-
     let dataAdapter = new $.jqx.dataAdapter(source);
-    let text = pgdef.childConfig ? "View" : "Edit";
+
+    // Check to see if permissions allow for edit & delete.  If no, then remove column
+    let permissions = this.props.permissions(this.props.pid);
+    const { columns,  showClipboard, isSaveSuccess } = this.state;
+
+    let newColumns = this.addColLinks(columns);
+
+        if (this.state.recordEdit) {
+      const editCellsRenderer = rowIndex => {
+        return ` <div id='edit-${rowIndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${rowIndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
+    };
     const editColumn = {
-      text: text,
+        text: "Edit",
       datafield: "edit",
       align: "center",
       width: "5%",
+      sortable: false,
       filterable: false,
       resizable: false,
       cellsrenderer: editCellsRenderer
     };
 
-    // Check to see if permissions allow for edit & delete.  If no, then remove column
-    let permissions = this.props.permissions(this.props.pid);
-    const { columns, numOfRows, showClipboard, isSaveSuccess } = this.state;
-
-    let newColumns = this.addColLinks(columns);
-    if (this.state.recordEdit || this.state.pgdef.childConfig) {
       newColumns = [...newColumns, editColumn];
 
       // this is temporary code to override permissions
@@ -378,7 +366,29 @@ class ReusableGrid extends React.Component {
         });
       }
     }
-    const { title, cruddef, isfilterform, pgid, subtitle, noResultsFoundTxt, isOpen } = this.state;
+
+    // Child config format in metadata is changed to below format to handle multiple child navigations
+    // Format: "childConfig": [{ "pgid": "pageId", "columnHeader": "Column Header" }]
+
+    if (pgdef.childConfig && Array.isArray(pgdef.childConfig) && pgdef.childConfig.length) {
+
+      const childCellsRenderer =  (rowIndex, columnField) => {
+        return `<div id='edit-${rowIndex}' style="text-align:center; margin-top: 10px; color: #4C7392" onClick="handleChildGrid('${columnField}', '${rowIndex}')"> <i class="fas fa-search  fa-1x" color="primary"/> </div>`;
+      };
+      const childColumns = pgdef.childConfig.map(({ pgid, columnHeader="View" }) => ({
+        text: columnHeader,
+        datafield: pgid,
+        align: "center",
+        width: "5%",
+        sortable: false,
+        filterable: false,
+        resizable: false,
+        cellsrenderer: childCellsRenderer,
+      }));
+      newColumns.push(...childColumns);
+    }
+
+    const { title, cruddef, isfilterform, pgid, noResultsFoundTxt, isOpen } = this.state;
     const { deleteRow, handleChange, renderMe, handleSubmit } = this;
     let filter;
     if (isfilterform) filter = true;
@@ -395,10 +405,11 @@ class ReusableGrid extends React.Component {
     };
 
     module.exports = this.editClick;
-    window.editClick = this.editClick;
-
     module.exports = this.handleChildGrid;
+    // Below "Global Methods" method's are used by Grid Cell Renderer
+    window.editClick = this.editClick;
     window.handleChildGrid = this.handleChildGrid;
+
     const {
       styles,
       tftools,
@@ -414,16 +425,10 @@ class ReusableGrid extends React.Component {
 
     let formatedFilterData = "";
 
-   
-
     if (this.props.formFilterData.taxCode) {
-      let name   = this.props.formFilterData.name;
-      let txName = this.props.formFilterData.taxName?this.props.formFilterData.taxName.split('-')[1]:'';
-      formatedFilterData = (
-        <span style={{ fontWeight: "bold" }}>
-          {this.props.formFilterData.taxCode}
-        </span>
-      );
+      let name = this.props.formFilterData.name;
+      let txName = this.props.formFilterData.taxName ? this.props.formFilterData.taxName.split("-")[1] : "";
+      formatedFilterData = <span style={{ fontWeight: "bold" }}>{this.props.formFilterData.taxCode}</span>;
     } else if (this.props.formFilterData.company) {
       formatedFilterData = (
         <span style={{ fontWeight: "bold" }}>
@@ -570,7 +575,7 @@ class ReusableGrid extends React.Component {
                     textAlign: "center",
                     height: 30,
                     paddingTop: 3,
-                    display:'none'
+                    display: "none"
                   }}
                 >
                   Saved successfully
