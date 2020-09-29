@@ -5,9 +5,9 @@ License: https://jqwidgets.com/license/
 */
 /* eslint-disable */
 
-import '../jqwidgets/styles/jqx.base.css';
-import '../jqwidgets/jqxcore.js';
-import '../jqwidgets/jqxtooltip.js';
+// import '../jqwidgets/styles/jqx.base.css';
+// import '../jqwidgets/jqxcore.js';
+// import '../jqwidgets/jqxtooltip.js';
 
 import React from 'react';
 
