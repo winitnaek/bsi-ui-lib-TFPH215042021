@@ -13,13 +13,6 @@ class ReusableGrid extends React.Component {
   constructor(props) {
     super(props);
     let metadata = this.props.metadata(this.props.pageid);
-    let data = this.props.griddata;
-    let source = {
-      datatype: "json",
-      datafields: metadata.griddef.dataFields,
-      localdata: data
-    };
-
     this.state = {
       value: "",
       pgdef: metadata.pgdef,
@@ -49,7 +42,6 @@ class ReusableGrid extends React.Component {
       allSelected: false,
       showClipboard: false,
       numOfRows: 0,
-      source: source,
       isOpen: false,
       viewPdfMode: false,
       isSaveSuccess: false,
@@ -90,6 +82,12 @@ class ReusableGrid extends React.Component {
       });
       renderGrid(pgData[0]);
     };
+
+    this.dispatchGridData = async (data) => {
+      debugger
+      const {setGridData} = this.props;
+      await setGridData(data);
+    }
 
     this.handleParentGrid = () => {
       const { tftools, renderGrid } = this.props;
@@ -317,11 +315,55 @@ class ReusableGrid extends React.Component {
     });
   }
 
+  buildDataAdapter() {
+    const {serverPaging,source} = this.props;
+    let dataAdapter = null;
+    if(serverPaging){
+      dataAdapter = this.processAdapter(source);
+      return dataAdapter;
+    }else{
+      let {griddef} = this.state;
+      let data = this.props.griddata;
+      let {dataFields} = griddef;
+      let source = {
+        datatype: "json",
+        datafields: dataFields,
+        localdata: data,
+      };
+      dataAdapter = new $.jqx.dataAdapter(source);
+    }
+    return dataAdapter;
+  }
+  
+  processAdapter(source){
+    if(source) {
+      let dataAdapter = new $.jqx.dataAdapter(source, {
+        formatData: function (data) {
+          try {
+              return JSON.stringify(data);
+          } catch (error) {
+              return data;
+          }
+        },
+        downloadComplete: function (data, status, xhr) {
+            if(data != null && data.candidateRecords.length > 0){
+              source.totalrecords = data.candidateRecords[0].totalRows;
+            }
+        },
+        beforeLoadComplete: function (records, sourceData) {
+        },
+        loadError: function (xhr, status, error) {
+            throw new Error(error);
+        }
+      });
+    return dataAdapter;
+    }
+  }
+
   render() {
     console.log("--------props ", this.props);
-
     let metadata = this.props.metadata(this.props.pageid);
-    const { pgdef, source } = this.state;
+    const {pgdef} = this.state;
     const { hasDeleteAll, extraLinks } = pgdef;
 
     const editCellsRenderer = ndex => {
@@ -335,7 +377,7 @@ class ReusableGrid extends React.Component {
       }
     };
 
-    let dataAdapter = new $.jqx.dataAdapter(source);
+    let dataAdapter = this.buildDataAdapter();
     let text = pgdef.childConfig ? "View" : "Edit";
     const editColumn = {
       text: text,
@@ -378,7 +420,7 @@ class ReusableGrid extends React.Component {
         });
       }
     }
-    const { title, cruddef, isfilterform, pgid, subtitle, noResultsFoundTxt, isOpen } = this.state;
+    const { title, cruddef, isfilterform, pgid, subtitle, noResultsFoundTxt, isOpen, griddef} = this.state;
     const { deleteRow, handleChange, renderMe, handleSubmit } = this;
     let filter;
     if (isfilterform) filter = true;
@@ -399,6 +441,10 @@ class ReusableGrid extends React.Component {
 
     module.exports = this.handleChildGrid;
     window.handleChildGrid = this.handleChildGrid;
+
+    module.exports = this.setGridData;
+    window.exports = this.setGridData;
+
     const {
       styles,
       tftools,
@@ -409,7 +455,8 @@ class ReusableGrid extends React.Component {
       recentUsage,
       autoComplete,
       renderGrid,
-      griddata
+      griddata,
+      serverPaging
     } = this.props;
 
     let formatedFilterData = "";
@@ -480,8 +527,8 @@ class ReusableGrid extends React.Component {
         {this.state.griddef.gridtype == "type2" && griddata[0] && this.state.pgdef.parentConfig ? (
           <Row>
             <p>
-              {this.state.source.localdata && this.state.subtitle}
-              {this.state.source.localdata && formatedFilterData}
+              {this.state.subtitle}
+              {formatedFilterData}
             </p>
           </Row>
         ) : null}
@@ -490,7 +537,7 @@ class ReusableGrid extends React.Component {
         this.state.pgdef.childConfig &&
         !this.state.pgdef.parentConfig ? (
           <Row>
-            <p>{this.state.source.localdata && this.state.subtitle}</p>
+            <p>{this.state.subtitle}</p>
           </Row>
         ) : null}
         {this.state.caption && (
@@ -624,9 +671,13 @@ class ReusableGrid extends React.Component {
             columns={newColumns}
             pageable={true}
             autoheight={true}
-            selectionmode="multiplerows"
+            virtualmode={serverPaging?true:false}
+            rendergridrows = {(obj) => {
+              if(serverPaging) this.dispatchGridData(obj);
+              return obj.data;
+            }}
+            selectionmode={griddef.selectionmode || "multiplerows"}
             style={styles.gridStyle}
-            virtualmode={false}
             sortable={true}
             filterable={true}
             columnsresize={true}
