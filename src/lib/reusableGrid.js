@@ -1,4 +1,6 @@
 import React, { Fragment } from "react";
+import ReactDOM from "react-dom";
+import JqxTooltip from '../../src/deps/jqwidgets-react/react_jqxtooltip';
 import { copyToClipboard } from "./utils/copyToClipboard";
 import ClipboardToast from "./clipboardToast";
 import { Col, Row, UncontrolledTooltip } from "reactstrap";
@@ -256,7 +258,19 @@ class ReusableGrid extends React.Component {
         this.unselectAll(event);
       }
     };
+    this.columnCounter = 1;
+    this.toolTipRenderer = this.toolTipRenderer.bind(this);
   }
+
+  toolTipRenderer(element) {
+    const id = `toolTipContainer${this.columnCounter}`;
+    element[0].id = id;
+    const content = element[0].innerText;
+      setTimeout(() => {
+          ReactDOM.render(<JqxTooltip position={'mouse'} content={content}>{content}</JqxTooltip>, document.getElementById(id));
+      });
+      this.columnCounter++;
+  };
 
   componentDidMount() {
     if (!this.props.griddata) {
@@ -308,6 +322,7 @@ class ReusableGrid extends React.Component {
           }
         };
       }
+      column.rendered = this.toolTipRenderer;
       return column;
     });
   }
@@ -338,7 +353,9 @@ class ReusableGrid extends React.Component {
       sortable: false,
       filterable: false,
       resizable: false,
-      cellsrenderer: editCellsRenderer
+      cellsrenderer: editCellsRenderer,
+      menu: false,
+      rendered: this.toolTipRenderer
     };
 
       newColumns = [...newColumns, editColumn];
@@ -384,6 +401,8 @@ class ReusableGrid extends React.Component {
         filterable: false,
         resizable: false,
         cellsrenderer: childCellsRenderer,
+        menu: false,
+        rendered: this.toolTipRenderer
       }));
       newColumns.push(...childColumns);
     }
@@ -409,7 +428,7 @@ class ReusableGrid extends React.Component {
     // Below "Global Methods" method's are used by Grid Cell Renderer
     window.editClick = this.editClick;
     window.handleChildGrid = this.handleChildGrid;
-
+    
     const {
       styles,
       tftools,
