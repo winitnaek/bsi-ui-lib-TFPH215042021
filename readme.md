@@ -11,6 +11,13 @@ Independent rendering of metadata based Grid.
 Independent rendering/usage of metadata based form.
 Single Entity Rendering - Filter/Grid/Form rendering based on metadata.
 Two level/parent-child rendering - A parent-child type relationship with/without filters and form for CRUD operations.
+Supports multi child navigation: 
+    New form of child config in the metadata is as below
+    ```javascript
+    "childConfig": [{ "pgid": "pageId", "columnHeader": "Manage Permissions" }]
+    ```
+    "ColumnHeader" is optional and default value is "View"
+
 Notes:
 
 Meta data MUST describe all elements/aspects of above supported use cases.
