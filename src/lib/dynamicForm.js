@@ -27,7 +27,7 @@ class DynamicForm extends Component {
       fieldData,
       saveAsMode: false,
       recentUsageData: [],
-      type2PgIds: ['customTaxFormulas','worksiteCompanies']
+      type2PgIds: ['customTaxFormulas', 'worksiteCompanies']
     };
 
     this.handleView = () => {
@@ -87,13 +87,65 @@ class DynamicForm extends Component {
     };
 
     this.handleGenerate = this.handleGenerate.bind(this);
+    this.handleFieldChange = this.handleFieldChange.bind(this);
+    this.resetDependentFields = this.resetDependentFields.bind(this);
   }
 
+  /*
+    Reset dependent fields
+    @params: 
+      dependentFields:string[]
+      formicProps: FormicProps // to access formic api
+  */
+  resetDependentFields(dependentFields, formikProps) {
+    const { fieldData } = this.state;
+    dependentFields.forEach(fieldId => {
+      formikProps.setFieldValue(fieldId, '');
+      const childDependentField = fieldData.find(formField => formField.id === fieldId && formField.dependentFields);
+      if (childDependentField) {
+        this.resetDependentFields(childDependentField.dependentFields, formikProps);
+      }
+    });
+  }
+
+  handleFieldChange(event, selected, item, props) {
+    if ((item.fieldinfo && item.fieldinfo.typeahead) || item.fieldtype === 'checkbox') {
+      props.setFieldValue(event, selected);
+    } else {
+      props.handleChange(event);
+    }
+
+    // Clear dependent fields values
+    if (item.dependentFields) {
+      this.resetDependentFields(item.dependentFields, props);
+    }
+
+    if (selected) {
+      let { disabledFields } = this.state;
+      if (selected.disable) {
+        disabledFields.push(...selected.disable);
+      }
+      if (selected.enable) {
+        const filteredDisabledFields = disabledFields.filter(field => selected.enable.indexOf(field) === -1);
+        disabledFields = filteredDisabledFields;
+      }
+
+      if (selected.valuesToUpdate) {
+        const keys = Object.keys(selected.valuesToUpdate);
+        keys.forEach(key => {
+          props.setFieldValue(key, selected.valuesToUpdate[key]);
+        });
+      }
+      this.setState({
+        disabledFields
+      });
+    }
+  }
   handleGenerate(e, formValues) {
     const { formHandlerService, formProps, fieldData } = this.props;
     const { pgid } = formProps;
     const payload = {};
-    fieldData.forEach(({id}) => {
+    fieldData.forEach(({ id }) => {
       payload[id] = formValues[id];
     });
     formHandlerService.generate(pgid, payload).then(response => {
@@ -108,7 +160,7 @@ class DynamicForm extends Component {
 
   disabledHandler(id) {
     const { disabledFields } = this.state;
-    const { formMetaData, formProps } = this.props;
+    const { formMetaData } = this.props;
     try {
       let row = disabledFields.filter(r => id == r);
       if (row.length > 0) return true;
@@ -144,7 +196,7 @@ class DynamicForm extends Component {
   populateIdForEntity(initialValues, pageId) {
     if (pageId == this.state.type2PgIds[0]) {
       initialValues.taxCode = this.props.formFilterData.taxCode;
-    }else if (pageId == this.state.type2PgIds[1]) {
+    } else if (pageId == this.state.type2PgIds[1]) {
       initialValues.company = this.props.formFilterData.company;
       initialValues.companyName = this.props.formFilterData.companyName;
     }
@@ -206,11 +258,9 @@ class DynamicForm extends Component {
             autoComplete={autoComplete}
             maxLength={item.fieldlength.maxlength}
             hidden={item.hidden}
-            onChange={
-              (item.fieldinfo && item.fieldinfo.typeahead) || item.fieldtype === 'checkbox'
-                ? props.setFieldValue
-                : props.handleChange
-            }
+            onChange={(event, selected) => {
+              this.handleFieldChange(event, selected, item, props);
+            }}
             onBlur={props.handleBlur}
             error={error}
             touched={touched}

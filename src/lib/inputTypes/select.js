@@ -6,12 +6,14 @@ import { FieldLabel, FieldMessage, FieldHeader } from '../field';
 class CustomSelect extends Component {
   constructor(props) {
     super(props);
-    const { fieldinfo = {} } = this.props;
+    const { fieldinfo = {}, value } = this.props;
     const { options = [] } = fieldinfo;
+    const defaultSelected = options.find(option => option.id === value) || { id: '', label: '' };
+
     this.state = {
       isLoading: false,
       options,
-      defaultSelected: { id: "", label: "" }
+      defaultSelected
     };
     this.handleChange = this.handleChange.bind(this);
     this.onSearchHandler = this.onSearchHandler.bind(this);
@@ -21,12 +23,21 @@ class CustomSelect extends Component {
 
   handleChange(selectedOptions) {
     const { onChange, id } = this.props;
+    // Commit-983b64e: This is for single and multi select check
     if (selectedOptions.length > 0) {
-      if (selectedOptions.length == 1) selectedOptions = selectedOptions[0].id;
+      if (selectedOptions.length == 1) {
+        selectedOptions = selectedOptions[0].id;
+      }
     } else {
-      selectedOptions = "";
+      selectedOptions = '';
     }
-    this.updateDependentField((selectedOptions && selectedOptions.label) || "");
+
+    // For single select the selectedOption is always string as per the above code
+    // TODO: Check what should be the pattern for multi select and update.
+    if (typeof selectedOptions === 'string') {
+      this.updateDependentField(selectedOptions);
+    }
+
     onChange(id, selectedOptions);
   }
 
@@ -35,12 +46,12 @@ class CustomSelect extends Component {
     const { value } = event.target;
     const { options } = this.state;
     let { defaultSelected } = this.state;
-    options.forEach(option=>{
-      if(option.id === value){
+    options.forEach(option => {
+      if (option.id === value) {
         defaultSelected = option;
       }
-    })
-     
+    });
+
     if (defaultSelected.id && defaultSelected.label) {
       this.setState({
         defaultSelected
@@ -48,7 +59,7 @@ class CustomSelect extends Component {
     }
 
     this.updateDependentField(value);
-    onChange(event);
+    onChange(event, defaultSelected);
   }
 
   updateDependentField(parentSelectedValue) {
@@ -58,6 +69,16 @@ class CustomSelect extends Component {
         autoComplete.getAutoCompleteData(depentFieldId, parentSelectedValue).then(options => {
           updateFieldData && updateFieldData(depentFieldId, options);
         });
+      });
+    }
+  }
+  
+  componentWillReceiveProps(nextProps) {
+    // sync default selected value based on the value change
+    if (nextProps.value !== this.state.defaultSelected.id && !this.props.fieldinfo.typeahead) {
+      const defaultSelected = nextProps.fieldinfo.options.find(option => option.id === nextProps.value) || { id: '', label: '' };
+      this.setState({
+        defaultSelected
       });
     }
   }
@@ -162,8 +183,8 @@ class CustomSelect extends Component {
             <AsyncTypeahead
               id={id}
               isLoading={isLoading}
-              labelKey={option => `${option.label ? option.label : ""}`}
-              defaultInputValue={value && value.label ? value.label : ""}
+              labelKey={option => `${option.label ? option.label : ''}`}
+              defaultInputValue={value && value.label ? value.label : ''}
               ref={typeahead => (this.typeahead = typeahead)}
               placeholder={placeholder}
               onChange={this.handleChange}
@@ -173,19 +194,20 @@ class CustomSelect extends Component {
               multiple={fieldinfo.multiselect}
               error={error && touched}
               options={options}
+              clearButton
             />
           ) : (
             <Input
-              type="select"
+              type='select'
               name={name}
               placeholder={placeholder}
-              value={defaultSelected.id || value}
+              value={defaultSelected.id}
               disabled={disabled}
               onChange={this.handleSelectFieldChange}
               invalid={error && touched}
             >
               {!defaultSet && (
-                <option value="" disabled>
+                <option value='' disabled>
                   {placeholder}
                 </option>
               )}
