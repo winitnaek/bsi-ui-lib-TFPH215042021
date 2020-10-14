@@ -96,11 +96,15 @@ class DynamicForm extends Component {
     fieldData.forEach(({id}) => {
       payload[id] = formValues[id];
     });
+    this.props.showProgress(true);
+    this.generateButton.disabled=true;
     formHandlerService.generate(pgid, payload).then(response => {
       if (response.status === 'SUCCESS') {
         formProps.renderMe(pgid, formValues, response);
+        this.generateButton.disabled=false;
       } else if (response.status === 'ERROR') {
         let message = response.message;
+        this.generateButton.disabled=false;
         alert(message);
       }
     });
@@ -406,7 +410,7 @@ class DynamicForm extends Component {
                       </Button>
                     )}
                   {hasGenerate && (
-                    <Button onClick={e => this.handleGenerate(e, props.values)} color='success'>
+                    <Button innerRef={button => (this.generateButton = button)} onClick={e => this.handleGenerate(e, props.values)} color='success'>
                       {generateButtonText}
                     </Button>
                   )}
