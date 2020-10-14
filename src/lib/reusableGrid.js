@@ -6,6 +6,7 @@ import ClipboardToast from "./clipboardToast";
 import { Col, Row, UncontrolledTooltip, Badge } from "reactstrap";
 import ReusableModal from "./reusableModal";
 import DynamicForm from "./dynamicForm";
+import CustomDate from "./inputTypes/date";
 import ConfirmModal from "./confirmModal";
 import ReusableAlert from "./reusableAlert";
 import Grid from "../../src/deps/jqwidgets-react/react_jqxgrid";
@@ -38,6 +39,7 @@ class ReusableGrid extends React.Component {
       childConfig: metadata.pgdef.childConfig,
       parentConfig: metadata.pgdef.parentConfig,
       isfilter: metadata.griddef.isfilter,
+      isDateFilter: metadata.griddef.isDateFilter,
       hasFilter: metadata.griddef.hasFilter,
       mockData: [],
       child: this.props.child,
@@ -53,7 +55,8 @@ class ReusableGrid extends React.Component {
         aheader: "",
         abody: "",
         abtnlbl: "Ok"
-      }
+      },
+      fieldData: this.props.fieldData
     };
 
     this.editClick = (index, pgid) => {
@@ -73,11 +76,16 @@ class ReusableGrid extends React.Component {
 
     this.handleChildGrid = (childId, rowIndex) => {
       const { setFilterFormData, tftools, renderGrid } = this.props;
+      const { isDateFilter, fieldData } = this.state;
       if (rowIndex !== undefined) {
         let _id = document.querySelector("div[role='grid']").id;
         let dataRecord = $("#" + _id).jqxGrid("getrowdata", rowIndex);
-      setFilterFormData(dataRecord);
+        if (isDateFilter) {
+          const { id, value } = fieldData[0];
+          dataRecord[id] = value;
         }
+        setFilterFormData(dataRecord);
+      }
       const pgData = tftools.find(tool => tool.id === childId);
       renderGrid(pgData);
     };
@@ -252,12 +260,21 @@ class ReusableGrid extends React.Component {
 
     this.toggleSelectAll = event => {
       event.preventDefault();
-      if (this.state.allSelected) {
+      // if (this.state.allSelected) {
         this.unselectAll(event);
-      }
+      // }
     };
     this.columnCounter = 1;
     this.toolTipRenderer = this.toolTipRenderer.bind(this);
+    this.onDateFilterChange = this.onDateFilterChange.bind(this);
+  }
+
+  onDateFilterChange(event) {
+    const { fieldData } = this.state;
+    fieldData[0].value = event.target.value;
+    this.setState({
+      fieldData: [...fieldData]
+    });
   }
 
   toolTipRenderer(element) {
@@ -349,28 +366,28 @@ class ReusableGrid extends React.Component {
     }
     return dataAdapter;
   }
-  
+
   processAdapter(source) {
     if (source) {
       let dataAdapter = new $.jqx.dataAdapter(source, {
         formatData: function (data) {
           try {
-              return JSON.stringify(data);
+            return JSON.stringify(data);
           } catch (error) {
-              return data;
+            return data;
           }
         },
         downloadComplete: function (data, status, xhr) {
           if (data != null && data.candidateRecords.length > 0) {
-              source.totalrecords = data.candidateRecords[0].totalRows;
-            }
+            source.totalrecords = data.candidateRecords[0].totalRows;
+          }
         },
         beforeLoadComplete: function (records, sourceData) {},
         loadError: function (xhr, status, error) {
-            throw new Error(error);
+          throw new Error(error);
         }
       });
-    return dataAdapter;
+      return dataAdapter;
     }
   }
 
@@ -387,22 +404,22 @@ class ReusableGrid extends React.Component {
 
     let newColumns = this.addColLinks(columns);
 
-        if (this.state.recordEdit) {
+    if (this.state.recordEdit) {
       const editCellsRenderer = rowIndex => {
         return ` <div id='edit-${rowIndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${rowIndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
-    };
-    const editColumn = {
+      };
+      const editColumn = {
         text: "Edit",
-      datafield: "edit",
-      align: "center",
-      width: "5%",
-      sortable: false,
-      filterable: false,
-      resizable: false,
-      cellsrenderer: editCellsRenderer,
-      menu: false,
-      rendered: this.toolTipRenderer
-    };
+        datafield: "edit",
+        align: "center",
+        width: "5%",
+        sortable: false,
+        filterable: false,
+        resizable: false,
+        cellsrenderer: editCellsRenderer,
+        menu: false,
+        rendered: this.toolTipRenderer
+      };
 
       newColumns = [...newColumns, editColumn];
 
@@ -491,25 +508,10 @@ class ReusableGrid extends React.Component {
       serverPaging
     } = this.props;
 
-    let formatedFilterData = "";
-
-    if (this.props.formFilterData.taxCode) {
-      let name = this.props.formFilterData.name;
-      let txName = this.props.formFilterData.taxName ? this.props.formFilterData.taxName.split("-")[1] : "";
-      formatedFilterData = <span style={{ fontWeight: "bold" }}>{this.props.formFilterData.taxCode}</span>;
-    } else if (this.props.formFilterData.company) {
-      formatedFilterData = (
-        <span style={{ fontWeight: "bold" }}>
-          {this.props.formFilterData.company} ( {this.props.formFilterData.companyName} )
-        </span>
-      );
-    }
-
     return (
       <Fragment>
-        <Row>
+        <Row className={this.props.className}>
           <h1 style={styles.pagetitle}>{this.state.title}</h1>
-
           {this.state.helpLabel && (
             <span style={styles.helpMargin}>
               <span id="help">
@@ -550,14 +552,7 @@ class ReusableGrid extends React.Component {
             </span>
           )}
         </Row>
-        {this.state.griddef.gridtype == "type2" && griddata[0] && this.state.pgdef.parentConfig ? (
-          <Row>
-            <p>
-              {this.state.subtitle}
-              {formatedFilterData}
-            </p>
-          </Row>
-        ) : null}
+
         {this.state.griddef.gridtype == "type2" &&
         griddata[0] &&
         this.state.pgdef.childConfig &&
@@ -566,34 +561,25 @@ class ReusableGrid extends React.Component {
             <p>{this.state.subtitle}</p>
           </Row>
         ) : null}
-        {this.state.caption && (
-          <Row>
-            <p className="text-center w-100 m-0">{this.state.caption}</p>
-          </Row>
-        )}
-        {!griddata[0] && this.props.formFilterData && this.props.formFilterData.companyName ? (
-          <Row>
-            <p>
-              {noResultsFoundTxt}
-              <span style={{ fontWeight: "bold" }}>
-                {this.props.formFilterData.company} ( {this.props.formFilterData.companyName} )
-              </span>
-            </p>
-          </Row>
+        {this.state.isDateFilter ? (
+          <CustomDate
+            {...this.state.fieldData[0]}
+            onChange={this.onDateFilterChange}
+            classNames="row"
+            colClassNames="d-flex p-0 align-items-center"
+            inputClassNames="w-25"
+            labelClassNames="mb-0 mr-2"
+          />
         ) : null}
-        {!griddata[0] && this.props.formFilterData && this.props.formFilterData.taxCode ? (
-          <Row>
-            <p>
-              {noResultsFoundTxt}
-              <span style={{ fontWeight: "bold" }}>
-                {this.props.formFilterData.taxCode} ( {this.props.formFilterData.name} )
-              </span>
-            </p>
-          </Row>
+
+        {this.state.isfilter ? (
+          <FilterValues
+            style={styles}
+            fieldData={this.state.parentConfig && this.state.parentConfig.griddef ? this.state.parentConfig.griddef.columns : this.props.fieldData}
+            formFilterData={this.props.formFilterData}
+          />
         ) : null}
-        {this.state.isfilter && !this.state.parentConfig ? (
-          <FilterValues style={styles} fieldData={this.props.fieldData} formFilterData={this.props.formFilterData} />
-        ) : null}
+
         <Row style={styles.rowTop}>
           <Col sm="2" style={styles.iconPaddingLeft}>
             {this.state.allSelected && (
@@ -816,11 +802,11 @@ export const FilterValues = ({ fieldData, formFilterData, style }) => {
 
   return (
     <Row className="mt-2 mb-3">
-      {fieldData.map(({ id, label, placeholder }) => {
-        return values[id] ? (
+      {fieldData.map(({ id, label, text, datafield }) => {
+        return values[id || datafield] ? (
           <Fragment>
-            <Badge color="light">{label || placeholder}</Badge>{" "}
-            <Badge color="dark" className="mr-1">{`${values[id]}`}</Badge>
+            <Badge color="light">{label || text}</Badge>{" "}
+            <Badge color="dark" className="mr-1">{`${values[id || datafield]}`}</Badge>
           </Fragment>
         ) : null;
       })}
