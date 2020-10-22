@@ -114,7 +114,7 @@ class ReusableGrid extends React.Component {
       setFormData(payload);
       this.setState({ isOpen: true });
     };
-    
+
     this.handlePdfView = () => {
       this.setState({
         viewPdfMode: !this.state.viewPdfMode
@@ -261,7 +261,7 @@ class ReusableGrid extends React.Component {
     this.toggleSelectAll = event => {
       event.preventDefault();
       // if (this.state.allSelected) {
-        this.unselectAll(event);
+      this.unselectAll(event);
       // }
     };
     this.columnCounter = 1;
@@ -281,27 +281,21 @@ class ReusableGrid extends React.Component {
     const id = `toolTipContainer${this.columnCounter}`;
     element[0].id = id;
     const content = element[0].innerText;
-      setTimeout(() => {
+    setTimeout(() => {
       ReactDOM.render(
         <JqxTooltip position={"mouse"} content={content}>
           {content}
         </JqxTooltip>,
         document.getElementById(id)
       );
-      });
-      this.columnCounter++;
+    });
+    this.columnCounter++;
   }
 
   componentDidMount() {
     if (!this.props.griddata) {
       this.setState({ noResultsFoundTxt: metadata.griddef.noResultsFoundTxt });
     }
-    // Below code is commented as the popup modal was reopening by default.
-    // if (this.state.griddef.isfilterform && !this.props.formFilterData.filter) {
-    //   this.setState({
-    //     isOpen: true
-    //   });
-    // }
   }
 
   exportToExcel() {
@@ -505,7 +499,8 @@ class ReusableGrid extends React.Component {
       autoComplete,
       renderGrid,
       griddata,
-      serverPaging
+      serverPaging,
+      filterComp = null // If no filter component then render nothing
     } = this.props;
 
     return (
@@ -553,14 +548,18 @@ class ReusableGrid extends React.Component {
           )}
         </Row>
 
-        {this.state.griddef.gridtype == "type2" &&
-        griddata[0] &&
-        this.state.pgdef.childConfig &&
-        !this.state.pgdef.parentConfig ? (
+        {this.state.subtitle ? (
           <Row>
             <p>{this.state.subtitle}</p>
           </Row>
         ) : null}
+
+        {metadata.pgdef.subHeader ? (
+          <Row>
+            <p>{metadata.pgdef.subHeader}</p>
+          </Row>
+        ) : null}
+
         {this.state.isDateFilter ? (
           <CustomDate
             {...this.state.fieldData[0]}
@@ -575,10 +574,16 @@ class ReusableGrid extends React.Component {
         {this.state.isfilter ? (
           <FilterValues
             style={styles}
-            fieldData={this.state.parentConfig && this.state.parentConfig.griddef ? this.state.parentConfig.griddef.columns : this.props.fieldData}
+            fieldData={
+              this.state.parentConfig && this.state.parentConfig.griddef
+                ? this.state.parentConfig.griddef.columns
+                : this.props.fieldData
+            }
             formFilterData={this.props.formFilterData}
           />
         ) : null}
+
+        {filterComp}
 
         <Row style={styles.rowTop}>
           <Col sm="2" style={styles.iconPaddingLeft}>
@@ -789,25 +794,29 @@ class ReusableGrid extends React.Component {
 }
 export default ReusableGrid;
 
-export const FilterValues = ({ fieldData, formFilterData, style }) => {
+export const FilterValues = ({ fieldData = [], formFilterData, style }) => {
   const values = Object.assign({}, formFilterData);
 
-  fieldData.forEach(({ id, disable }) => {
+  fieldData.forEach(({ id, disable, hidden, datafield }) => {
     if (disable && disable.length && values[id]) {
       disable.forEach(disabled => {
         delete values[disabled];
       });
     }
+    if (hidden) {
+      delete values[datafield];
+    }
   });
 
   return (
     <Row className="mt-2 mb-3">
-      {fieldData.map(({ id, label, text, datafield }) => {
+      {/* placeholder is for checkboxes having no label */}
+      {fieldData.map(({ id, label, placeholder, text, datafield }) => {
         return values[id || datafield] ? (
-          <Fragment>
-            <Badge color="light">{label || text}</Badge>{" "}
+          <span className="mb-1">
+            <Badge color="light">{label || text || placeholder}</Badge>{" "}
             <Badge color="dark" className="mr-1">{`${values[id || datafield]}`}</Badge>
-          </Fragment>
+          </span>
         ) : null;
       })}
     </Row>

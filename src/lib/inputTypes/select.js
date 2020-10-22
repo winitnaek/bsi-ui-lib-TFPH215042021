@@ -165,7 +165,11 @@ class CustomSelect extends Component {
       onChange,
       isReset,
       id,
-      fieldHeader
+      fieldHeader,
+      className='',
+      labelClassName='',
+      columnClassName='',
+      inputClassName=''
     } = this.props;
 
     if (isReset) {
@@ -174,10 +178,10 @@ class CustomSelect extends Component {
     }
 
     return (
-      <FormGroup>
-        <Col>
+      <FormGroup className={className}>
+        <Col className={columnClassName}>
           {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
-          {label && <FieldLabel label={label} required={required} />}
+          {label && <FieldLabel label={label} required={required} className={labelClassName}/>}
 
           {fieldinfo && fieldinfo.typeahead ? (
             <AsyncTypeahead
@@ -205,6 +209,7 @@ class CustomSelect extends Component {
               disabled={disabled}
               onChange={this.handleSelectFieldChange}
               invalid={error && touched}
+              className={inputClassName}
             >
               {!defaultSet && (
                 <option value='' disabled>
