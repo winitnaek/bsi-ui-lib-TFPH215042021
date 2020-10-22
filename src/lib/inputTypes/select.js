@@ -186,6 +186,7 @@ class CustomSelect extends Component {
           {fieldinfo && fieldinfo.typeahead ? (
             <AsyncTypeahead
               id={id}
+              minLength={1}
               isLoading={isLoading}
               labelKey={option => `${option.label ? option.label : ''}`}
               defaultInputValue={value && value.label ? value.label : ''}
