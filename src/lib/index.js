@@ -18,3 +18,5 @@ export {default as copyToClipboard} from './utils/copyToClipboard';
 export {default as createYupSchema} from './utils/createYupSchema';
 export {default as updateGrid} from './utils/updateGrid';
 export {default as getAdminErrorMessage} from './utils/appErrorEvent';
+export {default as FlyoutMenu} from './flyoutMenu/FlyoutMenu';
+export {default as SearchBar} from './flyoutMenu/SearchBar';
