@@ -72,7 +72,7 @@ class Section extends Component {
                   : renderApplication(option)
               }
               className="d-block p-0"
-              style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+              style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textAlign:'left' }}
             >
               {option.label}
             </Button>
