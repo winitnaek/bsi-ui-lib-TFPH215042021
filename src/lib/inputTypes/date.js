@@ -9,7 +9,7 @@ class CustomDate extends Component {
     this.getValue = value => {
       const momentObj = moment(value);
       if (momentObj.isValid()) {
-        return momentObj.format("yyyy-MM-DD");
+        return momentObj.format("YYYY-MM-DD");
       }
       return value;
     };
@@ -34,6 +34,7 @@ class CustomDate extends Component {
       labelClassNames="",
       inputClassNames=""
     } = this.props;
+
     return (
       <FormGroup className={classNames}>
         <Col className={colClassNames}>
