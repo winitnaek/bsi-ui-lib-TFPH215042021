@@ -16,6 +16,7 @@ class CustomSelect extends Component {
         isOpen:false,
     }
 
+    
     this.handleChange = this.handleChange.bind(this);
     this.onSearchHandler = this.onSearchHandler.bind(this);
     this.clearInput = this.clearInput.bind(this);

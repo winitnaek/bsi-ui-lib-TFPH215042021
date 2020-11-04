@@ -6,7 +6,7 @@ import Select from "./inputTypes/select";
 import Radio from "./inputTypes/radio";
 import Checkbox from "./inputTypes/checkbox";
 import moment from "moment";
-import MappedInput from "./inputTypes/mappedInput";
+//import MappedInput from "./inputTypes/mappedInput";
 import Date from "./inputTypes/date";
 import FileUpload from "./inputTypes/fileUpload";
 import Usage from "./usage";
@@ -120,7 +120,7 @@ class DynamicForm extends Component {
         checkbox:Checkbox,
         radio:Radio,
         fileUpload:FileUpload,
-        mappedInput:MappedInput
+        //mappedInput:MappedInput
       };
       const Component = fieldMap[item.fieldtype];
       let error = props.errors.hasOwnProperty(item.id) && props.errors[item.id];
