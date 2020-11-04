@@ -49,7 +49,7 @@ class SearchBar extends Component {
             style={{
               position: "absolute",
               zIndex: 99,
-              top: "55px",
+              top: "56px",
               left: "0",
               height: "calc(100vh - 134px)",
               overflowY: "auto"
