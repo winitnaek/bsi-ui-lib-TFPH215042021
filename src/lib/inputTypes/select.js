@@ -9,10 +9,9 @@ class CustomSelect extends Component {
     const { fieldinfo = {}, value } = this.props;
     const { options = [] } = fieldinfo;
     const defaultSelected = options.find(option => option.id === value) || { id: '', label: '' };
-
     this.state = {
         isLoading: false,
-        options: [],
+        options,
         defaultSelected,
         showAllOptions: false,
         query: "",
@@ -26,6 +25,7 @@ class CustomSelect extends Component {
     this.clearInput = this.clearInput.bind(this);
     this.globalSearchHandler = this.globalSearchHandler.bind(this);
     this.resetFieldValue = this.resetFieldValue.bind(this);
+    this.handleSelectFieldChange = this.handleSelectFieldChange.bind(this);
   }
 
 
@@ -58,10 +58,9 @@ class CustomSelect extends Component {
 
   handleSelectFieldChange(event) {
     debugger
-    const { onChange, fieldinfo } = this.props;
     const { value } = event.target;
     const { options } = this.state;
-    let { defaultSelected } = this.state;
+    let {defaultSelected} = this.state;
     options.forEach(option => {
       if (option.id === value) {
         defaultSelected = option;
@@ -75,14 +74,14 @@ class CustomSelect extends Component {
     }
 
     this.updateDependentField(value);
-    onChange(event, defaultSelected);
+    this.props.onChange(event, defaultSelected);
   }
 
   updateDependentField(parentSelectedValue) {
     debugger
     const {fieldinfo, getFormData, updateFieldData } = this.props;
-    if (fieldinfo && fieldinfo.dependentFields && fieldinfo.dependentFields.length) {
-      fieldinfo.dependentFields.forEach(depentFieldId => {
+    if (fieldinfo && fieldinfo.autoPopulateFields && fieldinfo.autoPopulateFields.length) {
+      fieldinfo.autoPopulateFields.forEach(depentFieldId => {
         getFormData.getFormData(depentFieldId, parentSelectedValue).then(options => {
           updateFieldData && updateFieldData(depentFieldId, options);
         });
@@ -114,7 +113,7 @@ class CustomSelect extends Component {
 
   // renders a form element of type select and switches from asynctypehead to typehead on global search
   renderFormElement(){
-    const {isLoading, options,showAllOptions, defaultSelected} = this.state;
+    const {isLoading, options,showAllOptions} = this.state;
     const {name,error,touched,value,defaultSet,childMetadata,
            fieldinfo,disabled,placeholder,onChange,id} = this.props;
     if(fieldinfo.typeahead){
@@ -196,30 +195,36 @@ class CustomSelect extends Component {
               </InputGroupAddon>
           </InputGroup>
     }else return <Input
-    type='select'
-    name={name}
-    placeholder={placeholder}
-    value={defaultSelected.id}
-    disabled={disabled}
-    onChange={this.handleSelectFieldChange}
-    invalid={error && touched}
-  >
-    {!defaultSet && (
-      <option value='' disabled>
-        {placeholder}
-      </option>
-    )}
-
-    {fieldinfo &&
-      fieldinfo.options &&
-      fieldinfo.options.map(opt => {
-        return (
-          <option index={opt.id || opt} value={opt.id || opt}>
-            {opt.label || opt}
-          </option>
-        );
-      })}
-  </Input>
+                type="select"
+                name={name}
+                placeholder={placeholder}
+                value={value}
+                disabled={disabled}
+                onChange={this.handleSelectFieldChange}
+                invalid={error && touched}
+              >
+                {!defaultSet && (
+                    <option value="" disabled>
+                      {placeholder}
+                    </option>
+                )}
+                {fieldinfo && fieldinfo.options && !fieldinfo.keyValue &&
+                  fieldinfo.options.map(opt => {
+                    return (
+                      <option index={opt} value={opt}>
+                        {opt}
+                      </option>
+                    );
+                  })}
+                {fieldinfo && fieldinfo.options && fieldinfo.keyValue &&
+                  fieldinfo.options.map(opt => {
+                    return (
+                      <option id={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    );
+                  })}
+            </Input>
   }
   
   //after user selects a value, on change is triggered and sets the selected value. 
@@ -228,6 +233,7 @@ class CustomSelect extends Component {
            handleChild,onResetFields,id,formMetadata} = this.props;
     const {autoSelectFields} = fieldinfo;
     const {showAllOptions} = this.state;
+    debugger
     let fieldData = {};
     let selectedOption = selectedOptions[0] || null;
     if(selectedOption){
@@ -242,7 +248,16 @@ class CustomSelect extends Component {
           Object.keys(newFieldValues).map(k => newFieldValues[k] = newFieldValues[k].trim());
           setValues(newFieldValues);
         }else{
-          setFieldValue(id,selectedOption[id]);
+          if (fieldinfo.fieldDisplayInfo) {
+            setFieldValue(id,selectedOption[id]);
+          }else if (fieldinfo.autoPopulateFields) {
+            // For single select the selectedOption is always string as per the above code
+            // TODO: Check what should be the pattern for multi select and update.
+            this.updateDependentField(selectedOptions);
+            this.props.onChange(id, selectedOptions,fieldinfo.autoPopulateFields);
+          }else{
+            this.props.onChange(id, selectedOptions,null);
+          }
         }
         let metadata = childMetadata;
         metadata[id] = {isSelected:true};
@@ -251,11 +266,6 @@ class CustomSelect extends Component {
         let formInfo = formMetadata || [];
         formInfo[id] = selectedOption;
         setFormMetadata(formInfo);
-         // For single select the selectedOption is always string as per the above code
-        // TODO: Check what should be the pattern for multi select and update.
-        if (fieldinfo.dependentFields) {
-          this.updateDependentField(selectedOptions);
-        }
         if(showAllOptions) this.setState({showAllOptions:false});
     }
   }
@@ -280,7 +290,6 @@ class CustomSelect extends Component {
     // Step-3 populate the value in the field.
     const { value, fieldinfo, autoComplete, id, updateFieldData, getFormData} = this.props;
     if (value && !options.length && fieldinfo.isasync) {
-      debugger
       this.setState({ isLoading: true });
       getFormData.getFormData(id, value).then(results => {
         options = results;

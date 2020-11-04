@@ -119,22 +119,21 @@ class DynamicForm extends Component {
   /*
     Reset dependent fields
     @params: 
-      dependentFields:string[]
+      autoPopulateFields:string[]
       formicProps: FormicProps // to access formic api
   */
-  resetDependentFields(dependentFields, formikProps) {
-    debugger
+  resetDependentFields(autoPopulateFields, formikProps) {
     const { fieldData } = this.state;
-    dependentFields.forEach(fieldId => {
+    autoPopulateFields.forEach(fieldId => {
       formikProps.setFieldValue(fieldId, '');
-      const childDependentField = fieldData.find(formField => formField.id === fieldId && formField.dependentFields);
+      const childDependentField = fieldData.find(formField => formField.id === fieldId && formField.autoPopulateFields);
       if (childDependentField) {
-        this.resetDependentFields(childDependentField.dependentFields, formikProps);
+        this.resetDependentFields(childDependentField.autoPopulateFields, formikProps);
       }
     });
   }
 
-  handleFieldChange(event, selected, item, props) {
+  handleFieldChange(event, selected, autoPopulateFields, item, props) {
     debugger
     if ((item.fieldinfo && item.fieldinfo.typeahead) || item.fieldtype === 'checkbox') {
       props.setFieldValue(event, selected);
@@ -143,8 +142,8 @@ class DynamicForm extends Component {
     }
 
     // Clear dependent fields values
-    if (item.dependentFields) {
-      this.resetDependentFields(item.dependentFields, props);
+    if (autoPopulateFields) {
+      this.resetDependentFields(autoPopulateFields, props);
     }
 
     if (selected) {
@@ -306,9 +305,9 @@ class DynamicForm extends Component {
                 fieldsToDisable={item.disable}
                 value={props.values[item.id]}
                 required={item.validation && item.validation.required}
-                //onChange={props.handleChange}
-                onChange={(event, selected) => {
-                  this.handleFieldChange(event, selected, item, props);
+                onChange={(event, selected,autoPopulateFields) => {
+                  debugger
+                  this.handleFieldChange(event, selected, autoPopulateFields, item, props);
                 }}
                 setValues={props.setValues}
                 setFieldValue={props.setFieldValue}
@@ -322,7 +321,7 @@ class DynamicForm extends Component {
                 handleChild={this.handleChild}
                 childMetadata={childMetadata}
 
-                dependentFields={item.dependentFields}
+                autoPopulateFields={item.autoPopulateFields}
                 updateFieldData={this.updateFieldData}
               />
             );
