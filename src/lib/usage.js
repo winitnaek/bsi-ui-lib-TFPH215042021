@@ -20,21 +20,22 @@ class Usage extends Component {
                 recentUsage: recentUsage
             })
         })*/
-        this.props.recentUsage(
-            this.props.pgid,
-            this.props.data,
-            this.props.mode
-          )
-          .then(recentUsage=> {
-            console.log("recentUsage");
-            console.log(recentUsage);
-            this.setState({
-                recentUsage: recentUsage
-            })
-          })
-          .catch((error) => {
-            throw error;
-          });
+        // this.props.recentUsage(
+        //     this.props.pgid,
+        //     this.props.data,
+        //     this.props.mode
+        //   )
+        //   .then(recentUsage=> {
+        //     console.log("recentUsage");
+        //     console.log(recentUsage);
+        //     this.setState({
+        //         recentUsage: recentUsage
+        //     })
+        //   })
+        //   .catch((error) => {
+        //     throw error;
+        //   });
+        this.setState({recentUsage:[]})
     }
 
     toggle() {

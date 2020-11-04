@@ -47,15 +47,15 @@ export function createYupSchema(schema, config) {
       validator = validator[type](subtypeParams);
     });
   } 
-  if(validation.dependent && validation.type == "date"){
-    validation.dependent.forEach(valdt => {
-      const {message, inputField, range} = valdt;
-      debugger
-      validator = validator.when(inputField, (field, schema) => field && schema.min(field, message));
-      if(range)
-      validator = validator.when(inputField, (field, schema) => field && schema.max(moment(field).add(range, 'month').toString(), `Invalid dates range. The From and To date values must be within ${range} months.`));
-    });
-  }
+  // if(validation.dependent && validation.type == "date"){
+  //   validation.dependent.forEach(valdt => {
+  //     const {message, inputField, range} = valdt;
+  //     debugger
+  //     validator = validator.when(inputField, (field, schema) => field && schema.min(field, message));
+  //     if(range)
+  //     validator = validator.when(inputField, (field, schema) => field && schema.max(moment(field).add(range, 'month').toString(), `Invalid dates range. The From and To date values must be within ${range} months.`));
+  //   });
+  // }
   schema[id] = validator;
   return schema;
 }

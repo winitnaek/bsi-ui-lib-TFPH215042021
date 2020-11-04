@@ -15,7 +15,7 @@ import ViewPDF from "./viewPDF";
 class ReusableGrid extends React.Component {
   constructor(props) {
     super(props);
-    let metadata = this.props.metadata(this.props.pageid);
+    let metadata = this.props.metadata;
     this.state = {
       value: "",
       pgdef: metadata.pgdef,
@@ -387,7 +387,23 @@ class ReusableGrid extends React.Component {
 
   render() {
     console.log("--------props ", this.props);
-    let metadata = this.props.metadata(this.props.pageid);
+    // let metadata = this.props.metadata(this.props.pageid);
+    const {
+      styles,
+      tftools,
+      saveGridData,
+      formData,
+      fieldData,
+      formMetaData,
+      recentUsage,
+      autoComplete,
+      renderGrid,
+      metadata,
+      getFormData,
+      griddata,
+      serverPaging,
+      filterComp = null // If no filter component then render nothing
+    } = this.props;
     const { pgdef } = this.state;
     const { hasDeleteAll, extraLinks } = pgdef;
     let dataAdapter = this.buildDataAdapter();
@@ -487,21 +503,6 @@ class ReusableGrid extends React.Component {
 
     module.exports = this.setGridData;
     window.exports = this.setGridData;
-
-    const {
-      styles,
-      tftools,
-      saveGridData,
-      formData,
-      fieldData,
-      formMetaData,
-      recentUsage,
-      autoComplete,
-      renderGrid,
-      griddata,
-      serverPaging,
-      filterComp = null // If no filter component then render nothing
-    } = this.props;
 
     return (
       <Fragment>
@@ -764,11 +765,13 @@ class ReusableGrid extends React.Component {
             formProps={formProps}
             fieldData={fieldData}
             tftools={tftools}
+            metadata={metadata}
             renderGrid={renderGrid}
             formMetaData={formMetaData}
             filterFormData={this.state.filterFormData}
             recentUsage={recentUsage}
             autoComplete={autoComplete}
+            getFormData={getFormData}
             saveGridData={saveGridData}
             handleChildGrid={() => handleChildGrid(this.state.index)}
             handleSaveAs={this.handleNewForm}
