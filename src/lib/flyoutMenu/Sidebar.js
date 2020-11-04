@@ -19,9 +19,9 @@ class Sidebar extends Component {
       return (
         <Row key={item.label} className="selected" key={item.id}>
           <Col style={linkColStyle}>
-            <span id={`jumpto-${item.id}`} onClick={e => this.renderApplication(item)}>
+            <Button color="link" className="d-block p-0" id={`jumpto-${item.id}`} onClick={e => this.props.renderApplication(item)}>
               {item.label}
-            </span>
+            </Button>
             <UncontrolledTooltip placement="top" target={`jumpto-${item.id}`}>
               Jump to {item.label}
             </UncontrolledTooltip>
