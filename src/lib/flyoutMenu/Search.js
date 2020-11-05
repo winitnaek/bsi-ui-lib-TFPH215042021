@@ -39,10 +39,10 @@ class Search extends Component {
                     <i class="far fa-star" style={star}></i>
                   </button>
                 )}
-                <span id={`jumpto-${data.value}`} onClick={e => renderApplication(data)}>
+                <span id={`jumpto-${data.id}`} onClick={e => renderApplication(data)}>
                   {data.label}
                 </span>
-                <UncontrolledTooltip placement="right" target={`jumpto-${data.value}`}>
+                <UncontrolledTooltip placement="right" target={`jumpto-${data.id}`}>
                   Jump to {data.label}
                 </UncontrolledTooltip>
               </div>
