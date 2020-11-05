@@ -13,29 +13,11 @@ class Usage extends Component {
         this.toggle = this.toggle.bind(this);
       }
 
-    componentDidMount() {
-        /*this.props.recentUsage.getUsageData(this.props.pgid,this.props.formValues.data,this.props.mode)
-        .then((recentUsage) =>{
-            this.setState({
-                recentUsage: recentUsage
-            })
-        })*/
-        // this.props.recentUsage(
-        //     this.props.pgid,
-        //     this.props.data,
-        //     this.props.mode
-        //   )
-        //   .then(recentUsage=> {
-        //     console.log("recentUsage");
-        //     console.log(recentUsage);
-        //     this.setState({
-        //         recentUsage: recentUsage
-        //     })
-        //   })
-        //   .catch((error) => {
-        //     throw error;
-        //   });
-        this.setState({recentUsage:[]})
+    async componentDidMount() {
+        const {getFormData,pgid,data,mode} = this.props;
+        debugger
+        let recentUsage = await getFormData.getFormData(pgid,data,mode)
+        if (recentUsage) this.setState({recentUsage:recentUsage});
     }
 
     toggle() {
