@@ -6,13 +6,10 @@ import {FieldLabel, FieldMessage, FieldHeader} from "../field";
 class CustomSelect extends Component {
   constructor(props) {
     super(props);
-    const { fieldinfo = {}, value } = this.props;
-    const { options = [] } = fieldinfo;
-    const defaultSelected = options.find(option => option.id === value) || { id: '', label: '' };
     this.state = {
         isLoading: false,
-        options,
-        defaultSelected,
+        options: [],
+        defaultSelected:"",
         showAllOptions: false,
         query: "",
         isSelected:false,
@@ -44,15 +41,17 @@ class CustomSelect extends Component {
 
   // performs a global search with parameter as ""(empty value) to bring all the records 
   async globalSearchHandler () {
-    const {getFormData,id,formMetadata} = this.props;
+    debugger
+    const {getFormData,id,formMetadata,fieldinfo} = this.props;
     const {showAllOptions} = this.state;
-    if(!showAllOptions){
+    if(!showAllOptions && fieldinfo.isasync){
       this.setState({isLoading:true});
       let options = await getFormData.getFormData(id, "",formMetadata);
-      this.setState({isLoading: false, options: options,showAllOptions:!this.state.showAllOptions});
+      this.setState({isLoading: false, options: options,showAllOptions:!showAllOptions});
       this.typeahead.focus();
-    }else{
-      this.setState({showAllOptions:false});
+    }else if (fieldinfo.options){
+      this.setState({showAllOptions:!showAllOptions, options: fieldinfo.options});
+      this.typeahead.focus();
     }
   }
 
@@ -92,19 +91,20 @@ class CustomSelect extends Component {
   //clears the current and the dependent input fields as well as formik state
   clearInput(){
     debugger
-    const {setValues, id, fieldinfo, formValues, onResetFields,handleChild,childMetadata} = this.props;
+    const {setValues, id, fieldinfo, formValues, 
+           onResetFields,handleFieldMetadata,fieldMetadata} = this.props;
     const {resetFields} = fieldinfo;
     this.resetFieldValue();
     let fieldData = {};
     fieldData[id] = "";
-    let metadata = childMetadata;
-    metadata[id] = {isSelected:false};
+    let newFieldMetadata = fieldMetadata;
+    newFieldMetadata[id] = {isSelected:false};
     resetFields && resetFields.map(item => {
       fieldData[item] = "";
-      metadata[item] = {isSelected:false}
+      newFieldMetadata[item] = {isSelected:false}
     });
     resetFields && onResetFields(resetFields);
-    handleChild(metadata);
+    handleFieldMetadata(newFieldMetadata);
     let newFieldValues = Object.assign(formValues, fieldData);
     Object.keys(newFieldValues).map(k => newFieldValues[k] = newFieldValues[k].trim());
     this.setState({isSelected:false,query:""});
@@ -114,8 +114,9 @@ class CustomSelect extends Component {
   // renders a form element of type select and switches from asynctypehead to typehead on global search
   renderFormElement(){
     const {isLoading, options,showAllOptions} = this.state;
-    const {name,error,touched,value,defaultSet,childMetadata,
+    const {name,error,touched,value,defaultSet,fieldMetadata,
            fieldinfo,disabled,placeholder,onChange,id} = this.props;
+    debugger
     if(fieldinfo.typeahead){
       let filterByFields = [];
       if(fieldinfo.labelMapping && showAllOptions) 
@@ -181,7 +182,7 @@ class CustomSelect extends Component {
                   )}
               </Col>
               <InputGroupAddon addonType="append">
-                {childMetadata && childMetadata[id] && childMetadata[id].isSelected && (
+                {fieldMetadata && fieldMetadata[id] && fieldMetadata[id].isSelected && (
                   <Button outline onClick={this.clearInput}>
                                 {!isLoading && <i class="fa fa-times"></i>}
                   </Button>
@@ -194,7 +195,8 @@ class CustomSelect extends Component {
                 </Button>}
               </InputGroupAddon>
           </InputGroup>
-    }else return <Input
+    }else return (
+              <Input
                 type="select"
                 name={name}
                 placeholder={placeholder}
@@ -225,12 +227,12 @@ class CustomSelect extends Component {
                     );
                   })}
             </Input>
-  }
+    )}
   
   //after user selects a value, on change is triggered and sets the selected value. 
   handleChange(selectedOptions) {
-    const {setValues,setFieldValue,setFormMetadata,formValues,fieldinfo,childMetadata,
-           handleChild,onResetFields,id,formMetadata} = this.props;
+    const {setValues,setFieldValue,setFormMetadata,formValues,fieldinfo,fieldMetadata,
+           handleFieldMetadata,onResetFields,id,formMetadata} = this.props;
     const {autoSelectFields} = fieldinfo;
     const {showAllOptions} = this.state;
     debugger
@@ -255,13 +257,15 @@ class CustomSelect extends Component {
             // TODO: Check what should be the pattern for multi select and update.
             this.updateDependentField(selectedOptions);
             this.props.onChange(id, selectedOptions,fieldinfo.autoPopulateFields);
+            setFieldValue(id,selectedOption.id);
           }else{
             this.props.onChange(id, selectedOptions,null);
+            setFieldValue(id,selectedOption.id);
           }
         }
-        let metadata = childMetadata;
-        metadata[id] = {isSelected:true};
-        handleChild(metadata);
+        let newFieldMetadata = fieldMetadata;
+        newFieldMetadata[id] = {isSelected:true};
+        handleFieldMetadata(newFieldMetadata);
         onResetFields([]);
         let formInfo = formMetadata || [];
         formInfo[id] = selectedOption;
@@ -280,44 +284,24 @@ class CustomSelect extends Component {
     }
   }
   
-  componentDidMount(){
-    this.setState({defaultSelected:this.props.value});
-    let { options = [] } = this.state;
-    let { defaultSelected } = this.state;
+  async componentDidMount(){
+    // this.setState({defaultSelected:this.props.value});
+    const {value, fieldinfo, autoComplete, id, updateFieldData, getFormData} = this.props;
+    let defaultSelected = this.state.defaultSelected;
     // for first time load options if empty, so the value will not populate in form as defautlSelection is null.
     // Step-1 request for the autoComplete options.
     // Step-2 find if the value is present in id or label.
     // Step-3 populate the value in the field.
-    const { value, fieldinfo, autoComplete, id, updateFieldData, getFormData} = this.props;
-    if (value && !options.length && fieldinfo.isasync) {
+    if (value && fieldinfo.isasync && !fieldinfo.typeahead && !fieldinfo.options.length) {
       this.setState({ isLoading: true });
-      getFormData.getFormData(id, value).then(results => {
-        options = results;
-        defaultSelected =
-          options.find(option => (option && option.id === value) || option.label === value) || defaultSelected;
-        this.setState(
-          {
-            isLoading: false,
-            options: options,
-            defaultSelected
-          },
-          () => {
-            if (defaultSelected.id && defaultSelected.label) {
-              this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
-            }
-            updateFieldData(id, options);
-          }
-        );
-      });
+      let options = await getFormData.getFormData(id, value);
+      defaultSelected = options.find(option => (option && option.id === value) || option.label === value) || defaultSelected;
+      this.setState({isLoading:false,options:options,defaultSelected:defaultSelected});
+      updateFieldData(id, options);
     } else {
-      defaultSelected =
-        options.find(option => option && (option.id === value || option.label === value || option === value)) ||
-        defaultSelected;
-      this.setState({ defaultSelected }, () => {
-        if (defaultSelected.id && defaultSelected.label) {
-          this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
-        }
-      });
+      defaultSelected = fieldinfo.options && fieldinfo.options.find(option => option && (option.id === value || option.label === value || option === value)) || defaultSelected;
+      this.setState({defaultSelected:defaultSelected});
+      this.resetFieldValue();
     }
   }
 

@@ -14,7 +14,7 @@ import PopupGrid from "./popupGrid";
 import { createYupSchema } from "./utils/createYupSchema";
 import * as yup from "yup";
 
-var childMetadata = {};
+var fieldMetadata = {};
 var resetFields = {};
 
 class DynamicForm extends Component {
@@ -35,7 +35,7 @@ class DynamicForm extends Component {
     this.handleViewAll = (event, { values }) => {
       event.preventDefault();
       const { formProps, formData } = this.props;
-      this.props.handleChildGrid();
+      this.props.handleFieldMetadataGrid();
     };
 
     this.handleSaveAs = (e, props) => {
@@ -63,8 +63,8 @@ class DynamicForm extends Component {
       renderGrid(data[0])
     };
 
-    this.handleChild = (payload) => {
-      childMetadata = payload;
+    this.handleFieldMetadata = (payload) => {
+      fieldMetadata = payload;
     }
     
     //
@@ -78,8 +78,10 @@ class DynamicForm extends Component {
     }
 
     // resets the entire form
+    // fieldMetadata keeps track of the state of the field,
+    // like to show or hide clear buttons
     this.handleReset = () => {
-      childMetadata = {}
+      fieldMetadata = {}  
       this.setState({isResetAll: true});
     }
 
@@ -123,7 +125,7 @@ class DynamicForm extends Component {
 
   handleFieldChange(event, selected, autoPopulateFields, item, props) {
     debugger
-    if ((item.fieldinfo && item.fieldinfo.typeahead) || item.fieldtype === 'checkbox') {
+    if (item.fieldtype === 'checkbox') {
       props.setFieldValue(event, selected.id);
     } else {
       props.handleChange(event);
@@ -297,8 +299,8 @@ class DynamicForm extends Component {
 
                 resetFields={resetFields}
                 onResetFields = {this.onResetFields}
-                handleChild={this.handleChild}
-                childMetadata={childMetadata}
+                handleFieldMetadata={this.handleFieldMetadata}
+                fieldMetadata={fieldMetadata}
 
                 autoPopulateFields={item.autoPopulateFields}
                 updateFieldData={this.updateFieldData}
@@ -310,7 +312,7 @@ class DynamicForm extends Component {
   }
 
   componentDidMount () {
-    childMetadata={};
+    fieldMetadata={};
     resetFields={};
     const hasDelete = this.props.metadata.formdef.hasDelete;
     const mode = this.props.formData.mode;

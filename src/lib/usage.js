@@ -15,7 +15,6 @@ class Usage extends Component {
 
     async componentDidMount() {
         const {getFormData,pgid,data,mode} = this.props;
-        debugger
         let recentUsage = await getFormData.getFormData(pgid,data,mode)
         if (recentUsage) this.setState({recentUsage:recentUsage});
     }
