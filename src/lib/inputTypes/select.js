@@ -206,26 +206,20 @@ class CustomSelect extends Component {
                 invalid={error && touched}
               >
                 {!defaultSet && (
-                    <option value="" disabled>
-                      {placeholder}
+                <option value='' disabled>
+                  {placeholder}
+                </option>
+              )}
+
+              {fieldinfo &&
+                fieldinfo.options &&
+                fieldinfo.options.map(opt => {
+                  return (
+                    <option index={opt.id || opt} value={opt.id || opt}>
+                      {opt.label || opt}
                     </option>
-                )}
-                {fieldinfo && fieldinfo.options && !fieldinfo.keyValue &&
-                  fieldinfo.options.map(opt => {
-                    return (
-                      <option index={opt} value={opt}>
-                        {opt}
-                      </option>
-                    );
-                  })}
-                {fieldinfo && fieldinfo.options && fieldinfo.keyValue &&
-                  fieldinfo.options.map(opt => {
-                    return (
-                      <option id={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    );
-                  })}
+                  );
+                })} 
             </Input>
     )}
   
