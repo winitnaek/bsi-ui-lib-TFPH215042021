@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "formik": "^1.5.2",
-    "moment": "^2.27.0",
+    "moment": "^2.29.0",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-bootstrap-typeahead": "^3.4.6",
