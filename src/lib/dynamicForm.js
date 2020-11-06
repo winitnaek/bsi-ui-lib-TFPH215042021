@@ -176,11 +176,11 @@ class DynamicForm extends Component {
 
   disabledHandler(id) {
     const { disabledFields } = this.state;
-    const { formMetaData } = this.props;
+    const { metadata } = this.props;
     try {
       let row = disabledFields.filter(r => id == r);
       if (row.length > 0) return true;
-      let formflds = formMetaData.formdef.formflds;
+      let formflds = metadata.formdef.formflds;
       if (formflds) {
         row = formflds.filter(r => id == r.id);
         if (row.length > 0) {
@@ -341,7 +341,7 @@ class DynamicForm extends Component {
         submitButtonText,
         hasGenerate,
         generateButtonText
-      } = this.props.formMetaData.formdef;
+      } = metadata.formdef;
       let isEdit = mode === "Edit" ? true:false;
       return (
         <Formik
@@ -470,7 +470,7 @@ class DynamicForm extends Component {
                 ) : null}
                 {!hasGenerate && (
                   <Button type='submit' color='success'>
-                    {this.props.filter || this.props.formMetaData.griddef.isfilterform
+                    {this.props.filter || this.props.metadata.griddef.isfilterform
                       ? submitButtonText || ' View '
                       : ' Save '}
                   </Button>
