@@ -493,8 +493,7 @@ class ReusableGrid extends React.Component {
       saveGridData,
       formData,
       fieldData,
-      recentUsage,
-      autoComplete,
+      getFormData,
       renderGrid,
       griddata,
       serverPaging,
@@ -765,8 +764,7 @@ class ReusableGrid extends React.Component {
             renderGrid={renderGrid}
             metadata={metadata}
             filterFormData={this.state.filterFormData}
-            recentUsage={recentUsage}
-            autoComplete={autoComplete}
+            getFormData={getFormData}
             saveGridData={saveGridData}
             handleChildGrid={() => handleChildGrid(this.state.index)}
             handleSaveAs={this.handleNewForm}

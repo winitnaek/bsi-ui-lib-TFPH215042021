@@ -25,6 +25,7 @@ class DynamicForm extends Component {
       showDelete: false,
       isResetAll: false,
       isLoading: false,
+      saveAsMode: false,
       disabledFields:[],
       formMetadata: [],
       fieldData,
@@ -342,6 +343,7 @@ class DynamicForm extends Component {
         hasGenerate,
         generateButtonText
       } = metadata.formdef;
+      const { saveAsMode } = this.state;
       let isEdit = mode === "Edit" ? true:false;
       return (
         <Formik
