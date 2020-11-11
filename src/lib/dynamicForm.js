@@ -125,7 +125,6 @@ class DynamicForm extends Component {
   }
 
   handleFieldChange(event, selected, autoPopulateFields, item, props) {
-    debugger
     if (item.fieldtype === 'checkbox') {
       props.setFieldValue(event, selected.id);
     } else {
@@ -199,7 +198,6 @@ class DynamicForm extends Component {
   }
 
   updateFieldData(fieldId, options) {
-    debugger
     const { fieldData } = this.state;
     const updatedFieldData = fieldData.map(field => {
       if (field.id === fieldId && field.fieldinfo && field.fieldinfo.options) {
@@ -263,7 +261,7 @@ class DynamicForm extends Component {
       const Component = fieldMap[item.fieldtype];
       let error = props.errors.hasOwnProperty(item.id) && props.errors[item.id];
       let touched = props.touched.hasOwnProperty(item.id) && props.touched[item.id];
-      if (item.fieldtype) {
+      if (item.fieldtype && !item.hidden) {
             return (
               <Component
                 index={index}
@@ -288,7 +286,6 @@ class DynamicForm extends Component {
                 value={props.values[item.id]}
                 required={item.validation && item.validation.required}
                 onChange={(event, selected,autoPopulateFields) => {
-                  debugger
                   this.handleFieldChange(event, selected, autoPopulateFields, item, props);
                 }}
                 setValues={props.setValues}
@@ -353,7 +350,6 @@ class DynamicForm extends Component {
           validateOnChange={true}
           onSubmit={(values, actions) => {
             try {
-              debugger
               if (gridType == "page"){
                 handleSubmit(values,formId);
               }else if (!filter) {
@@ -421,6 +417,7 @@ class DynamicForm extends Component {
                       data={this.props.formData.data || {}}
                       close={close}
                       getFormData={getFormData}
+                      recentUsage={this.props.recentUsage}
                     />
                   )}
                     {metadata.formdef &&
@@ -509,7 +506,6 @@ class DynamicForm extends Component {
       const {gridType} = this.props;
       const {hasPopupGrid} = this.props.metadata.formdef;
        const {deleteHandler, handleDelete} = formProps;
-       debugger
         this.setState({isLoading: true});
         if(hasPopupGrid){
           let _id = $("#popupgrid").children(":first")[0].id;
@@ -542,7 +538,7 @@ class DynamicForm extends Component {
           initialValues[id] =  moment().startOf('month').format("YYYY-MM-DD"); 
         else if (validation && validation.constraint && validation.constraint.map(validation => validation.type) == "endOfMonth")
           initialValues[id] =  moment().endOf('month').format("YYYY-MM-DD"); 
-        else
+        // else
         initialValues[id] = item.value || "";
       });
     }

@@ -495,6 +495,7 @@ class ReusableGrid extends React.Component {
       fieldData,
       getFormData,
       renderGrid,
+      recentUsage,
       griddata,
       serverPaging,
       filterComp = null // If no filter component then render nothing
@@ -764,6 +765,7 @@ class ReusableGrid extends React.Component {
             renderGrid={renderGrid}
             metadata={metadata}
             filterFormData={this.state.filterFormData}
+            recentUsage={recentUsage}
             getFormData={getFormData}
             saveGridData={saveGridData}
             handleChildGrid={() => handleChildGrid(this.state.index)}
