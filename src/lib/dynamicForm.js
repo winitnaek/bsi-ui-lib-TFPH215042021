@@ -288,7 +288,6 @@ class DynamicForm extends Component {
                 value={props.values[item.id]}
                 required={item.validation && item.validation.required}
                 onChange={(event, selected,autoPopulateFields) => {
-                  debugger
                   this.handleFieldChange(event, selected, autoPopulateFields, item, props);
                 }}
                 setValues={props.setValues}
@@ -331,6 +330,26 @@ class DynamicForm extends Component {
     const {popupGrids} = metadata.pgdef;
     const fieldInfo = fieldData;
     let initialValues = {};
+
+    if (mode == "Edit") {
+      initialValues = this.props.formData.data;
+    } else {
+      fieldInfo.forEach((item, index) => {
+        const {validation,value,id} = item;
+        if(validation && validation.constraint){
+           validation.constraint.map(obj => {
+              if(obj.type == "startOfMonth")
+                initialValues[id] =  moment().startOf('month').format(obj.format||"YYYY-MM-DD"); 
+              else if (obj.type == "endOfMonth")
+                initialValues[id] =  moment().endOf('month').format(obj.format||"YYYY-MM-DD"); 
+              else if (obj.type == "currentDate")
+                initialValues[id] =  moment(new Date()).format(obj.format||"YYYY-MM-DD");
+          });
+        }else{
+          initialValues[id] = item.value || "";
+        }
+      });
+    }
    
     this.displayForm = () => {
       const {
@@ -351,6 +370,7 @@ class DynamicForm extends Component {
           enableReinitialize={true}
           validationSchema={validateSchema}
           validateOnChange={true}
+          validateOnBlur={true}
           onSubmit={(values, actions) => {
             try {
               debugger
@@ -531,20 +551,6 @@ class DynamicForm extends Component {
       }
       this.setState({isLoading: false});
       close();
-    }
-
-    if (this.props.formData.mode == "Edit") {
-      initialValues = this.props.formData.data;
-    } else {
-      fieldInfo.forEach((item, index) => {
-        const {validation,value,id} = item;
-        if(validation && validation.constraint && validation.constraint.map(validation => validation.type) == "startOfMonth") 
-          initialValues[id] =  moment().startOf('month').format("YYYY-MM-DD"); 
-        else if (validation && validation.constraint && validation.constraint.map(validation => validation.type) == "endOfMonth")
-          initialValues[id] =  moment().endOf('month').format("YYYY-MM-DD"); 
-        else
-        initialValues[id] = item.value || "";
-      });
     }
 
     const yepSchema = fieldInfo.reduce(createYupSchema, {});

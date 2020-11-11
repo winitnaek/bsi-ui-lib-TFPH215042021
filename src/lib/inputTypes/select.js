@@ -116,7 +116,6 @@ class CustomSelect extends Component {
     const {isLoading, options,showAllOptions} = this.state;
     const {name,error,touched,value,defaultSet,fieldMetadata,
            fieldinfo,disabled,placeholder,onChange,id} = this.props;
-    debugger
     if(fieldinfo.typeahead){
       let filterByFields = [];
       if(fieldinfo.labelMapping && showAllOptions) 
@@ -125,6 +124,7 @@ class CustomSelect extends Component {
         filterByFields[0] = (fieldinfo.labelMapping && fieldinfo.fieldDisplayInfo[0].field) || "label";
       const primaryId = (fieldinfo.labelMapping && fieldinfo.fieldDisplayInfo[0].field) || "label";
       let mappedFieldLength = (fieldinfo.labelMapping && fieldinfo.fieldDisplayInfo.length) || 0;
+      debugger
       return <InputGroup>
               <Col style={{margin:0,padding:0}}>
                   {!showAllOptions ? (
