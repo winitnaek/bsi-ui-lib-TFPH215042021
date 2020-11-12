@@ -328,6 +328,26 @@ class DynamicForm extends Component {
     const {popupGrids} = metadata.pgdef;
     const fieldInfo = fieldData;
     let initialValues = {};
+
+    if (mode == "Edit") {
+      initialValues = this.props.formData.data;
+    } else {
+      fieldInfo.forEach((item, index) => {
+        const {validation,value,id} = item;
+        if(validation && validation.constraint){
+           validation.constraint.map(obj => {
+              if(obj.type == "startOfMonth")
+                initialValues[id] =  moment().startOf('month').format(obj.format||"YYYY-MM-DD"); 
+              else if (obj.type == "endOfMonth")
+                initialValues[id] =  moment().endOf('month').format(obj.format||"YYYY-MM-DD"); 
+              else if (obj.type == "currentDate")
+                initialValues[id] =  moment(new Date()).format(obj.format||"YYYY-MM-DD");
+          });
+        }else{
+          initialValues[id] = item.value || "";
+        }
+      });
+    }
    
     this.displayForm = () => {
       const {
@@ -348,6 +368,7 @@ class DynamicForm extends Component {
           enableReinitialize={true}
           validationSchema={validateSchema}
           validateOnChange={true}
+          validateOnBlur={true}
           onSubmit={(values, actions) => {
             try {
               if (gridType == "page"){
