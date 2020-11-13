@@ -1,25 +1,73 @@
 import * as yup from "yup";
 import moment from "moment";
 
-const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
-const socialSecurityRegExp = /^((?!000)(?!666)(?:[0-6]\d{2}|7[0-2][0-9]|73[0-3]|7[5-6][0-9]|77[0-2]))-((?!00)\d{2})-((?!0000)\d{4})$/
+// yup.addMethod(yup.string, "matches", function(args) {
+//   const message = args["message"];
+//   const regex = args["input"];
+//   const requiredMsg = args["requiredMsg"];
+//   return yup.string().required(requiredMsg).test(`matches`,message, value => regex.test(value));
+// })
 
-yup.addMethod(yup.string, "phoneNumber", function(args) {
-  debugger
-  const message = args[1];
-  return yup.mixed().test(`phoneNumber`,message, function(value) {
+yup.addMethod(yup.string, "matches", function(args) {
+  const message = args["message"];
+  const regex = args["input"];
+  const requiredMsg = args["requiredMsg"];
+  return yup.string().required(requiredMsg).test(`matches`,message, function(value) {
+    debugger
     const { path, createError } = this;
-    return (phoneRegExp.test(value) && value.length <= 15) || createError({ path, message });
+    return regex.test(value) || createError({ path, message });
   })
 })
 
-yup.addMethod(yup.string, "socialSecurity", function(args) {
-  const message = args[1];
-  return yup.mixed().test(`socialSecurity`,message, function(value) {
-    const { path, createError } = this;
-    return socialSecurityRegExp.test(value) || createError({ path, message });
-  })
+yup.addMethod(yup.date, "range", function(args) {
+  const dependentField = args["dependentField"];
+  const message = args["message"];
+  const input = args["input"];
+  return yup.date()
+          .when(dependentField, (field,schema) => {
+            return (field && schema.min(field,message));
+          })
+          .when(dependentField, (field,schema) => {
+            return (field && schema.max(moment(field).add(input, 'month').toString(),message));
+          });
 })
+
+yup.addMethod(yup.date, "after", function(args) {
+  const dependentField = args["dependentField"];
+  const message = args["message"];
+  return yup.date().when(dependentField, (field,schema) => {
+  return (field && schema.min(field,message));
+  });
+})
+
+yup.addMethod(yup.date, "before", function(args) {
+  const dependentField = args["dependentField"];
+  const message = args["message"];
+  return yup.date().when(dependentField, (field,schema) => {
+  return (field && schema.max(field,message));
+  });
+})
+
+// yup.addMethod(yup.string, "minLen", function(args) {
+//   const input = args["input"];
+//   const message = args["message"];
+//   yup.string().test('len', message, val => val.length === 45);
+//   return yup.string().required().test(`minLen`, message, function(value) {
+//     const { path, createError } = this;
+//     return !value || value.toString().length >= input || createError({ path, message });
+//   });
+// })
+
+// yup.addMethod(yup.string, "maxLen", function(args) {
+//   const input = args["input"];
+//   const message = args["message"];
+//   return yup.string().required().test(`maxLen`,message, function(value) {
+//     const { path, createError } = this;
+//     return !value || value.toString().length <= input || createError({ path, message });
+//   });
+// })
+
+
 
 
 export function createYupSchema(schema, config) {
@@ -32,10 +80,12 @@ export function createYupSchema(schema, config) {
     validator = validator["required"]([config.errmsg]);
   if(validation.constraint){
     validation.constraint.forEach(valdt => {
-      const {type, input, message} = valdt;
+      const {type,input,message,dependentField,range} = valdt;
       if (!validator[type]) return;
-        constraintParams[0] = input;
-        constraintParams[1] = message;
+        constraintParams["input"] = input;
+        constraintParams["message"] = message;
+        constraintParams["dependentField"] = dependentField;
+        constraintParams["requiredMsg"] = config.errmsg;
         validator = validator[type](constraintParams);
     });
   }
@@ -47,15 +97,6 @@ export function createYupSchema(schema, config) {
       validator = validator[type](subtypeParams);
     });
   } 
-  // if(validation.dependent && validation.type == "date"){
-  //   validation.dependent.forEach(valdt => {
-  //     const {message, inputField, range} = valdt;
-  //     debugger
-  //     validator = validator.when(inputField, (field, schema) => field && schema.min(field, message));
-  //     if(range)
-  //     validator = validator.when(inputField, (field, schema) => field && schema.max(moment(field).add(range, 'month').toString(), `Invalid dates range. The From and To date values must be within ${range} months.`));
-  //   });
-  // }
   schema[id] = validator;
   return schema;
 }

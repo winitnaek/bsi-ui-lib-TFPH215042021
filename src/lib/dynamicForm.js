@@ -200,7 +200,7 @@ class DynamicForm extends Component {
   updateFieldData(fieldId, options) {
     const { fieldData } = this.state;
     const updatedFieldData = fieldData.map(field => {
-      if (field.id === fieldId && field.fieldinfo && field.fieldinfo.options) {
+      if (field.id === fieldId && field.fieldinfo) {
         field.fieldinfo.options = options;
       }
       return field;
@@ -328,6 +328,34 @@ class DynamicForm extends Component {
     const {popupGrids} = metadata.pgdef;
     const fieldInfo = fieldData;
     let initialValues = {};
+
+    if (mode == "Edit") {
+      initialValues = this.props.formData.data;
+    } else {
+      fieldInfo.forEach((item, index) => {
+        const {validation,value,id} = item;
+        if(validation && validation.constraint){
+            let constraints = validation.constraint;
+            for (let key in constraints) {
+              if(constraints[key].type == "startOfMonth"){
+                initialValues[id] =  moment().startOf('month').format(constraints[key].format||"YYYY-MM-DD");
+                break;
+              } else if (constraints[key].type == "endOfMonth") {
+                initialValues[id] =  moment().endOf('month').format(constraints[key].format||"YYYY-MM-DD");
+                break; 
+              } else if (constraints[key].type == "currentDate"){
+                initialValues[id] =  moment(new Date()).format(constraints[key].format||"YYYY-MM-DD");
+                break;
+              } else {
+                initialValues[id] = item.value || "";
+                break;
+              }
+          }
+        }else{
+          initialValues[id] = item.value || "";
+        }
+      });
+    }
    
     this.displayForm = () => {
       const {
@@ -348,6 +376,7 @@ class DynamicForm extends Component {
           enableReinitialize={true}
           validationSchema={validateSchema}
           validateOnChange={true}
+          validateOnBlur={true}
           onSubmit={(values, actions) => {
             try {
               if (gridType == "page"){
@@ -527,20 +556,6 @@ class DynamicForm extends Component {
       }
       this.setState({isLoading: false});
       close();
-    }
-
-    if (this.props.formData.mode == "Edit") {
-      initialValues = this.props.formData.data;
-    } else {
-      fieldInfo.forEach((item, index) => {
-        const {validation,value,id} = item;
-        if(validation && validation.constraint && validation.constraint.map(validation => validation.type) == "startOfMonth") 
-          initialValues[id] =  moment().startOf('month').format("YYYY-MM-DD"); 
-        else if (validation && validation.constraint && validation.constraint.map(validation => validation.type) == "endOfMonth")
-          initialValues[id] =  moment().endOf('month').format("YYYY-MM-DD"); 
-        // else
-        initialValues[id] = item.value || "";
-      });
     }
 
     const yepSchema = fieldInfo.reduce(createYupSchema, {});

@@ -7,14 +7,14 @@ class CustomSelect extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: false,
-      options: [],
-      defaultSelected: "",
-      showAllOptions: false,
-      query: "",
-      isSelected: false,
-      isOpen: false
-    };
+        isLoading: false,
+        options: [],
+        defaultSelected: "",
+        showAllOptions: false,
+        query: "",
+        isSelected:false,
+        isOpen:false,
+    }
 
     this.handleChange = this.handleChange.bind(this);
     this.onSearchHandler = this.onSearchHandler.bind(this);
@@ -26,14 +26,15 @@ class CustomSelect extends Component {
 
   // resets the field value for typehead, asynctypehead and its autopopulated fields.
   // if default value is present it resets to default value
-  resetFieldValue() {
-    const { defaultSelected } = this.state;
-    if (defaultSelected) {
-      this.typeahead && this.typeahead.getInstance()._updateSelected([defaultSelected]);
-      this.asynctypeahead && this.asynctypeahead.getInstance()._updateSelected([defaultSelected]);
-    } else {
-      this.typeahead && this.typeahead.getInstance().clear();
-      this.asynctypeahead && this.asynctypeahead.getInstance().clear();
+  resetFieldValue(clearInput) {
+    const {defaultSelected} = this.state;
+    const {mode} = this.props;
+    if(mode == "Edit" && defaultSelected.id && defaultSelected.label && !clearInput){
+        this.typeahead && this.typeahead.getInstance()._updateSelected(defaultSelected);
+        this.asynctypeahead && this.asynctypeahead.getInstance()._updateSelected(defaultSelected);
+    }else{
+        this.typeahead && this.typeahead.getInstance().clear(); 
+        this.asynctypeahead && this.asynctypeahead.getInstance().clear(); 
     }
   }
 
@@ -101,27 +102,16 @@ class CustomSelect extends Component {
     handleFieldMetadata(newFieldMetadata);
     let newFieldValues = Object.assign(formValues, fieldData);
     Object.keys(newFieldValues).map(k => (newFieldValues[k] = newFieldValues[k].trim()));
-    this.setState({ isSelected: false, query: "", defaultSelected:"" }, this.resetFieldValue);
+    this.setState({ isSelected: false, query: "", defaultSelected:"" }, this.resetFieldValue({clearInput:true}));
     setValues(newFieldValues);
   }
 
   // renders a form element of type select and switches from asynctypehead to typehead on global search
-  renderFormElement() {
-    const { isLoading, options, showAllOptions } = this.state;
-    const {
-      name,
-      error,
-      touched,
-      value,
-      defaultSet,
-      fieldMetadata,
-      fieldinfo,
-      disabled,
-      placeholder,
-      onChange,
-      id
-    } = this.props;
-    if (fieldinfo.typeahead) {
+  renderFormElement(){
+    const {isLoading, options,showAllOptions,defaultSelected} = this.state;
+    const {name,error,touched,value,defaultSet,fieldMetadata,
+           fieldinfo,disabled,placeholder,onChange,id} = this.props;
+    if(fieldinfo.typeahead){
       let filterByFields = [];
       if (fieldinfo.labelMapping && showAllOptions)
         filterByFields = fieldinfo.fieldDisplayInfo.map(item => {
@@ -200,12 +190,12 @@ class CustomSelect extends Component {
           </Col>
           <InputGroupAddon addonType="append">
             {fieldMetadata && fieldMetadata[id] && fieldMetadata[id].isSelected && (
-              <Button outline onClick={this.clearInput}>
+              <Button outline onClick={this.clearInput} disabled={disabled}>
                 {!isLoading && <i class="fa fa-times"></i>}
               </Button>
             )}
             {fieldinfo && fieldinfo.globalSearch && (
-              <Button outline onClick={this.globalSearchHandler}>
+              <Button outline onClick={this.globalSearchHandler} disabled={disabled}>
                 {!isLoading && !showAllOptions && <i class="fas fa-ellipsis-h"></i>}
                 {!isLoading && showAllOptions && <i class="fas fa-globe"></i>}
                 {isLoading && <i class="fas fa-spinner fa-spin"></i>}
@@ -310,18 +300,40 @@ class CustomSelect extends Component {
       });
     }
   }
+  
+  // async componentDidMount(){
+  //   // this.setState({defaultSelected:this.props.value});
+  //   const {value, fieldinfo, id, updateFieldData, getFormData} = this.props;
+  //   let defaultSelected = this.state.defaultSelected;
+  //   // for first time load options if empty, so the value will not populate in form as defautlSelection is null.
+  //   // Step-1 request for the autoComplete options.
+  //   // Step-2 find if the value is present in id or label.
+  //   // Step-3 populate the value in the field.
+  //   if (value && fieldinfo.isasync && !fieldinfo.typeahead && !fieldinfo.options.length) {
+  //     this.setState({ isLoading: true });
+  //     let options = await getFormData.getFormData(id, value);
+  //     defaultSelected = options.find(option => (option && option.id === value) || option.label === value) || defaultSelected;
+  //     this.setState({isLoading:false,options:options,defaultSelected:defaultSelected});
+  //     updateFieldData(id, options);
+  //   } else {
+  //     defaultSelected = fieldinfo.options && fieldinfo.options.find(option => option && (option.id === value || option.label === value || option === value)) || defaultSelected;
+  //     this.setState({defaultSelected:defaultSelected});
+  //     this.resetFieldValue();
+  //   }
+  // }
 
   async componentDidMount() {
     // this.setState({defaultSelected:this.props.value});
-    const { value, fieldinfo, autoComplete, id, updateFieldData, getFormData } = this.props;
+    const { value, fieldinfo, id, updateFieldData, getFormData } = this.props;
     let defaultSelected = this.state.defaultSelected;
     // for first time load options if empty, so the value will not populate in form as defautlSelection is null.
     // Step-1 request for the autoComplete options.
+
     // Step-2 find if the value is present in id or label.
     // Step-3 populate the value in the field.
-    if (fieldinfo.labelMapping) {
-      defaultSelected = value;
-    } else if (value && fieldinfo.isasync && fieldinfo.options && !fieldinfo.options.length) {
+    if(fieldinfo.labelMapping){
+      this.setState({defaultSelected:{"id":value,"label":value}});
+    } else if (value && fieldinfo.isasync && !fieldinfo.options.length) {
       this.setState({ isLoading: true });
       let options = await getFormData.getFormData(id, value);
       updateFieldData(id, options);
@@ -352,19 +364,8 @@ class CustomSelect extends Component {
   }
 
   render() {
-    const {
-      name,
-      error,
-      touched,
-      description,
-      required,
-      label,
-      fieldinfo,
-      index,
-      isResetAll,
-      fieldHeader,
-      resetFields
-    } = this.props;
+    const {name,error,touched,description,required,label,fieldinfo,
+           index,isResetAll,fieldHeader,resetFields} = this.props;
     if (isResetAll) this.resetFieldValue();
     else if (resetFields.length && fieldinfo.typeahead) {
       resetFields.map(field => {

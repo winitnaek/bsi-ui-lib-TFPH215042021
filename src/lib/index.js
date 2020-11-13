@@ -3,6 +3,7 @@ export {default as CustomCheckbox} from './inputTypes/checkbox';
 export {default as CustomFile} from './inputTypes/fileUpload';
 export {default as CustomSelect} from './inputTypes/select';
 export {default as ReusableGrid} from './reusableGrid.js';
+export {default as EnhancedGrid} from './enhancedGrid.js';
 export {default as ConfirmModal} from './confirmModal.js';
 export {default as ReusableAlert} from './reusableAlert.js';
 export {default as ReusableModal} from './reusableModal.js';

@@ -6,13 +6,13 @@ import moment from "moment";
 class CustomDate extends Component {
   constructor() {
     super();
-    this.getValue = value => {
-      const momentObj = moment(value);
-      if (momentObj.isValid()) {
-        return momentObj.format("YYYY-MM-DD");
-      }
-      return value;
-    };
+    // this.getValue = value => {
+    //   const momentObj = moment(value);
+    //   if (momentObj.isValid()) {
+    //     return momentObj.format("YYYY-MM-DD");
+    //   }
+    //   return value;
+    // };
   }
   render() {
     const {
@@ -46,7 +46,7 @@ class CustomDate extends Component {
             type={"date"}
             name={name}
             placeholder={placeholder}
-            value={this.getValue(value)}
+            value={value}
             onChange={onChange}
             onBlur={onBlur}
             invalid={error && touched}
