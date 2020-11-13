@@ -28,20 +28,13 @@ class CustomSelect extends Component {
   // if default value is present it resets to default value
   resetFieldValue(clearInput) {
     const {defaultSelected} = this.state;
-    //const {mode} = this.props;
-    // if(mode == "Edit" && defaultSelected.id && defaultSelected.label && !clearInput){
-    //     this.typeahead && this.typeahead.getInstance()._updateSelected(defaultSelected);
-    //     this.asynctypeahead && this.asynctypeahead.getInstance()._updateSelected(defaultSelected);
-    // }else{
-    //     this.typeahead && this.typeahead.getInstance().clear(); 
-    //     this.asynctypeahead && this.asynctypeahead.getInstance().clear(); 
-    // }
-    if(defaultSelected){
-      this.typeahead && this.typeahead.getInstance()._updateSelected(defaultSelected);
-      this.asynctypeahead && this.asynctypeahead.getInstance()._updateSelected(defaultSelected);
+    const {mode} = this.props;
+    if(mode == "Edit" && defaultSelected.id && defaultSelected.label && !clearInput){
+        this.typeahead && this.typeahead.getInstance()._updateSelected(defaultSelected);
+        this.asynctypeahead && this.asynctypeahead.getInstance()._updateSelected(defaultSelected);
     }else{
-      this.typeahead && this.typeahead.getInstance().clear(); 
-      this.asynctypeahead && this.asynctypeahead.getInstance().clear(); 
+        this.typeahead && this.typeahead.getInstance().clear(); 
+        this.asynctypeahead && this.asynctypeahead.getInstance().clear(); 
     }
   }
 
