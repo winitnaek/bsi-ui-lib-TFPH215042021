@@ -5,9 +5,8 @@ import {Col} from "reactstrap";
 
 export default class PageFilters extends React.Component {
     render() {
-        const {griddef,styles,fieldData,formFilterData} = this.props;
-        const {isfilter,parentConfig} = griddef;
-        debugger
+        const {metadata,styles,fieldData,formFilterData} = this.props;
+        const {isfilter,parentConfig} = metadata.griddef;
         return (
             <Col>
                 {isfilter ? (

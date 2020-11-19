@@ -8,7 +8,7 @@ class ReusableModal extends Component {
   }
 
   render() {
-    const {styles,pgdef} = this.props;
+    const {styles,formdef} = this.props;
     return (
       <Modal
         isOpen={this.props.open}
@@ -16,7 +16,7 @@ class ReusableModal extends Component {
         style={styles.modal}
       >
         <ModalHeader toggle={e => this.props.close()}>
-          <span> {pgdef.pgtitle} </span>
+          <span> {formdef.title} </span>
         </ModalHeader>
         {this.props.children}
       </Modal>

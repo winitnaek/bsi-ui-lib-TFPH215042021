@@ -82,15 +82,6 @@ class BaseGrid extends React.Component {
       renderGrid(pgData[0]);
     };
 
-    this.handleNewForm = (e, formProps) => {
-      e.preventDefault();
-      const { values = {} } = formProps || {};
-      const payload = { data: values, mode: "New" };
-      const { setFormData } = this.props;
-      setFormData(payload);
-      this.setState({ isOpen: true });
-    };
-
     this.handlePdfView = () => {
       this.setState({
         viewPdfMode: !this.state.viewPdfMode
@@ -103,16 +94,16 @@ class BaseGrid extends React.Component {
       this.props.closeForm();
     };
 
-    this.OpenHelp = () => {
-      this.props.help(this.state.pgid);
-    };
-
     this.toggle = isSaveSuccess => {
       this.setState({ isOpen: false, isSaveSuccess }, () => {
         window.setTimeout(() => {
           this.setState({ isSaveSuccess: false });
         }, 2000);
       });
+    };
+
+    this.setIsOpen = (isOpen) => {
+      this.setState({ isOpen: isOpen});
     };
 
     this.deleteRow = index => {
@@ -138,6 +129,7 @@ class BaseGrid extends React.Component {
       });
     };
 
+    //TODO this is used for confirmation modal
     this.handleOk = () => {
       let _id = document.querySelector("div[role='grid']").id;
       const { deleteGridData } = this.props;
@@ -157,21 +149,10 @@ class BaseGrid extends React.Component {
       });
     };
 
+    //TODO this is used for confirmation modal
     this.handleCancel = () => {
       this.setState({
         showConfirm: false
-      });
-    };
-
-    this.mapToolUsage = (id, successMessage, errorMessage) => {
-      const { mapToolUsage } = this.props;
-      const { pgid } = this.state;
-      // TODO: Check for request payload format
-      mapToolUsage.createDefaultMapping(pgid, { id }).then(res => {
-        const { alertInfo } = this.state;
-        this.setState({
-          alertInfo: Object.assign({}, alertInfo, { abody: successMessage, showAlert: true })
-        });
       });
     };
 
@@ -292,8 +273,8 @@ class BaseGrid extends React.Component {
     const {
         styles,tftools,saveGridData,formData,fieldData,filterFormData,
         formFilterData,getFormData,mapToolUsage,renderGrid,recentUsage,
-        metadata,serverPaging} = this.props;
-    const { pgdef,cruddef,griddef} = metadata;
+        metadata,serverPaging,setFormData} = this.props;
+    const { pgdef,cruddef,griddef,formdef} = metadata;
     const {columns,isfilterform} = griddef;
     const {pgid} = pgdef;
     const {isOpen,recordEdit} = this.state;
@@ -390,15 +371,15 @@ class BaseGrid extends React.Component {
     window.exports = this.setGridData;
     return (
       <Fragment>
-            <PageTitle styles = {styles} help={this.props.help} pgid={pgid} pgdef={metadata.pgdef} />
-            <PageFilters styles = {styles} griddef = {metadata.griddef} fieldData = {fieldData} formFilterData = {formFilterData} />
-            <PageActions styles = {styles} griddef = {metadata.griddef} 
-                         pgdef={metadata.pgdef} handleNewForm = {this.handleNewForm}
+            <PageTitle styles = {styles} help={this.props.help} metadata={metadata} />
+            <PageFilters styles = {styles} metadata={metadata} fieldData = {fieldData} formFilterData = {formFilterData} />
+            <PageActions styles = {styles} metadata={metadata} setIsOpen={this.setIsOpen} formFilterData = {formFilterData}
+                         setFormData={setFormData} handleParentGrid={this.handleParentGrid}
             />
             <Row>
                 <Grid
-                    ref="reusableGrid"
-                    id="myGrid"
+                    ref="baseGrid"
+                    id="baseGrid"
                     width="100%"
                     altrows={true}
                     source={dataAdapter}
@@ -422,7 +403,7 @@ class BaseGrid extends React.Component {
             </Row>
             <PageFooter styles = {styles} pgdef={metadata.pgdef} pgid={pgid} mapToolUsage={mapToolUsage} />
             <ViewPDF view={this.state.viewPdfMode} handleHidePDF={this.handlePdfView} />
-            <ReusableModal open={isOpen} close={this.toggle} pgdef={pgdef} cruddef={cruddef} styles={styles}>
+            <ReusableModal open={isOpen} close={this.toggle} pgdef={pgdef} formdef={formdef} cruddef={cruddef} styles={styles}>
                 <DynamicForm
                     formData={formData}
                     renderMe={this.renderMe}

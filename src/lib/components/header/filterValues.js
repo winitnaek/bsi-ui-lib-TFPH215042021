@@ -2,7 +2,6 @@ import {Row,Badge} from "reactstrap";
 
 export default function  FilterValues({ fieldData = [], formFilterData, style }) {
     const values = Object.assign({}, formFilterData);
-    debugger
     fieldData.forEach(({ id, disable, hidden, datafield }) => {
       if (disable && disable.length && values[id]) {
         disable.forEach(disabled => {

@@ -3,9 +3,9 @@ import {Row, UncontrolledTooltip,Col} from "reactstrap";
 
 export default class PageTitle extends React.Component {
     render() {
-       const {styles,pgid,help,pgdef} = this.props;
+       const {styles,help,metadata} = this.props;
        const {pageTitle,helpMargin,helpIcon} = styles;
-       const {pgtitle,pgsubtitle,helpLblTxt,subHeader} = pgdef;
+       const {pgtitle,pgsubtitle,helpLblTxt,subHeader,pgid} = metadata.pgdef;
        return (
         <Fragment>
             <Row>

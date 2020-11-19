@@ -8,49 +8,25 @@ export default class PageActions extends React.Component {
             allSelected:false,
         };
         this.handleFilterForm = this.handleFilterForm.bind(this);
-        this.handleFilter = this.handleFilter.bind(this);
         this.handleParentGrid = this.handleParentGrid.bind(this);
         this.unselectAll = this.unselectAll.bind(this);
         this.selectAll = this.selectAll.bind(this);
         this.refreshGrid = this.refreshGrid.bind(this);
         this.clearFilters = this.clearFilters.bind(this);
+        this.handleNewForm = this.handleNewForm.bind(this);
 
     }
 
     handleFilterForm(e) {
-        // const {formFilterData,griddef,pgdef} = this.props;
-        // const payload = {
-        //   formData: formFilterData,
-        //   mode: "Edit",
-        //   index: null
-        // };
-        // const { setFormData } = this.props;
-        // const setIsOpen = () => {
-        //   this.setState({ isOpen: true });
-        // };
-        // async function dispatchAction(setFormData, setIsOpen) {
-        //   setFormData(payload);
-        //   await setIsOpen();
-        // }
-        // dispatchAction(setFormData, setIsOpen);
-      };
-  
-      handleFilter(e) {
-        // e.preventDefault();
-        // // Either Render Parent Grid or Toggle isOpen to Open Modal
-        // const { parentConfig } = this.state;
-        // parentConfig ? this.handleChildGrid(parentConfig.pgdef.pgid) : this.handleFilterForm(e);
-      };
-
-      handleParentGrid() {
-        // const { tftools, renderGrid } = this.props;
-        // const parentConfig = this.state.parentConfig.pgdef.pgid;
-        // const pgData = tftools.filter(item => {
-        //   if (item.id === parentConfig) {
-        //     return item;
-        //   }
-        // });
-        //renderGrid(pgData[0]);
+        const {formFilterData,setFormData,setIsOpen} = this.props;
+        debugger
+        const payload = {
+          formData: formFilterData,
+          mode: "Edit",
+          index: null
+        };
+        setFormData(payload);
+        setIsOpen(true);
       };
 
       clearFilters() {
@@ -76,12 +52,22 @@ export default class PageActions extends React.Component {
         let _id = document.querySelector("div[role='grid']").id;
         $("#" + _id).jqxGrid("selectallrows");
       };
+
+      handleNewForm(e){
+        e.preventDefault();
+        debugger
+        const { setFormData,setIsOpen } = this.props;
+        const values = {} 
+        const payload = { data: values, mode: "New" };
+        setFormData(payload);
+        setIsOpen(true);
+      };
       
 
     render() {
-        const {griddef,pgdef,styles,handleNewForm} = this.props;
-        const {hasFilter,isfilter,parentConfig,selectionmode} = griddef;
-        const {hasAddNew,actiondel,addNewLabel} = pgdef;
+        const {metadata,styles,handleParentGrid} = this.props;
+        const {hasFilter,isfilter,parentConfig,selectionmode} = metadata.griddef;
+        const {hasAddNew,actiondel,addNewLabel} = metadata.pgdef;
         const {allSelected} = this.state;
         debugger
         return (
@@ -142,7 +128,7 @@ export default class PageActions extends React.Component {
                         {hasAddNew && (
                         <span>
                             <span id="addNew">
-                            <a href="" onClick={handleNewForm}>
+                            <a href="" onClick={this.handleNewForm}>
                                 <i className="fas fa-calendar-plus  fa-2x" />
                             </a>
                             </span>
@@ -179,14 +165,14 @@ export default class PageActions extends React.Component {
                             <span>
                                 {parentConfig ? (
                                     <span id="filter">
-                                    <i class="fas fa-arrow-up fa-2x" style={styles.filterIcon} onClick={this.handleParentGrid} />
+                                    <i class="fas fa-arrow-up fa-2x" style={styles.filterIcon} onClick={handleParentGrid} />
                                     <UncontrolledTooltip placement="right" target="filter">
                                         Return to prior screen
                                     </UncontrolledTooltip>
                                     </span>
                                 ) : (
                                     <span id="filter">
-                                    <i class="fas fa-filter fa-2x" style={styles.filterIcon} onClick={this.handleFilter} />
+                                    <i class="fas fa-filter fa-2x" style={styles.filterIcon} onClick={this.handleFilterForm} />
                                     <UncontrolledTooltip placement="right" target="filter">
                                         Modify Selection Criteriaaa
                                     </UncontrolledTooltip>
