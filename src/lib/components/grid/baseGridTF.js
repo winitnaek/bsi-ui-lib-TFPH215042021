@@ -1,12 +1,12 @@
 import React, { Fragment } from "react";
 import ReactDOM from "react-dom";
-import JqxTooltip from "../../../../src/deps/jqwidgets-react/react_jqxtooltip";
+import JqxTooltip from "../../../deps/jqwidgets-react/react_jqxtooltip";
 import {Row} from "reactstrap";
 import FormModal from "../../formModal";
 import DynamicForm from "../../dynamicForm";
-import Grid from "../../../../src/deps/jqwidgets-react/react_jqxgrid";
+import Grid from "../../../deps/jqwidgets-react/react_jqxgrid";
 
-class BaseGrid extends React.Component {
+class BaseGridTF extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -315,6 +315,6 @@ class BaseGrid extends React.Component {
     );
   }
 }
-export default BaseGrid;
+export default BaseGridTF;
 
 

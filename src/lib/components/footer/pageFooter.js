@@ -7,23 +7,10 @@ export default class PageFooter extends React.Component {
         super(props);
         this.state = {
         };
-        this.exportToExcel = this.exportToExcel.bind(this);
-        this.exportToCsv = this.exportToCsv.bind(this);
         this.copyToClipboardHandler = this.copyToClipboardHandler.bind(this);
         this.mapToolUsage = this.mapToolUsage.bind(this);
     }
 
-    exportToExcel() {
-        const {pgdef,ref} = this.props;
-        ref.exportdata("xls", pgdef.pgid);
-      }
-    
-      exportToCsv() {
-        debugger
-        const {pgdef,ref} = this.props;
-        ref.exportdata("csv", pgdef.pgid);
-      }
-    
       copyToClipboardHandler(event) {
         event.preventDefault();
         var numOfRows = copyToClipboard();
@@ -40,8 +27,18 @@ export default class PageFooter extends React.Component {
         );
       }
 
+      exportToFile(type){
+        debugger
+        const {metadata} = this.props;
+        const {pgid} = metadata.pgdef;
+        let _id = document.querySelector("div[role='grid']").id;
+        $("#" + _id).jqxGrid('exportdata',type, pgid);
+        //exportExternal({pageid:pgid,type:type});
+      }
+
       mapToolUsage(id, successMessage, errorMessage){
-        const { mapToolUsage,pgid } = this.props;
+        const { mapToolUsage,metadata} = this.props;
+        const {pgid} = metadata.pgdef;
         // TODO: Check for request payload format
         mapToolUsage.createDefaultMapping(pgid, { id }).then(res => {
           const { alertInfo } = this.state;
@@ -53,18 +50,18 @@ export default class PageFooter extends React.Component {
   
 
     render() {
-        const {styles,pgdef} = this.props;
-        const {gridLinkStyle,gridRowStyle,helpMargin,helpIcon} = styles;
-        const { hasDeleteAll, extraLinks } = pgdef;
+        const {styles,metadata} = this.props;
+        const {gridLinkStyle,gridRowStyle} = styles;
+        const { hasDeleteAll, extraLinks } = metadata.pgdef;
         return (
             <Row style={gridRowStyle}>
-                <a href="#" id="exportToExcel" onClick={this.exportToExcel}>
+                <a href="#" id="exportToExcel" onClick={() => this.exportToFile("xls")}>
                     <i class="fas fa-table fa-lg fa-2x"></i>
                 </a>
                 <UncontrolledTooltip placement="right" target="exportToExcel">
                     <span> Export to Excel </span>
                 </UncontrolledTooltip>
-                <a href="#" id="exportToCsv" onClick={this.exportToCsv} style={gridLinkStyle}>
+                <a href="#" id="exportToCsv" onClick={() => this.exportToFile("csv")} style={gridLinkStyle}>
                     <i class="fas fa-pen-square fa-lg fa-2x"></i>
                 </a>
                 <UncontrolledTooltip placement="right" target="exportToCsv">

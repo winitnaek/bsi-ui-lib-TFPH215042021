@@ -482,7 +482,7 @@ class DynamicForm extends Component {
                   !saveAsMode &&
                   this.state.recentUsageData &&
                   !this.state.recentUsageData.usageDataStr && (
-                    <Button onClick={this.handleDelete} color='danger'>
+                    <Button onClick={(e) => this.handleDelete(props.values,props)} color='danger'>
                       Delete
                     </Button>
                   )}
@@ -532,10 +532,13 @@ class DynamicForm extends Component {
     };
 
     this.handleDelete = async (values) => {
-      const {gridType} = this.props;
-      const {hasPopupGrid} = this.props.metadata.formdef;
-       const {deleteHandler, handleDelete} = formProps;
+      debugger
+      const {metadata,formData} = this.props;
+      const {hasPopupGrid} = metadata.formdef;
+      const handleDeleteExternal  = (metadata.actiondef && metadata.actiondef.handleDeleteExternal) ? true:false;
+       const {handleDelete,deleteRow} = formProps;
         this.setState({isLoading: true});
+        //TODO To be removed later
         if(hasPopupGrid){
           let _id = $("#popupgrid").children(":first")[0].id;
           var rows = $("#"+_id).jqxGrid('selectedrowindexes');
@@ -550,9 +553,9 @@ class DynamicForm extends Component {
               await deleteGridData.deleteGridData(pgid,selectedRecords);
           }
       }else if(values){
-          gridType == "page" ?
+          handleDeleteExternal ?
           handleDelete(values):
-          await deleteHandler(values);
+          await deleteRow(formData.index);
       }
       this.setState({isLoading: false});
       close();

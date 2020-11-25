@@ -8,7 +8,6 @@ export default class PageActions extends React.Component {
             allSelected:false,
         };
         this.handleFilterForm = this.handleFilterForm.bind(this);
-        this.handleParentGrid = this.handleParentGrid.bind(this);
         this.unselectAll = this.unselectAll.bind(this);
         this.selectAll = this.selectAll.bind(this);
         this.refreshGrid = this.refreshGrid.bind(this);
@@ -56,18 +55,17 @@ export default class PageActions extends React.Component {
       handleNewForm(e){
         e.preventDefault();
         debugger
-        const { setFormData,setIsOpen } = this.props;
-        const values = {} 
-        const payload = { data: values, mode: "New" };
-        setFormData(payload);
+        const {setFormData,setIsOpen,metadata} = this.props;
+        const {pgid} = metadata.pgdef; 
+        setFormData(pgid,"New",{});
         setIsOpen(true);
       };
       
 
     render() {
         const {metadata,styles,handleParentGrid} = this.props;
-        const {hasFilter,isfilter,parentConfig,selectionmode} = metadata.griddef;
-        const {hasAddNew,actiondel,addNewLabel} = metadata.pgdef;
+        const {hasFilter,isfilter,selectionmode} = metadata.griddef;
+        const {hasAddNew,actiondel,addNewLabel,parentConfig} = metadata.pgdef;
         const {allSelected} = this.state;
         debugger
         return (
