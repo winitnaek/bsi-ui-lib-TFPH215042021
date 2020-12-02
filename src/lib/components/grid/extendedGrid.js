@@ -3,6 +3,7 @@ import {Row} from "reactstrap";
 import Aggregates from "../../../../res/js/jqwidgets/jqxgrid.aggregates";
 import Grid from "../../../../src/deps/jqwidgets-react/react_jqxgrid";
 import BaseGrid from "./baseGrid";
+import {columnModifier,getEditColumn,getChildColumn} from "../../utils/cellRenderer";
 
 class ExtendedGrid extends BaseGrid {
   constructor(props) {
@@ -12,34 +13,53 @@ class ExtendedGrid extends BaseGrid {
   
     //Only Required For Paginated Grid
     this.saveGridData = async (data) => {
-      debugger
       const {setGridData} = this.props;
       await setGridData(data);
     } 
+}
+
+  updateGrid(type){
+    let _id = document.querySelector("div[role='grid']").id;
+    $('#' + _id).jqxGrid('updatebounddata',type);
+  }
+
+  processFilters(filters){
+    this.props.processFilters(filters);
+  }
+
+  formatData(data){
+    debugger
+      try {
+          return JSON.stringify(data);
+      } catch (error) {
+          return data;
+      }
   }
   
   buildDataAdapter() {
     const {source} = this.props;
+    if(source){
+      source.filter = () => this.updateGrid("filter");
+      source.sort = () => this.updateGrid("sort");
+    }
     let dataAdapter = this.processAdapter(source);
     return dataAdapter;
   }
   
   processAdapter(source){
+    debugger
+    let compRef = this;
     if(source) {
       let dataAdapter = new $.jqx.dataAdapter(source, {
-        formatData: function (data) {
-          try {
-              return JSON.stringify(data);
-          } catch (error) {
-              return data;
-          }
+        formatData: this.formatData,
+        beforeLoadComplete: function (records, sourceData) {
+          debugger
+          source.filters = compRef.processFilters(source.filters);
         },
         downloadComplete: function (data, status, xhr) {
             if(data != null && data.candidateRecords.length > 0){
               source.totalrecords = data.candidateRecords[0].totalRows;
             }
-        },
-        beforeLoadComplete: function (records, sourceData) {
         },
         loadError: function (xhr, status, error) {
             throw new Error(error);
@@ -54,51 +74,14 @@ class ExtendedGrid extends BaseGrid {
   }
 
   render() {
-    const {styles,metadata, formProps} = this.props;
+    const {styles,metadata, formProps, source} = this.props;
     const { pgdef,griddef} = metadata;
-    const {columns,recordEdit} = griddef;
-
     let dataAdapter = this.buildDataAdapter();
-    let newColumns = this.addColLinks(columns);
-    if (recordEdit) {
-      const editCellsRenderer = rowIndex => {
-        return ` <div id='edit-${rowIndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${rowIndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
-      };
-      const editColumn = {
-        text: "Edit",
-        datafield: "edit",
-        align: "center",
-        width: "5%",
-        sortable: false,
-        filterable: false,
-        resizable: false,
-        cellsrenderer: editCellsRenderer,
-        menu: false,
-        rendered: this.toolTipRenderer
-      };
-
-      newColumns = [...newColumns, editColumn];
-    }
-
+    let newColumns = columnModifier(griddef,source.filters);
     // Child config format in metadata is changed to below format to handle multiple child navigations
     // Format: "childConfig": [{ "pgid": "pageId", "columnHeader": "Column Header" }]
-
     if (pgdef.childConfig && Array.isArray(pgdef.childConfig) && pgdef.childConfig.length) {
-      const childCellsRenderer = (rowIndex, columnField) => {
-        return `<div id='edit-${rowIndex}' style="text-align:center; margin-top: 10px; color: #4C7392" onClick="handleChildGrid('${columnField}', '${rowIndex}')"> <i class="fas fa-search  fa-1x" color="primary"/> </div>`;
-      };
-      const childColumns = pgdef.childConfig.map(({ pgid, columnHeader = "View" }) => ({
-        text: columnHeader,
-        datafield: pgid,
-        align: "center",
-        width: "5%",
-        sortable: false,
-        filterable: false,
-        resizable: false,
-        cellsrenderer: childCellsRenderer,
-        menu: false,
-        rendered: this.toolTipRenderer
-      }));
+      const childColumns = pgdef.childConfig.map(({ pgid, columnHeader = "View" }) => getChildColumn(columnHeader,pgid));
       newColumns.push(...childColumns);
     }
  
@@ -136,8 +119,9 @@ class ExtendedGrid extends BaseGrid {
                 style={styles.gridStyle}
                 showaggregates={showaggregates} 
                 showstatusbar={showstatusbar}
-                sortable = {griddef.sortable || true}
-                filterable={griddef.filterable || true}
+                sortable = {griddef.sortable || false}
+                filterable={griddef.filterable || false}
+                showfilterrow={griddef.showfilterrow || false}
           />
             </Row>
       </Fragment>

@@ -1,14 +1,12 @@
 import React, { Fragment } from "react";
-import ReactDOM from "react-dom";
-import JqxTooltip from "../../../../src/deps/jqwidgets-react/react_jqxtooltip";
 import {Row} from "reactstrap";
+import {addColumnLinks,getEditColumn,getChildColumn} from "../../utils/cellRenderer"
 import Grid from "../../../../src/deps/jqwidgets-react/react_jqxgrid";
 
 class BaseGrid extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      
     };
 
     this.getSelectedRow = (index) => {
@@ -45,49 +43,6 @@ class BaseGrid extends React.Component {
     }; 
   }
 
-  toolTipRenderer(element) {
-    const id = `toolTipContainer${this.columnCounter}`;
-    element[0].id = id;
-    const content = element[0].innerText;
-    setTimeout(() => {
-      ReactDOM.render(
-        <JqxTooltip position={"mouse"} content={content}>
-          {content}
-        </JqxTooltip>,
-        document.getElementById(id)
-      );
-    });
-    this.columnCounter++;
-  }
-
-
-  addColLinks(columns){
-    return columns.map((column) => { 
-      if (column.link) {
-        column = {
-          text: column.text, datafield: column.datafield, align: column.align, cellsalign: column.cellsalign, cellsformat: 'c2', 
-          cellsrenderer: function (index, datafield, value, defaultvalue, column, rowdata) {
-            let cell = {
-              index:index,
-              datafield: datafield,
-              value: value
-          };
-          let cellJSON = encodeURIComponent(JSON.stringify(cell));
-                return `<a href='#' id='${datafield}-${index}' class='click' onClick={cellClick('${cellJSON}')}><div style="padding-left:4px;padding-top:8px">${value}</div></a>`;
-          }
-        }
-      }else if (column.autoFill){
-        column = {
-          text: column.text, datafield: column.datafield, align: column.align, cellsalign: column.cellsalign, cellsformat: 'c2', 
-          cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
-                return `<a href='#' id='${datafield}-${ndex}' class='click' onClick={autoFill(${ndex})}><div style="padding-left:4px;padding-top:8px">${value}</div></a>`;
-          }
-        }
-      }
-      return column; 
-  });
-}
-
   buildDataAdapter() {
     const {metadata} = this.props;
     let {griddef} = metadata;
@@ -114,36 +69,15 @@ class BaseGrid extends React.Component {
     const {pgdef,griddef} = metadata;
     const {columns,recordEdit} = griddef;
     let dataAdapter = this.buildDataAdapter();
-    let newColumns = this.addColLinks(columns);
+    let newColumns = addColumnLinks(columns);
     if (recordEdit) {
-      const editCellsRenderer = rowIndex => {
-        return ` <div id='edit-${rowIndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${rowIndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
-      };
-      const editColumn = {
-        text: "Edit",
-        datafield: "edit",
-        align: "center",
-        cellsrenderer: editCellsRenderer,
-        rendered: this.toolTipRenderer
-      };
+      const editColumn = getEditColumn();
       newColumns = [...newColumns, editColumn];
     }
-
     // Child config format in metadata is changed to below format to handle multiple child navigations
     // Format: "childConfig": [{ "pgid": "pageId", "columnHeader": "Column Header" }]
-
     if (pgdef.childConfig && Array.isArray(pgdef.childConfig) && pgdef.childConfig.length) {
-      const childCellsRenderer = (rowIndex) => {
-        return `<div id='edit-${rowIndex}' style="text-align:center; margin-top: 10px; color: #4C7392" onClick="handleChildGrid(${rowIndex})"> <i class="fas fa-search  fa-1x" color="primary"/> </div>`;
-      };
-      const childColumns = pgdef.childConfig.map(({ pgid, columnHeader = "View" }) => ({
-        text: columnHeader,
-        datafield: pgid,
-        align: "center",
-        width: "5%",
-        cellsrenderer: childCellsRenderer,
-        rendered: this.toolTipRenderer
-      }));
+      const childColumns = pgdef.childConfig.map(({ pgid, columnHeader = "View" }) => getChildColumn(columnHeader,pgid));
       newColumns.push(...childColumns);
     }
 

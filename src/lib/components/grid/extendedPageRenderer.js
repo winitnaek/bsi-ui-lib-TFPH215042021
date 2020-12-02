@@ -46,6 +46,7 @@ class ExtendedPageRenderer extends React.Component {
     const {isOpen} = this.state;
     const {styles,fieldData,formFilterData,metadata,setFormData,mapToolUsage} = this.props;
     const {hidePageTitle,hidePageFilter,hidePageActions,hidePageFooter} = metadata.pgdef;
+    debugger
     return (
       <Fragment>
             {!hidePageTitle &&
@@ -56,7 +57,7 @@ class ExtendedPageRenderer extends React.Component {
             <PageActions styles = {styles} metadata={metadata} setIsOpen={this.setIsOpen} formFilterData = {formFilterData}
                          setFormData={setFormData} handleParentGrid={this.handleParentGrid}
             />}
-            <ExtendedGrid {...this.props} isOpen={isOpen} setIsOpen={this.setIsOpen} />
+            <ExtendedGrid {...this.props} isOpen={isOpen} setIsOpen={this.setIsOpen} processFilters = {this.props.processFilters} />
             {!hidePageFooter && 
             <PageFooter styles = {styles} metadata={metadata} mapToolUsage={mapToolUsage} />}
             {metadata.confirmdef ? (

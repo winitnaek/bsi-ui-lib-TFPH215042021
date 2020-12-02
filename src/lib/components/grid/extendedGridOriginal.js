@@ -1,6 +1,4 @@
 import React, { Fragment } from "react";
-import ReactDOM from "react-dom";
-import JqxTooltip from "../../../deps/jqwidgets-react/react_jqxtooltip";
 import {Form, Row} from "reactstrap";
 import FormModal from "../../formModal";
 import DynamicForm from "../../dynamicForm";

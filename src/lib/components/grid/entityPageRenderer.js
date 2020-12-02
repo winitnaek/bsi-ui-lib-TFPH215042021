@@ -1,6 +1,4 @@
 import React, { Fragment } from "react";
-import ReactDOM from "react-dom";
-import JqxTooltip from "../../../deps/jqwidgets-react/react_jqxtooltip";
 import ConfirmModal from "../../confirmModal";
 import ReusableAlert from "../../reusableAlert";
 import PageTitle from "../header/pageTitle";

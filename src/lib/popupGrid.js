@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { TypeaheadInputSingle } from "react-bootstrap-typeahead";
 import {Col, Collapse, Button, ListGroup, ListGroupItem,Row} from "reactstrap";
 import Grid from "../../src/deps/jqwidgets-react/react_jqxgrid";
 
@@ -7,27 +8,11 @@ class PopupGrid extends Component {
         super(props);
         this.state = {
             isOpen:false,
+            isLoading:false,
             gridData: []
         }
         this.toggle = this.toggle.bind(this);
       }
-
-    //   deleteHandler(){
-    //     let _id = document.querySelectorAll("div[role='grid']")[1].id;
-    //     var rows = $("#"+_id).jqxGrid('selectedrowindexes');
-    //     var selectedRecords = new Array();
-    //     for (var m = 0; m < rows.length; m++) {
-    //         var row = $("#"+_id).jqxGrid('getrowdata', rows[m]);
-    //         selectedRecords[selectedRecords.length] = row;
-    //     }
-    //     if(selectedRecords) {
-    //         this.props.deleteRecords(selectedRecords)
-    //         .then(formData => {
-    //             let gridData = this.convertGridInput(formData)
-    //             this.setState({gridData:gridData})
-    //         });
-    //     }
-    //   }
 
       convertGridInput(formData){
         let gridData = [];
@@ -44,9 +29,10 @@ class PopupGrid extends Component {
     async componentDidMount() {
         debugger
         const {pgid,values, getFormData} = this.props;
+        this.setState({isLoading:true});
         let formData = await getFormData.getFormData(pgid,values) || [];
         var gridData = this.convertGridInput(formData);
-        this.setState({gridData: gridData})
+        this.setState({gridData: gridData,isLoading:false})
     }
 
     toggle() {
@@ -61,7 +47,7 @@ class PopupGrid extends Component {
     }
 
     render() {
-        const {isOpen, gridData} = this.state;
+        const {isOpen, isLoading, gridData} = this.state;
         const {columns,dataFields} = this.props.metadata.pgdef.popupGrid || null;
         let source = { 
             datafields: dataFields,
@@ -71,7 +57,11 @@ class PopupGrid extends Component {
         let dataAdapter = new $.jqx.dataAdapter(source);
         return (
         <Col>
-            {gridData.length > 0 &&
+            {isLoading ? (
+                <Row style={{justifyContent:"center"}}>
+                    <i class="fas fa-spinner fa-spin"></i>
+                </Row>
+            ):(
                 <Col>
                     <div id="popupgrid">
                         <Grid width='100%' source={dataAdapter} pageable={gridData.length > 5 ? true:false}
@@ -80,7 +70,7 @@ class PopupGrid extends Component {
                         />
                     </div>
                 </Col>
-            }
+            )}
         </Col>
         // <Col>
         //     {gridData.length > 0 &&

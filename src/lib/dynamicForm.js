@@ -317,7 +317,9 @@ class DynamicForm extends Component {
     const hasDeletePermission = this.props.formProps.permissions && this.props.formProps.permissions.DELETE;
     let isEdit = false;
     if (mode === 'Edit') isEdit = true;
-    this.setState({showDelete: hasDelete && isEdit && hasDeletePermission});
+    //this.setState({showDelete: hasDelete && isEdit && hasDeletePermission});
+    this.setState({showDelete: hasDelete && isEdit});
+
   }
 
   render() {
@@ -478,10 +480,7 @@ class DynamicForm extends Component {
                         </Button>
                       </Fragment>
                     )}
-                {this.state.showDelete &&
-                  !saveAsMode &&
-                  this.state.recentUsageData &&
-                  !this.state.recentUsageData.usageDataStr && (
+                {this.state.showDelete && (
                     <Button onClick={(e) => this.handleDelete(props.values,props)} color='danger'>
                       Delete
                     </Button>
