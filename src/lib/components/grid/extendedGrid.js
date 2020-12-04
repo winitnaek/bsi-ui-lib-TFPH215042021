@@ -9,7 +9,8 @@ class ExtendedGrid extends BaseGrid {
   constructor(props) {
     super(props);
     this.state = {
-      filterObj:{}
+      filterObj:{},
+      filters:[]
     };
   
     //Only Required For Paginated Grid
@@ -43,7 +44,6 @@ class ExtendedGrid extends BaseGrid {
   }
 
     updateDropdownFilters(sourceData,filters) {
-      debugger
       let filtersRecordsOut = sourceData.filtersRecordsOut;
       let filterObj = {};
       filters.map(filter => {
@@ -51,23 +51,26 @@ class ExtendedGrid extends BaseGrid {
         filterObj[filter.mapping.columnName] = filter;
       })
       //this.setState({allRowSelected:false,allSelected:false});
-      this.setState({filterObj});
+      this.setState({filterObj,filters});
   }
   
   processAdapter(source){
-    debugger
     let compRef = this;
     if(source) {
       let dataAdapter = new $.jqx.dataAdapter(source, {
         formatData: this.formatData,
         beforeLoadComplete: function (records, sourceData) {
-          debugger
-        compRef.updateDropdownFilters(sourceData,source.filters);
+          compRef.updateDropdownFilters(sourceData,source.filters);
         },
         downloadComplete: function (data, status, xhr) {
             if(data != null && data.candidateRecords.length > 0){
               source.totalrecords = data.candidateRecords[0].totalRows;
             }
+        },
+        loadComplete: function (data,status) {
+            const {filterObj,filters} = compRef.state;
+            let _id = document.querySelector("div[role='grid']").id;
+            filters.map(filter => $('#' + _id).jqxGrid('setcolumnproperty', filter.mapping.columnName, 'filteritems', filterObj[filter.mapping.columnName].localdata));
         },
         loadError: function (xhr, status, error) {
             throw new Error(error);
@@ -86,7 +89,6 @@ class ExtendedGrid extends BaseGrid {
     const { pgdef,griddef} = metadata;
     const {filterObj} = this.state;
     let dataAdapter = this.buildDataAdapter();
-    debugger
     let newColumns = columnModifier(griddef,filterObj);
     // Child config format in metadata is changed to below format to handle multiple child navigations
     // Format: "childConfig": [{ "pgid": "pageId", "columnHeader": "Column Header" }]

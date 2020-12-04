@@ -21,7 +21,6 @@ export function addColLinksCellRenderer(index, datafield, value, defaultvalue, c
 }
 
 export function columnModifier(griddef,filterObj){
-    debugger
     const {columns,recordEdit} = griddef;
     let newColumns = columns.map((column) => { 
       if (column.link){
@@ -30,7 +29,7 @@ export function columnModifier(griddef,filterObj){
          column.cellsrenderer = autoFillCellRenderer;
       }
       if(filterObj && filterObj[column.datafield]){
-        column.filterItems =  new jqx.dataAdapter(filterObj[column.datafield])
+       column.filteritems =  new jqx.dataAdapter(filterObj[column.datafield]);
       }
       column.rendered = toolTipRenderer;
       return column; 
