@@ -57,7 +57,7 @@ class ExtendedPageRenderer extends React.Component {
             <PageActions styles = {styles} metadata={metadata} setIsOpen={this.setIsOpen} formFilterData = {formFilterData}
                          setFormData={setFormData} handleParentGrid={this.handleParentGrid}
             />}
-            <ExtendedGrid {...this.props} isOpen={isOpen} setIsOpen={this.setIsOpen} processFilters = {this.props.processFilters} />
+            <ExtendedGrid {...this.props} isOpen={isOpen} setIsOpen={this.setIsOpen}/>
             {!hidePageFooter && 
             <PageFooter styles = {styles} metadata={metadata} mapToolUsage={mapToolUsage} />}
             {metadata.confirmdef ? (

@@ -9,6 +9,7 @@ class ExtendedGrid extends BaseGrid {
   constructor(props) {
     super(props);
     this.state = {
+      filterObj:{}
     };
   
     //Only Required For Paginated Grid
@@ -23,12 +24,7 @@ class ExtendedGrid extends BaseGrid {
     $('#' + _id).jqxGrid('updatebounddata',type);
   }
 
-  processFilters(filters){
-    this.props.processFilters(filters);
-  }
-
   formatData(data){
-    debugger
       try {
           return JSON.stringify(data);
       } catch (error) {
@@ -45,6 +41,18 @@ class ExtendedGrid extends BaseGrid {
     let dataAdapter = this.processAdapter(source);
     return dataAdapter;
   }
+
+    updateDropdownFilters(sourceData,filters) {
+      debugger
+      let filtersRecordsOut = sourceData.filtersRecordsOut;
+      let filterObj = {};
+      filters.map(filter => {
+        filter.localdata = filtersRecordsOut[filter.mapping.filterId]
+        filterObj[filter.mapping.columnName] = filter;
+      })
+      //this.setState({allRowSelected:false,allSelected:false});
+      this.setState({filterObj});
+  }
   
   processAdapter(source){
     debugger
@@ -54,7 +62,7 @@ class ExtendedGrid extends BaseGrid {
         formatData: this.formatData,
         beforeLoadComplete: function (records, sourceData) {
           debugger
-          source.filters = compRef.processFilters(source.filters);
+        compRef.updateDropdownFilters(sourceData,source.filters);
         },
         downloadComplete: function (data, status, xhr) {
             if(data != null && data.candidateRecords.length > 0){
@@ -74,10 +82,12 @@ class ExtendedGrid extends BaseGrid {
   }
 
   render() {
-    const {styles,metadata, formProps, source} = this.props;
+    const {styles,metadata, formProps} = this.props;
     const { pgdef,griddef} = metadata;
+    const {filterObj} = this.state;
     let dataAdapter = this.buildDataAdapter();
-    let newColumns = columnModifier(griddef,source.filters);
+    debugger
+    let newColumns = columnModifier(griddef,filterObj);
     // Child config format in metadata is changed to below format to handle multiple child navigations
     // Format: "childConfig": [{ "pgid": "pageId", "columnHeader": "Column Header" }]
     if (pgdef.childConfig && Array.isArray(pgdef.childConfig) && pgdef.childConfig.length) {

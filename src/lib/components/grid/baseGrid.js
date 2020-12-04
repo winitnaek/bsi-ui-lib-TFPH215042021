@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import {Row} from "reactstrap";
-import {addColumnLinks,getEditColumn,getChildColumn} from "../../utils/cellRenderer"
+import {columnModifier,getChildColumn} from "../../utils/cellRenderer"
 import Grid from "../../../../src/deps/jqwidgets-react/react_jqxgrid";
 
 class BaseGrid extends React.Component {
@@ -67,13 +67,8 @@ class BaseGrid extends React.Component {
     const {styles,metadata} = this.props;
     debugger
     const {pgdef,griddef} = metadata;
-    const {columns,recordEdit} = griddef;
     let dataAdapter = this.buildDataAdapter();
-    let newColumns = addColumnLinks(columns);
-    if (recordEdit) {
-      const editColumn = getEditColumn();
-      newColumns = [...newColumns, editColumn];
-    }
+    let newColumns = columnModifier(griddef,null);
     // Child config format in metadata is changed to below format to handle multiple child navigations
     // Format: "childConfig": [{ "pgid": "pageId", "columnHeader": "Column Header" }]
     if (pgdef.childConfig && Array.isArray(pgdef.childConfig) && pgdef.childConfig.length) {

@@ -21,15 +21,15 @@ export function addColLinksCellRenderer(index, datafield, value, defaultvalue, c
 }
 
 export function columnModifier(griddef,filterObj){
+    debugger
     const {columns,recordEdit} = griddef;
     let newColumns = columns.map((column) => { 
-      debugger
       if (column.link){
         column.cellsrenderer = addColLinksCellRenderer;
       } else if (column.autoFill){
          column.cellsrenderer = autoFillCellRenderer;
       }
-      if(filterObj[column.datafield]){
+      if(filterObj && filterObj[column.datafield]){
         column.filterItems =  new jqx.dataAdapter(filterObj[column.datafield])
       }
       column.rendered = toolTipRenderer;
