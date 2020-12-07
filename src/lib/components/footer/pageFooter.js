@@ -8,7 +8,6 @@ export default class PageFooter extends React.Component {
     super(props);
     this.state = {};
     this.copyToClipboardHandler = this.copyToClipboardHandler.bind(this);
-    this.mapToolUsage = this.mapToolUsage.bind(this);
   }
 
   // Handles the copy to clipboard functionality.
