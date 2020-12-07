@@ -1,41 +1,45 @@
 import React, { Fragment } from "react";
-import {Row} from "reactstrap";
+import { Row } from "reactstrap";
 import Aggregates from "../../../../res/js/jqwidgets/jqxgrid.aggregates";
 import Grid from "../../../../src/deps/jqwidgets-react/react_jqxgrid";
 import BaseGrid from "./baseGrid";
-import {columnModifier,getEditColumn,getChildColumn} from "../../utils/cellRenderer";
+import { columnModifier, getChildColumn } from "../../utils/cellRenderer";
 
+//This will be used for server side paging, custom filtering and sorting
 class ExtendedGrid extends BaseGrid {
   constructor(props) {
     super(props);
     this.state = {
-      filterObj:{},
-      filters:[]
+      filtersMetadata: [],
+      initialLoad: true,
     };
-  
-    //Only Required For Paginated Grid
+
+    //Only Required For Paginated Grid, to save data to the redux store
     this.saveGridData = async (data) => {
-      const {setGridData} = this.props;
+      const { setGridData } = this.props;
       await setGridData(data);
-    } 
-}
+    };
+  }
 
-  updateGrid(type){
+  //Refreshes grid with new data.
+  updateGrid(type) {
     let _id = document.querySelector("div[role='grid']").id;
-    $('#' + _id).jqxGrid('updatebounddata',type);
+    $("#" + _id).jqxGrid("updatebounddata", type);
   }
 
-  formatData(data){
-      try {
-          return JSON.stringify(data);
-      } catch (error) {
-          return data;
-      }
+  //Format the post payload
+  formatData(data) {
+    try {
+      return JSON.stringify(data);
+    } catch (error) {
+      return data;
+    }
   }
-  
+
+  // Handles filter and sort events for the grid.
   buildDataAdapter() {
-    const {source} = this.props;
-    if(source){
+    const { source } = this.props;
+    if (source) {
       source.filter = () => this.updateGrid("filter");
       source.sort = () => this.updateGrid("sort");
     }
@@ -43,60 +47,84 @@ class ExtendedGrid extends BaseGrid {
     return dataAdapter;
   }
 
-    updateDropdownFilters(sourceData,filters) {
-      let filtersRecordsOut = sourceData.filtersRecordsOut;
-      let filterObj = {};
-      filters.map(filter => {
-        filter.localdata = filtersRecordsOut[filter.mapping.filterId]
-        filterObj[filter.mapping.columnName] = filter;
-      })
-      //this.setState({allRowSelected:false,allSelected:false});
-      this.setState({filterObj,filters});
+  //Reinitializes the filters with data from the backend.
+  updateDropdownFilters(filtersMetadata, responseData) {
+    const { initialLoad } = this.state;
+    let dropdownFilterValues = responseData.filtersRecordsOut;
+    filtersMetadata &&
+      filtersMetadata.map((filter) => {
+        if (initialLoad || filter.repopulate)
+          filter.localdata =
+            dropdownFilterValues[filter.mapping.filterId] || [];
+      });
+    this.setState({ filtersMetadata, initialLoad: false });
   }
-  
-  processAdapter(source){
+
+  // Process Adapter handles the request and response for API calls.
+  // BeforeLoadComplete - Populates the grid and updates the state for filter dropdowns.
+  // DownloadComplete - Sets the page totals for the grid.
+  // LoadComplete - Sets the filter values for the dropdowns.
+  processAdapter(source) {
     let compRef = this;
-    if(source) {
+    if (source) {
+      const { filterdef } = this.props.metadata;
       let dataAdapter = new $.jqx.dataAdapter(source, {
         formatData: this.formatData,
-        beforeLoadComplete: function (records, sourceData) {
-          compRef.updateDropdownFilters(sourceData,source.filters);
+        beforeLoadComplete: function (records, responseData) {
+          compRef.updateDropdownFilters(filterdef, responseData);
+          source.data.initialLoad = false;
+          compRef.setState({ initialLoad: false });
         },
         downloadComplete: function (data, status, xhr) {
-            if(data != null && data.candidateRecords.length > 0){
-              source.totalrecords = data.candidateRecords[0].totalRows;
-            }
+          if (data != null && data.candidateRecords.length > 0) {
+            source.totalrecords = data.candidateRecords[0].totalRows;
+          }
         },
-        loadComplete: function (data,status) {
-            const {filterObj,filters} = compRef.state;
-            let _id = document.querySelector("div[role='grid']").id;
-            filters.map(filter => $('#' + _id).jqxGrid('setcolumnproperty', filter.mapping.columnName, 'filteritems', filterObj[filter.mapping.columnName].localdata));
+        loadComplete: function (data, status) {
+          const { filtersMetadata } = compRef.state;
+          let _id = document.querySelector("div[role='grid']").id;
+          filtersMetadata &&
+            filtersMetadata.map((filter) => {
+              let columnName = filter.mapping.columnName;
+              $("#" + _id).jqxGrid(
+                "setcolumnproperty",
+                columnName,
+                "filteritems",
+                filter.localdata
+              );
+            });
         },
         loadError: function (xhr, status, error) {
-            throw new Error(error);
-        }
+          throw new Error(error);
+        },
       });
-    return dataAdapter;
+      return dataAdapter;
     }
   }
 
+  //Binds with juxGrid.aggregates to display totals for individual columns
   componentDidMount() {
     if (this.refs.extendedGrid) jqxGrid.aggregates = Aggregates;
   }
 
+  // Renders the Grid
   render() {
-    const {styles,metadata, formProps} = this.props;
-    const { pgdef,griddef} = metadata;
-    const {filterObj} = this.state;
+    const { styles, metadata, formProps } = this.props;
+    const { pgdef, griddef } = metadata;
+    const { filterObj } = this.state;
     let dataAdapter = this.buildDataAdapter();
-    let newColumns = columnModifier(griddef,filterObj);
-    // Child config format in metadata is changed to below format to handle multiple child navigations
-    // Format: "childConfig": [{ "pgid": "pageId", "columnHeader": "Column Header" }]
-    if (pgdef.childConfig && Array.isArray(pgdef.childConfig) && pgdef.childConfig.length) {
-      const childColumns = pgdef.childConfig.map(({ pgid, columnHeader = "View" }) => getChildColumn(columnHeader,pgid));
+    let newColumns = columnModifier(griddef, filterObj);
+    if (
+      pgdef.childConfig &&
+      Array.isArray(pgdef.childConfig) &&
+      pgdef.childConfig.length
+    ) {
+      const childColumns = pgdef.childConfig.map(
+        ({ pgid, columnHeader = "View" }) => getChildColumn(columnHeader, pgid)
+      );
       newColumns.push(...childColumns);
     }
- 
+
     module.exports = this.editClick;
     window.editClick = this.editClick;
     module.exports = this.cellClick;
@@ -106,40 +134,38 @@ class ExtendedGrid extends BaseGrid {
     module.exports = this.setGridData;
     window.exports = this.setGridData;
 
-    let showaggregates= formProps.showaggregates || false;
-    let showstatusbar= formProps.showstatusbar || false;
+    let showaggregates = formProps.showaggregates || false;
+    let showstatusbar = formProps.showstatusbar || false;
     return (
       <Fragment>
-            <Row>
-            <Grid
-                ref="extendedGrid"
-                id="extendedGrid"
-                width="100%"
-                altrows={true}
-                columnsresize={true} 
-                columnsautoresize={true}
-                source={dataAdapter}
-                virtualmode={true}
-                rendergridrows = {(obj) => {
-                    this.saveGridData(obj);
-                    return obj.data;
-                }}
-                columns={newColumns}
-                pageable={true}
-                autoheight={true}
-                selectionmode={griddef.selectionmode || "multiplerows"}
-                style={styles.gridStyle}
-                showaggregates={showaggregates} 
-                showstatusbar={showstatusbar}
-                sortable = {griddef.sortable || false}
-                filterable={griddef.filterable || false}
-                showfilterrow={griddef.showfilterrow || false}
+        <Row>
+          <Grid
+            ref="extendedGrid"
+            id="extendedGrid"
+            width="100%"
+            altrows={true}
+            columnsresize={true}
+            columnsautoresize={true}
+            source={dataAdapter}
+            virtualmode={true}
+            rendergridrows={(obj) => {
+              this.saveGridData(obj);
+              return obj.data;
+            }}
+            columns={newColumns}
+            pageable={true}
+            autoheight={true}
+            selectionmode={griddef.selectionmode || "multiplerows"}
+            style={styles.gridStyle}
+            showaggregates={showaggregates}
+            showstatusbar={showstatusbar}
+            sortable={griddef.sortable || false}
+            filterable={griddef.filterable || false}
+            showfilterrow={griddef.showfilterrow || false}
           />
-            </Row>
+        </Row>
       </Fragment>
     );
   }
 }
 export default ExtendedGrid;
-
-
