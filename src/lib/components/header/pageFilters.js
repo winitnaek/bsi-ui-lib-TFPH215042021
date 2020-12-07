@@ -12,11 +12,7 @@ export default class PageFilters extends React.Component {
         {isfilter ? (
           <FilterValues
             style={styles}
-            fieldData={
-              parentConfig && parentConfig.griddef
-                ? parentConfig.griddef.columns
-                : fieldData
-            }
+            fieldData={parentConfig && parentConfig.griddef ? parentConfig.griddef.columns : fieldData}
             formFilterData={formFilterData}
           />
         ) : null}

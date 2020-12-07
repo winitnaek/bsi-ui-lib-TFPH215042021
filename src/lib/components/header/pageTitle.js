@@ -14,11 +14,7 @@ export default class PageTitle extends React.Component {
           {helpLblTxt && (
             <span style={helpMargin}>
               <span id="help">
-                <i
-                  className="fas fa-question-circle  fa-lg"
-                  onClick={() => help(pgid)}
-                  style={helpIcon}
-                />
+                <i className="fas fa-question-circle  fa-lg" onClick={() => help(pgid)} style={helpIcon} />
               </span>
               <UncontrolledTooltip placement="right" target="help">
                 <span> {helpLblTxt} </span>

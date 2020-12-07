@@ -76,13 +76,9 @@ class BaseGrid extends React.Component {
     const { pgdef, griddef } = metadata;
     let dataAdapter = this.buildDataAdapter();
     let newColumns = columnModifier(griddef, null);
-    if (
-      pgdef.childConfig &&
-      Array.isArray(pgdef.childConfig) &&
-      pgdef.childConfig.length
-    ) {
-      const childColumns = pgdef.childConfig.map(
-        ({ pgid, columnHeader = "View" }) => getChildColumn(columnHeader, pgid)
+    if (pgdef.childConfig && Array.isArray(pgdef.childConfig) && pgdef.childConfig.length) {
+      const childColumns = pgdef.childConfig.map(({ pgid, columnHeader = "View" }) =>
+        getChildColumn(columnHeader, pgid)
       );
       newColumns.push(...childColumns);
     }

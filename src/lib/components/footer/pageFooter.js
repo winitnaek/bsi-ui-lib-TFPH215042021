@@ -50,24 +50,14 @@ export default class PageFooter extends React.Component {
         <UncontrolledTooltip placement="right" target="exportToExcel">
           <span> Export to Excel </span>
         </UncontrolledTooltip>
-        <a
-          href="#"
-          id="exportToCsv"
-          onClick={() => this.exportToFile("csv")}
-          style={gridLinkStyle}
-        >
+        <a href="#" id="exportToCsv" onClick={() => this.exportToFile("csv")} style={gridLinkStyle}>
           <i class="fas fa-pen-square fa-lg fa-2x"></i>
         </a>
         <UncontrolledTooltip placement="right" target="exportToCsv">
           <span> Export to CSV </span>
         </UncontrolledTooltip>
 
-        <a
-          href="#"
-          id="copyToClipboard"
-          onClick={this.copyToClipboardHandler}
-          style={gridLinkStyle}
-        >
+        <a href="#" id="copyToClipboard" onClick={this.copyToClipboardHandler} style={gridLinkStyle}>
           <i class="far fa-copy fa-lg fa-2x"></i>
         </a>
         <UncontrolledTooltip placement="right" target="copyToClipboard">

@@ -1,11 +1,7 @@
 import { Row, Badge } from "reactstrap";
 
 //Displays the filter values for the selected form filters in the header section.
-export default function FilterValues({
-  fieldData = [],
-  formFilterData,
-  style,
-}) {
+export default function FilterValues({ fieldData = [], formFilterData }) {
   const values = Object.assign({}, formFilterData);
   fieldData.forEach(({ id, disable, hidden, datafield }) => {
     if (disable && disable.length && values[id]) {
@@ -25,9 +21,7 @@ export default function FilterValues({
         return values[id || datafield] ? (
           <span className="mb-1">
             <Badge color="light">{label || text || placeholder}</Badge>{" "}
-            <Badge color="dark" className="mr-1">{`${
-              values[id || datafield]
-            }`}</Badge>
+            <Badge color="dark" className="mr-1">{`${values[id || datafield]}`}</Badge>
           </span>
         ) : null;
       })}

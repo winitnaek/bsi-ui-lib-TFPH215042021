@@ -48,37 +48,14 @@ class ExtendedPageRenderer extends React.Component {
   // Renders the Page title, Page filters, Extended Grid, and Page footer components.
   render() {
     const { isOpen } = this.state;
-    const {
-      styles,
-      fieldData,
-      formFilterData,
-      metadata,
-      setFormData,
-      mapToolUsage,
-    } = this.props;
-    const {
-      hidePageTitle,
-      hidePageFilter,
-      hidePageActions,
-      hidePageFooter,
-    } = metadata.pgdef;
+    const { styles, fieldData, formFilterData, metadata, setFormData, mapToolUsage } = this.props;
+    const { hidePageTitle, hidePageFilter, hidePageActions, hidePageFooter } = metadata.pgdef;
     debugger;
     return (
       <Fragment>
-        {!hidePageTitle && (
-          <PageTitle
-            styles={styles}
-            help={this.props.help}
-            metadata={metadata}
-          />
-        )}
+        {!hidePageTitle && <PageTitle styles={styles} help={this.props.help} metadata={metadata} />}
         {!hidePageFilter && (
-          <PageFilters
-            styles={styles}
-            metadata={metadata}
-            fieldData={fieldData}
-            formFilterData={formFilterData}
-          />
+          <PageFilters styles={styles} metadata={metadata} fieldData={fieldData} formFilterData={formFilterData} />
         )}
         {!hidePageActions && (
           <PageActions
@@ -90,18 +67,8 @@ class ExtendedPageRenderer extends React.Component {
             handleParentGrid={this.handleParentGrid}
           />
         )}
-        <ExtendedGrid
-          {...this.props}
-          isOpen={isOpen}
-          setIsOpen={this.setIsOpen}
-        />
-        {!hidePageFooter && (
-          <PageFooter
-            styles={styles}
-            metadata={metadata}
-            mapToolUsage={mapToolUsage}
-          />
-        )}
+        <ExtendedGrid {...this.props} isOpen={isOpen} setIsOpen={this.setIsOpen} />
+        {!hidePageFooter && <PageFooter styles={styles} metadata={metadata} mapToolUsage={mapToolUsage} />}
         {metadata.confirmdef ? (
           <ConfirmModal
             showConfirm={this.state.showConfirm}
@@ -111,10 +78,7 @@ class ExtendedPageRenderer extends React.Component {
           />
         ) : null}
         {this.state.alertInfo.showAlert ? (
-          <ReusableAlert
-            {...this.state.alertInfo}
-            handleClick={this.handleAlertOk}
-          />
+          <ReusableAlert {...this.state.alertInfo} handleClick={this.handleAlertOk} />
         ) : null}
       </Fragment>
     );

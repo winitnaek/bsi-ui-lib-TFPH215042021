@@ -48,36 +48,13 @@ class EntityPageRenderer extends React.Component {
   // Renders the Page title, Page filters, Base Grid, and Page footer components.
   render() {
     const { isOpen } = this.state;
-    const {
-      styles,
-      fieldData,
-      formFilterData,
-      metadata,
-      setFormData,
-      mapToolUsage,
-    } = this.props;
-    const {
-      hidePageTitle,
-      hidePageFilter,
-      hidePageActions,
-      hidePageFooter,
-    } = metadata.pgdef;
+    const { styles, fieldData, formFilterData, metadata, setFormData, mapToolUsage } = this.props;
+    const { hidePageTitle, hidePageFilter, hidePageActions, hidePageFooter } = metadata.pgdef;
     return (
       <Fragment>
-        {!hidePageTitle && (
-          <PageTitle
-            styles={styles}
-            help={this.props.help}
-            metadata={metadata}
-          />
-        )}
+        {!hidePageTitle && <PageTitle styles={styles} help={this.props.help} metadata={metadata} />}
         {!hidePageFilter && (
-          <PageFilters
-            styles={styles}
-            metadata={metadata}
-            fieldData={fieldData}
-            formFilterData={formFilterData}
-          />
+          <PageFilters styles={styles} metadata={metadata} fieldData={fieldData} formFilterData={formFilterData} />
         )}
         {!hidePageActions && (
           <PageActions
@@ -90,13 +67,7 @@ class EntityPageRenderer extends React.Component {
           />
         )}
         <BaseGrid {...this.props} isOpen={isOpen} setIsOpen={this.setIsOpen} />
-        {!hidePageFooter && (
-          <PageFooter
-            styles={styles}
-            metadata={metadata}
-            mapToolUsage={mapToolUsage}
-          />
-        )}
+        {!hidePageFooter && <PageFooter styles={styles} metadata={metadata} mapToolUsage={mapToolUsage} />}
         {metadata.confirmdef ? (
           <ConfirmModal
             showConfirm={this.state.showConfirm}
@@ -106,10 +77,7 @@ class EntityPageRenderer extends React.Component {
           />
         ) : null}
         {this.state.alertInfo.showAlert ? (
-          <ReusableAlert
-            {...this.state.alertInfo}
-            handleClick={this.handleAlertOk}
-          />
+          <ReusableAlert {...this.state.alertInfo} handleClick={this.handleAlertOk} />
         ) : null}
       </Fragment>
     );

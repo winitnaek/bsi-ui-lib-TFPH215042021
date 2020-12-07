@@ -53,9 +53,7 @@ class ExtendedGrid extends BaseGrid {
     let dropdownFilterValues = responseData.filtersRecordsOut;
     filtersMetadata &&
       filtersMetadata.map((filter) => {
-        if (initialLoad || filter.repopulate)
-          filter.localdata =
-            dropdownFilterValues[filter.mapping.filterId] || [];
+        if (initialLoad || filter.repopulate) filter.localdata = dropdownFilterValues[filter.mapping.filterId] || [];
       });
     this.setState({ filtersMetadata, initialLoad: false });
   }
@@ -86,12 +84,7 @@ class ExtendedGrid extends BaseGrid {
           filtersMetadata &&
             filtersMetadata.map((filter) => {
               let columnName = filter.mapping.columnName;
-              $("#" + _id).jqxGrid(
-                "setcolumnproperty",
-                columnName,
-                "filteritems",
-                filter.localdata
-              );
+              $("#" + _id).jqxGrid("setcolumnproperty", columnName, "filteritems", filter.localdata);
             });
         },
         loadError: function (xhr, status, error) {
@@ -114,13 +107,9 @@ class ExtendedGrid extends BaseGrid {
     const { filterObj } = this.state;
     let dataAdapter = this.buildDataAdapter();
     let newColumns = columnModifier(griddef, filterObj);
-    if (
-      pgdef.childConfig &&
-      Array.isArray(pgdef.childConfig) &&
-      pgdef.childConfig.length
-    ) {
-      const childColumns = pgdef.childConfig.map(
-        ({ pgid, columnHeader = "View" }) => getChildColumn(columnHeader, pgid)
+    if (pgdef.childConfig && Array.isArray(pgdef.childConfig) && pgdef.childConfig.length) {
+      const childColumns = pgdef.childConfig.map(({ pgid, columnHeader = "View" }) =>
+        getChildColumn(columnHeader, pgid)
       );
       newColumns.push(...childColumns);
     }

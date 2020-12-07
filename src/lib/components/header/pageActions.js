@@ -73,12 +73,7 @@ export default class PageActions extends React.Component {
     const { allSelected } = this.state;
     debugger;
     return (
-      <Row
-        style={
-          (styles.rowTop,
-          { justifyContent: "space-between", marginRight: 0, marginTop: 16 })
-        }
-      >
+      <Row style={(styles.rowTop, { justifyContent: "space-between", marginRight: 0, marginTop: 16 })}>
         <Col style={styles.iconPaddingLeft}>
           {allSelected && selectionmode != "checkbox" && (
             <span>
@@ -145,13 +140,7 @@ export default class PageActions extends React.Component {
               </span>
             )}
             {actiondel ? (
-              <span
-                style={
-                  (hasAddNew && actiondel) == true
-                    ? { marginLeft: 16 }
-                    : { marginLeft: 46 }
-                }
-              >
+              <span style={(hasAddNew && actiondel) == true ? { marginLeft: 16 } : { marginLeft: 46 }}>
                 <span id="delAll">
                   <a href="" onClick="">
                     <i className="fas fa-calendar-minus fa-2x" />
@@ -164,11 +153,7 @@ export default class PageActions extends React.Component {
             ) : null}
             {hasFilter ? (
               <span id="filter">
-                <i
-                  class="fas fa-filter fa-2x"
-                  style={styles.filterIcon}
-                  onClick={this.handleFilterForm}
-                />
+                <i class="fas fa-filter fa-2x" style={styles.filterIcon} onClick={this.handleFilterForm} />
                 <UncontrolledTooltip placement="right" target="filter">
                   Modify Selection Criteria
                 </UncontrolledTooltip>
@@ -178,22 +163,14 @@ export default class PageActions extends React.Component {
               <span>
                 {parentConfig ? (
                   <span id="filter">
-                    <i
-                      class="fas fa-arrow-up fa-2x"
-                      style={styles.filterIcon}
-                      onClick={handleParentGrid}
-                    />
+                    <i class="fas fa-arrow-up fa-2x" style={styles.filterIcon} onClick={handleParentGrid} />
                     <UncontrolledTooltip placement="right" target="filter">
                       Return to prior screen
                     </UncontrolledTooltip>
                   </span>
                 ) : (
                   <span id="filter">
-                    <i
-                      class="fas fa-filter fa-2x"
-                      style={styles.filterIcon}
-                      onClick={this.handleFilterForm}
-                    />
+                    <i class="fas fa-filter fa-2x" style={styles.filterIcon} onClick={this.handleFilterForm} />
                     <UncontrolledTooltip placement="right" target="filter">
                       Modify Selection Criteriaaa
                     </UncontrolledTooltip>
