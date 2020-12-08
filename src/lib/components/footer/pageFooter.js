@@ -30,11 +30,13 @@ export default class PageFooter extends React.Component {
   //TODO
   // Handles the export to file.
   exportToFile(type) {
-    const { metadata } = this.props;
-    const { pgid } = metadata.pgdef;
-    let _id = document.querySelector("div[role='grid']").id;
-    $("#" + _id).jqxGrid("exportdata", type, pgid);
-    //exportExternal({pageid:pgid,type:type});
+    const { metadata, exportHandler } = this.props;
+    const { pgid, exportAll } = metadata.pgdef;
+    if (exportAll) exportHandler(type);
+    else {
+      let _id = document.querySelector("div[role='grid']").id;
+      $("#" + _id).jqxGrid("exportdata", type, pgid);
+    }
   }
 
   // Renders the export and copy to clipboard buttons.

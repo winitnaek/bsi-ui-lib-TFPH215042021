@@ -48,7 +48,7 @@ class ExtendedPageRenderer extends React.Component {
   // Renders the Page title, Page filters, Extended Grid, and Page footer components.
   render() {
     const { isOpen } = this.state;
-    const { styles, fieldData, formFilterData, metadata, setFormData, mapToolUsage } = this.props;
+    const { styles, fieldData, formFilterData, metadata, setFormData, mapToolUsage, exportHandler } = this.props;
     const { hidePageTitle, hidePageFilter, hidePageActions, hidePageFooter } = metadata.pgdef;
     debugger;
     return (
@@ -68,7 +68,9 @@ class ExtendedPageRenderer extends React.Component {
           />
         )}
         <ExtendedGrid {...this.props} isOpen={isOpen} setIsOpen={this.setIsOpen} />
-        {!hidePageFooter && <PageFooter styles={styles} metadata={metadata} mapToolUsage={mapToolUsage} />}
+        {!hidePageFooter && (
+          <PageFooter styles={styles} metadata={metadata} mapToolUsage={mapToolUsage} exportHandler={exportHandler} />
+        )}
         {metadata.confirmdef ? (
           <ConfirmModal
             showConfirm={this.state.showConfirm}
