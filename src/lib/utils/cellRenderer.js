@@ -21,7 +21,7 @@ export function autoFillCellRenderer(ndex, datafield, value, defaultvalue, colum
 export function addColLinksCellRenderer(index, datafield, value, defaultvalue, column, rowdata) {
   let cell = { index: index, datafield: datafield, value: value };
   let cellJSON = encodeURIComponent(JSON.stringify(cell));
-  return `<a href='#' id='${datafield}-${index}' class='click' onClick={cellClick('${cellJSON}')}><div style="padding-left:4px;padding-top:8px" title="Hello">${value}</div></a>`;
+  return `<a href='#' id='${datafield}-${index}' class='click' onClick={cellClick('${cellJSON}')}><div style="padding-left:4px;padding-top:8px">${value}</div></a>`;
 }
 
 // Adds autoFill links or regular hyperlink to the cell.
