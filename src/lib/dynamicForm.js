@@ -317,7 +317,9 @@ class DynamicForm extends Component {
     const hasDeletePermission = this.props.formProps.permissions && this.props.formProps.permissions.DELETE;
     let isEdit = false;
     if (mode === 'Edit') isEdit = true;
-    this.setState({showDelete: hasDelete && isEdit && hasDeletePermission});
+    //this.setState({showDelete: hasDelete && isEdit && hasDeletePermission});
+    this.setState({showDelete: hasDelete && isEdit});
+
   }
 
   render() {
@@ -478,11 +480,8 @@ class DynamicForm extends Component {
                         </Button>
                       </Fragment>
                     )}
-                {this.state.showDelete &&
-                  !saveAsMode &&
-                  this.state.recentUsageData &&
-                  !this.state.recentUsageData.usageDataStr && (
-                    <Button onClick={this.handleDelete} color='danger'>
+                {this.state.showDelete && (
+                    <Button onClick={(e) => this.handleDelete(props.values,props)} color='danger'>
                       Delete
                     </Button>
                   )}
@@ -532,10 +531,13 @@ class DynamicForm extends Component {
     };
 
     this.handleDelete = async (values) => {
-      const {gridType} = this.props;
-      const {hasPopupGrid} = this.props.metadata.formdef;
-       const {deleteHandler, handleDelete} = formProps;
+      debugger
+      const {metadata,formData} = this.props;
+      const {hasPopupGrid} = metadata.formdef;
+      const handleDeleteExternal  = (metadata.actiondef && metadata.actiondef.handleDeleteExternal) ? true:false;
+       const {handleDelete,deleteRow} = formProps;
         this.setState({isLoading: true});
+        //TODO To be removed later
         if(hasPopupGrid){
           let _id = $("#popupgrid").children(":first")[0].id;
           var rows = $("#"+_id).jqxGrid('selectedrowindexes');
@@ -550,9 +552,9 @@ class DynamicForm extends Component {
               await deleteGridData.deleteGridData(pgid,selectedRecords);
           }
       }else if(values){
-          gridType == "page" ?
+          handleDeleteExternal ?
           handleDelete(values):
-          await deleteHandler(values);
+          await deleteRow(formData.index);
       }
       this.setState({isLoading: false});
       close();
