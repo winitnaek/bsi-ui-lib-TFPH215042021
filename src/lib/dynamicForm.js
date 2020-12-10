@@ -337,8 +337,10 @@ class DynamicForm extends Component {
     const mode = this.props.formData.mode;
     const hasDeletePermission = this.props.formProps.permissions && this.props.formProps.permissions.DELETE;
     let isEdit = false;
-    if (mode === "Edit") isEdit = true;
-    this.setState({ showDelete: hasDelete && isEdit && hasDeletePermission });
+    if (mode === 'Edit') isEdit = true;
+    //this.setState({showDelete: hasDelete && isEdit && hasDeletePermission});
+    this.setState({showDelete: hasDelete && isEdit});
+
   }
 
   render() {
@@ -500,10 +502,8 @@ class DynamicForm extends Component {
                         </Button>
                       </Fragment>
                     )}
-                    {this.state.showDelete && !saveAsMode && (
-                      // this.state.recentUsageData &&
-                      // !this.state.recentUsageData.usageDataStr &&
-                      <Button onClick={this.props.deleteAndRefresh} color="danger">
+                {this.state.showDelete && (
+                    <Button onClick={(e) => this.handleDelete(props.values,props)} color='danger'>
                       Delete
                     </Button>
                   )}
@@ -554,12 +554,15 @@ class DynamicForm extends Component {
       );
     };
 
-    this.handleDelete = async values => {
-      const { gridType, deleteAndRefresh } = this.props;
-      const { hasPopupGrid } = this.props.metadata.formdef;
-      const { deleteHandler, handleDelete } = formProps;
-      this.setState({ isLoading: true });
-      if (hasPopupGrid) {
+    this.handleDelete = async (values) => {
+      debugger
+      const {metadata,formData} = this.props;
+      const {hasPopupGrid} = metadata.formdef;
+      const handleDeleteExternal  = (metadata.actiondef && metadata.actiondef.handleDeleteExternal) ? true:false;
+       const {handleDelete,deleteRow} = formProps;
+        this.setState({isLoading: true});
+        //TODO To be removed later
+        if(hasPopupGrid){
           let _id = $("#popupgrid").children(":first")[0].id;
         var rows = $("#" + _id).jqxGrid("selectedrowindexes");
           var selectedRecords = new Array();
@@ -572,9 +575,10 @@ class DynamicForm extends Component {
           const { pgid } = formProps;
           await deleteGridData.deleteGridData(pgid, selectedRecords);
           }
-      } else if (values) {
-        deleteAndRefresh
-        //gridType == "page" ? handleDelete(values) : await deleteHandler(values);
+      }else if(values){
+          handleDeleteExternal ?
+          handleDelete(values):
+          await deleteRow(formData.index);
       }
       this.setState({ isLoading: false });
       close();
