@@ -12,9 +12,9 @@ class CustomSelect extends Component {
         defaultSelected: "",
         showAllOptions: false,
         query: "",
-        isSelected:false,
-        isOpen:false,
-    }
+      isSelected: false,
+      isOpen: false
+    };
 
     this.handleChange = this.handleChange.bind(this);
     this.onSearchHandler = this.onSearchHandler.bind(this);
@@ -27,12 +27,12 @@ class CustomSelect extends Component {
   // resets the field value for typehead, asynctypehead and its autopopulated fields.
   // if default value is present it resets to default value
   resetFieldValue(clearInput) {
-    const {defaultSelected} = this.state;
-    const {mode} = this.props;
-    if(mode == "Edit" && defaultSelected.id && defaultSelected.label && !clearInput){
+    const { defaultSelected } = this.state;
+    const { mode } = this.props;
+    if (mode == "Edit" && defaultSelected.id && defaultSelected.label && !clearInput) {
         this.typeahead && this.typeahead.getInstance()._updateSelected(defaultSelected);
         this.asynctypeahead && this.asynctypeahead.getInstance()._updateSelected(defaultSelected);
-    }else{
+    } else {
         this.typeahead && this.typeahead.getInstance().clear(); 
         this.asynctypeahead && this.asynctypeahead.getInstance().clear(); 
     }
@@ -102,16 +102,27 @@ class CustomSelect extends Component {
     handleFieldMetadata(newFieldMetadata);
     let newFieldValues = Object.assign(formValues, fieldData);
     Object.keys(newFieldValues).map(k => (newFieldValues[k] = newFieldValues[k].trim()));
-    this.setState({ isSelected: false, query: "", defaultSelected:"" }, this.resetFieldValue({clearInput:true}));
+    this.setState({ isSelected: false, query: "", defaultSelected: "" }, this.resetFieldValue({ clearInput: true }));
     setValues(newFieldValues);
   }
 
   // renders a form element of type select and switches from asynctypehead to typehead on global search
-  renderFormElement(){
-    const {isLoading, options,showAllOptions,defaultSelected} = this.state;
-    const {name,error,touched,value,defaultSet,fieldMetadata,
-           fieldinfo,disabled,placeholder,onChange,id} = this.props;
-    if(fieldinfo.typeahead){
+  renderFormElement() {
+    const { isLoading, options, showAllOptions, defaultSelected } = this.state;
+    const {
+      name,
+      error,
+      touched,
+      value,
+      defaultSet,
+      fieldMetadata,
+      fieldinfo,
+      disabled,
+      placeholder,
+      onChange,
+      id
+    } = this.props;
+    if (fieldinfo.typeahead) {
       let filterByFields = [];
       if (fieldinfo.labelMapping && showAllOptions)
         filterByFields = fieldinfo.fieldDisplayInfo.map(item => {
@@ -331,8 +342,8 @@ class CustomSelect extends Component {
 
     // Step-2 find if the value is present in id or label.
     // Step-3 populate the value in the field.
-    if(fieldinfo.labelMapping){
-      this.setState({defaultSelected:{"id":value,"label":value}});
+    if (fieldinfo.labelMapping) {
+      this.setState({ defaultSelected: { id: value, label: value } });
     } else if (value && fieldinfo.isasync && !fieldinfo.options.length) {
       this.setState({ isLoading: true });
       let options = await getFormData.getFormData(id, value);
@@ -347,7 +358,7 @@ class CustomSelect extends Component {
             option => option && (option.id === value || option.label === value || option === value)
           )) ||
         defaultSelected;
-      this.setState({ defaultSelected }, this.resetFieldValue);
+      this.setState({ defaultSelected, options: fieldinfo.options }, this.resetFieldValue);
     }
   }
 
@@ -364,8 +375,19 @@ class CustomSelect extends Component {
   }
 
   render() {
-    const {name,error,touched,description,required,label,fieldinfo,
-           index,isResetAll,fieldHeader,resetFields} = this.props;
+    const {
+      name,
+      error,
+      touched,
+      description,
+      required,
+      label,
+      fieldinfo,
+      index,
+      isResetAll,
+      fieldHeader,
+      resetFields
+    } = this.props;
     if (isResetAll) this.resetFieldValue();
     else if (resetFields.length && fieldinfo.typeahead) {
       resetFields.map(field => {

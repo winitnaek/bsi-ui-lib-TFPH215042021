@@ -56,7 +56,8 @@ class ReusableGrid extends React.Component {
         abody: "",
         abtnlbl: "Ok"
       },
-      fieldData: this.props.fieldData
+      fieldData: this.props.fieldData,
+      hasChildData: false
     };
 
     this.editClick = (index, pgid) => {
@@ -71,8 +72,28 @@ class ReusableGrid extends React.Component {
         await setIsOpen();
       }
       const { setFormData } = this.props;
-      dispatchAction(setFormData, setIsOpen);
+      const { pgdef } = this.state;
+      const { childConfig } = pgdef;
+
+      const { checkForData } = childConfig && childConfig.length && childConfig[0];
+      if (checkForData) {
+        this.props.setFilterFormData(data.formData);
+        this.props.getDataForChildGrid(childConfig[0]).then(res => {
+          this.setState({ hasChildData: !!res.length }, () => {
+            dispatchAction(setFormData, setIsOpen);
+          });
+        });
+      } else {
+        dispatchAction(setFormData, setIsOpen);
+      }
     };
+
+    this.saveAndRefresh = async (pgid,values,mode) => {
+      const { saveGridData, renderGrid, tftools } = this.props;
+      let payload = await saveGridData.saveGridData(pgid, values, mode);
+      const pgData = tftools.find(tool => tool.id === pgid);
+      renderGrid(pgData);
+    }
 
     this.handleChildGrid = (childId, rowIndex) => {
       const { setFilterFormData, tftools, renderGrid } = this.props;
@@ -478,11 +499,13 @@ class ReusableGrid extends React.Component {
       filter
     };
 
-    module.exports = this.editClick;
+   
     module.exports = this.handleChildGrid;
     // Below "Global Methods" method's are used by Grid Cell Renderer
     window.editClick = this.editClick;
     window.handleChildGrid = this.handleChildGrid;
+    window.saveAndRefresh = this.saveAndRefresh;
+    module.exports = this.saveAndRefresh;
 
     module.exports = this.setGridData;
     window.exports = this.setGridData;
@@ -773,6 +796,9 @@ class ReusableGrid extends React.Component {
             handleCancel={this.handleFilterForm}
             handlePdfView={this.handlePdfView}
             formFilterData={this.props.formFilterData}
+            hasChildData={formData.mode == "New" ?  false : this.state.hasChildData}
+            saveAndRefresh={this.saveAndRefresh}
+            deleteAndRefresh={this.deleteRow}
           />
         </ReusableModal>
         {metadata.confirmdef ? (

@@ -28,7 +28,7 @@ class SearchBar extends Component {
     const { options, favorites, title, setFavorite, sectionLayout } = this.props;
     const { isOpen } = this.state;
     return (
-      <div style={{ position: "relative" }}>
+      <div style={{ position: "relative", zIndex: 200 }}>
         <Row className="p-2 mb-3 bg-light" style={{ borderBottom: "1px solid #003764" }}>
           <Col className='text-center'>
             <Button color="link" onClick={this.toggle}>
