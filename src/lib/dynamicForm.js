@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from "react";
 import { Formik, Form } from "formik";
-import { Col, Button, Row, Label, Container, ModalBody, ModalFooter, FormGroup, UncontrolledTooltip } from "reactstrap";
+import { Col, Button, Row, Label, Container, ModalBody, ModalFooter, FormGroup } from "reactstrap";
 import Input from "./inputTypes/input";
 import Select from "./inputTypes/select";
 import Radio from "./inputTypes/radio";
@@ -50,13 +50,13 @@ class DynamicForm extends Component {
     this.handleSaveAs = (e, props) => {
       e.preventDefault();
       this.setState({ saveAsMode: true }, () => {
-          this.props.handleSaveAs(e, props);
+        this.props.handleSaveAs(e, props);
       });
     };
 
-    this.getFilteredValues = values => {
+    this.getFilteredValues = (values) => {
       const { fieldData } = this.state;
-      fieldData.forEach(field => {
+      fieldData.forEach((field) => {
         if (field.hide) delete values[field.id];
       });
       return values;
@@ -65,24 +65,63 @@ class DynamicForm extends Component {
     this.handleView = () => {
       const { formProps, renderGrid } = this.props;
       const { pgid } = formProps;
-      let data = this.props.tftools.filter(tftool => {
+      let data = this.props.tftools.filter((tftool) => {
         if (tftool.id == pgid) return tftool;
       });
       renderGrid(data[0]);
     };
 
-    this.handleFieldMetadata = payload => {
+    this.handleFieldMetadata = (payload) => {
       fieldMetadata = payload;
     };
-    
+
     //
-    this.setFormMetadata = formMetadata => {
+    this.setFormMetadata = (formMetadata) => {
       this.setState({ formMetadata });
     };
 
     // sets list of field id's to reset
-    this.onResetFields = fields => {
+    this.onResetFields = (fields) => {
       resetFields = fields;
+    };
+
+    //On Click of View. Used to handle the popup filter form.
+    this.handleFilters = (pgid, values, filter, actions) => {
+      const { formProps } = this.props;
+      debugger;
+      if (formProps && formProps.handleFilters) {
+        // External Filter Handler
+        formProps.handleFilters(pgid, values, actions);
+      } else {
+        // On click of a link to filter the form data.
+        formProps.renderMe(pgid, values, filter);
+        actions.resetForm({});
+        formProps.close();
+      }
+    };
+
+    this.handleSubmit = (values, mode, pgid, formId, actions) => {
+      debugger;
+      const { formProps, saveGridData } = this.props;
+      if (formProps && formProps.handleSubmit) {
+        //External Handler
+        formProps.handleSubmit(values, mode, pgid, formId, actions);
+      } else {
+        // Handles the submit of the form which is launched directly from a link
+        const formValues = this.getFilteredValues(Object.assign({}, values));
+        saveGridData.saveGridData(pgid, values, mode).then((saveStatus) => {
+          if (saveStatus.status === "SUCCESS") {
+            formProps.renderMe(pgid, formValues, saveStatus);
+            let message = saveStatus.message;
+            alert(message);
+          } else if (saveStatus.status === "ERROR") {
+            let message = saveStatus.message;
+            alert(message);
+          }
+        });
+        actions.resetForm({});
+        formProps.close();
+      }
     };
 
     // resets the entire form
@@ -98,7 +137,7 @@ class DynamicForm extends Component {
     };
 
     // list of field id's that needs to be disabled
-    this.onDisableField = fields => {
+    this.onDisableField = (fields) => {
       this.setState({ disabledFields: fields });
     };
 
@@ -122,9 +161,11 @@ class DynamicForm extends Component {
   */
   resetDependentFields(autoPopulateFields, formikProps) {
     const { fieldData } = this.state;
-    autoPopulateFields.forEach(fieldId => {
+    autoPopulateFields.forEach((fieldId) => {
       formikProps.setFieldValue(fieldId, "");
-      const childDependentField = fieldData.find(formField => formField.id === fieldId && formField.autoPopulateFields);
+      const childDependentField = fieldData.find(
+        (formField) => formField.id === fieldId && formField.autoPopulateFields
+      );
       if (childDependentField) {
         this.resetDependentFields(childDependentField.autoPopulateFields, formikProps);
       }
@@ -148,12 +189,12 @@ class DynamicForm extends Component {
         disabledFields.push(...selected.disable);
       }
       if (selected.enable) {
-        const filteredDisabledFields = disabledFields.filter(field => selected.enable.indexOf(field) === -1);
+        const filteredDisabledFields = disabledFields.filter((field) => selected.enable.indexOf(field) === -1);
         disabledFields = filteredDisabledFields;
       }
       if (selected.valuesToUpdate) {
         const keys = Object.keys(selected.valuesToUpdate);
-        keys.forEach(key => {
+        keys.forEach((key) => {
           props.setFieldValue(key, selected.valuesToUpdate[key]);
         });
       }
@@ -171,7 +212,6 @@ class DynamicForm extends Component {
 
       this.setState({
         disabledFields,
-        fieldData,
       });
     }
   }
@@ -184,7 +224,7 @@ class DynamicForm extends Component {
     });
     this.props.showProgress(true);
     this.generateButton.disabled = true;
-    formHandlerService.generate(pgid, payload).then(response => {
+    formHandlerService.generate(pgid, payload).then((response) => {
       if (response.status === "SUCCESS") {
         formProps.renderMe(pgid, formValues, response);
         this.generateButton.disabled = false;
@@ -200,11 +240,11 @@ class DynamicForm extends Component {
     const { disabledFields } = this.state;
     const { metadata } = this.props;
     try {
-      let row = disabledFields.filter(r => id == r);
+      let row = disabledFields.filter((r) => id == r);
       if (row.length > 0) return true;
       let formflds = metadata.formdef.formflds;
       if (formflds) {
-        row = formflds.filter(r => id == r.id);
+        row = formflds.filter((r) => id == r.id);
         if (row.length > 0) {
           if (row[0].isReadOnlyOnEdit == true && this.props.formData.mode == "Edit") {
             return true;
@@ -221,14 +261,14 @@ class DynamicForm extends Component {
 
   updateFieldData(fieldId, options) {
     const { fieldData } = this.state;
-    const updatedFieldData = fieldData.map(field => {
+    const updatedFieldData = fieldData.map((field) => {
       if (field.id === fieldId && field.fieldinfo) {
         field.fieldinfo.options = options;
       }
       return field;
     });
     this.setState({
-      fieldData: updatedFieldData
+      fieldData: updatedFieldData,
     });
   }
 
@@ -241,16 +281,16 @@ class DynamicForm extends Component {
     }
     return initialValues;
   }
-  
+
   disabledHandler(id) {
     const { disabledFields } = this.state;
     const { metadata, formProps } = this.props;
     try {
-      let row = disabledFields.filter(r => id == r);
+      let row = disabledFields.filter((r) => id == r);
       if (row.length > 0) return true;
       let formflds = metadata.formdef.formflds;
       if (formflds) {
-        row = formflds.filter(r => id == r.id);
+        row = formflds.filter((r) => id == r.id);
         if (row.length > 0) {
           if (row[0].isReadOnlyOnEdit == true && this.props.formData.mode == "Edit") {
             return true;
@@ -268,13 +308,13 @@ class DynamicForm extends Component {
   renderFormElements(props, fieldInfo, popupGrids, getFormData, setFormData, mode) {
     if (this.state.isResetAll) this.setState({ isResetAll: false });
     return fieldInfo.map((item, index) => {
-      const fieldMap = { 
+      const fieldMap = {
         text: Input,
         date: Date,
         select: Select,
         checkbox: Checkbox,
         radio: Radio,
-        fileUpload: FileUpload
+        fileUpload: FileUpload,
         //mappedInput:MappedInput
       };
       const Component = fieldMap[item.fieldtype];
@@ -283,48 +323,49 @@ class DynamicForm extends Component {
       if (!this.props.hasChildData && item.dataDependent) {
         return null;
       }
-     
+
       if (item.fieldtype && !item.hidden) {
-            return (
-              <Component
-                index={index}
-                fieldHeader={item.fieldHeader}
-                type={item.fieldtype}
-                mode={mode}
-                label={item.label}
-                fieldinfo={item.fieldinfo && item.fieldinfo}
-                name={item.id}
-                id={item.id}
-                placeholder={item.placeholder}
-                description={item.description}
-                disabled={this.disabledHandler(item.id)}
-                onDisableField={this.onDisableField}
-                popupGrids={popupGrids}
-                getFormData={getFormData}
-                setFormData={setFormData}
-                formMetadata={this.state.formMetadata}
+        return (
+          <Component
+            index={index}
+            fieldHeader={item.fieldHeader}
+            type={item.fieldtype}
+            mode={mode}
+            label={item.label}
+            fieldinfo={item.fieldinfo && item.fieldinfo}
+            name={item.id}
+            id={item.id}
+            placeholder={item.placeholder}
+            description={item.description}
+            disabled={this.disabledHandler(item.id)}
+            onDisableField={this.onDisableField}
+            popupGrids={popupGrids}
+            getFormData={getFormData}
+            setFormData={setFormData}
+            formMetadata={this.state.formMetadata}
             setFormMetadata={this.setFormMetadata}
-                formValues={props.values}
-                fieldsToDisable={item.disable}
-                value={props.values[item.id]}
-                required={item.validation && item.validation.required}
+            formValues={props.values}
+            fieldsToDisable={item.disable}
+            value={props.values[item.id]}
+            required={item.validation && item.validation.required}
             onChange={(event, selected, autoPopulateFields) => {
-                  this.handleFieldChange(event, selected, autoPopulateFields, item, props);
-                }}
-                setValues={props.setValues}
-                setFieldValue={props.setFieldValue}
-                onBlur={props.handleBlur}
-                error={error}
-                touched={touched}
-                isResetAll={this.state.isResetAll}
-                resetFields={resetFields}
+              this.handleFieldChange(event, selected, autoPopulateFields, item, props);
+            }}
+            setValues={props.setValues}
+            setFieldValue={props.setFieldValue}
+            onBlur={props.handleBlur}
+            error={error}
+            touched={touched}
+            isResetAll={this.state.isResetAll}
+            resetFields={resetFields}
             onResetFields={this.onResetFields}
-                handleFieldMetadata={this.handleFieldMetadata}
-                fieldMetadata={fieldMetadata}
-                autoPopulateFields={item.autoPopulateFields}
-                updateFieldData={this.updateFieldData}
-              />
-            );
+            maxLength={item.fieldlength && item.fieldlength.maxlength}
+            handleFieldMetadata={this.handleFieldMetadata}
+            fieldMetadata={fieldMetadata}
+            autoPopulateFields={item.autoPopulateFields}
+            updateFieldData={this.updateFieldData}
+          />
+        );
       }
       return "";
     });
@@ -337,53 +378,62 @@ class DynamicForm extends Component {
     const mode = this.props.formData.mode;
     const hasDeletePermission = this.props.formProps.permissions && this.props.formProps.permissions.DELETE;
     let isEdit = false;
-    if (mode === 'Edit') isEdit = true;
+    if (mode === "Edit") isEdit = true;
     //this.setState({showDelete: hasDelete && isEdit && hasDeletePermission});
-    this.setState({showDelete: hasDelete && isEdit});
-
+    this.setState({ showDelete: hasDelete && isEdit });
   }
 
   render() {
-    const { formProps, tftools, getFormData,formId, 
-      saveGridData,setFormData,gridType,formActions,metadata, saveAndRefresh} = this.props;
-    const { close, deleteRow, pgid, filter, handleSubmit } = formProps;
-    const {mode} = this.props.formData;
-    const {popupGrids} = metadata.pgdef;
-    const fieldInfo = this.state.fieldData;
+    const {
+      formProps,
+      tftools,
+      getFormData,
+      fieldData,
+      formId,
+      setFormData,
+      formActions,
+      metadata,
+      formFilterData,
+    } = this.props;
+    //const { close, pgid, filter, handleSubmit, handleFilters } = formProps;
+    const { pgid, filter, close, permissions, handleDelete, handleSubmit, handleFilters, renderMe } = formProps;
+    const { mode } = this.props.formData;
+    const { popupGrids } = metadata.pgdef;
+    const fieldInfo = fieldData;
     let initialValues = {};
-
+    debugger;
     if (mode == "Edit") {
       initialValues = this.props.formData.data;
     } else {
       fieldInfo.forEach((item, index) => {
         const { validation, value, id } = item;
         if (validation && validation.constraint) {
-            let constraints = validation.constraint;
-            for (let key in constraints) {
+          let constraints = validation.constraint;
+          for (let key in constraints) {
             if (constraints[key].type == "startOfMonth") {
               initialValues[id] = moment()
                 .startOf("month")
                 .format(constraints[key].format || "YYYY-MM-DD");
-                break;
-              } else if (constraints[key].type == "endOfMonth") {
+              break;
+            } else if (constraints[key].type == "endOfMonth") {
               initialValues[id] = moment()
                 .endOf("month")
                 .format(constraints[key].format || "YYYY-MM-DD");
-                break; 
+              break;
             } else if (constraints[key].type == "currentDate") {
               initialValues[id] = moment(new Date()).format(constraints[key].format || "YYYY-MM-DD");
-                break;
-              } else {
-                initialValues[id] = item.value || "";
-                break;
-              }
+              break;
+            } else {
+              initialValues[id] = item.value || "";
+              break;
+            }
           }
         } else {
           initialValues[id] = item.value || "";
         }
       });
     }
-   
+
     this.displayForm = () => {
       const {
         hasDelete,
@@ -396,7 +446,6 @@ class DynamicForm extends Component {
         generateButtonText,
       } = metadata.formdef;
       const { saveAsMode } = this.state;
-      let isEdit = mode === "Edit" ? true : false;
       return (
         <Formik
           initialValues={initialValues}
@@ -405,39 +454,30 @@ class DynamicForm extends Component {
           validateOnChange={true}
           validateOnBlur={true}
           onSubmit={(values, actions) => {
+            debugger;
             try {
-              if (gridType == "page") {
-                handleSubmit(values, formId);
-              } else if (!filter) {
-                metadata.formdef.hasPopupGrid
-                  ? saveGridData.saveGridData(pgid, values, mode)
-                  : saveAndRefresh(pgid, values, mode);
-                close();
-                actions.resetForm({});
-              } else {
-                formProps.renderMe(pgid, values, filter);
-                close();
-                actions.resetForm({});
-              }
+              if (filter) this.handleFilters(pgid, values, filter, actions);
+              else this.handleSubmit(values, mode, pgid, formId, actions);
             } catch (error) {
-              console.log("Form Error >>>>>>  ", error);
+              debugger;
+              console.log(error.message);
               actions.setSubmitting(false);
               actions.setErrors({ submit: error.message });
             }
           }}
           onReset={() => {
             fieldInfo &&
-              fieldInfo.forEach(item => {
-              if (item.fieldtype == "radio" || item.fieldtyle == "checkbox") {
+              fieldInfo.forEach((item) => {
+                if (item.fieldtype == "radio" || item.fieldtyle == "checkbox") {
                   item.fieldinfo.options &&
-                    item.fieldinfo.options.forEach(subItem => {
-                  document.getElementById(subItem.id).checked = false;
-                });
-              }
-            });
+                    item.fieldinfo.options.forEach((subItem) => {
+                      document.getElementById(subItem.id).checked = false;
+                    });
+                }
+              });
           }}
         >
-          {props => (
+          {(props) => (
             <Form>
               <Container>
                 <ModalBody>
@@ -447,7 +487,7 @@ class DynamicForm extends Component {
                       display: "flex",
                       margin: "0 auto",
                       width: "100%",
-                      flexWrap: "wrap"
+                      flexWrap: "wrap",
                     }}
                     id="myform"
                   >
@@ -456,14 +496,14 @@ class DynamicForm extends Component {
                   {metadata.formdef && metadata.formdef.note && (
                     <FormGroup row>
                       <Col sm={2} style={{ marginLeft: "15px" }}>
-                      <Label for="toolsFile"></Label>
-                    </Col>
+                        <Label for="toolsFile"></Label>
+                      </Col>
                       <Col sm={9}>
                         <Label style={{ fontWeight: "bold" }}>{metadata.formdef.note}</Label>
                       </Col>
                     </FormGroup>
                   )}
-                   {metadata.formdef && metadata.formdef.hasRecentUsage && (
+                  {metadata.formdef && metadata.formdef.hasRecentUsage && (
                     <Usage
                       pgid={pgid}
                       tftools={tftools}
@@ -475,18 +515,18 @@ class DynamicForm extends Component {
                     />
                   )}
                   {metadata.formdef && metadata.formdef.hasPopupGrid && (
-                      <PopupGrid
-                        pgid={pgid}
-                        tftools={tftools}
-                        close={close}
-                        getFormData={getFormData}
-                        values={props.values}
-                        metadata={metadata}
-                      />
-                    )}
+                    <PopupGrid
+                      pgid={pgid}
+                      tftools={tftools}
+                      close={close}
+                      getFormData={getFormData}
+                      values={props.values}
+                      metadata={metadata}
+                    />
+                  )}
                 </ModalBody>
                 {!formActions ? (
-                   <ModalFooter>
+                  <ModalFooter>
                     {!hideReset && (
                       <Fragment>
                         <Button color="primary" className="btn btn-primary" onClick={() => close(false)}>
@@ -502,51 +542,51 @@ class DynamicForm extends Component {
                         </Button>
                       </Fragment>
                     )}
-                {this.state.showDelete && (
-                    <Button onClick={(e) => this.handleDelete(props.values,props)} color='danger'>
-                      Delete
-                    </Button>
-                  )}
-                {hasGenerate && (
+                    {this.state.showDelete && (
+                      <Button onClick={(e) => this.deleteHandler(props.values, props)} color="danger">
+                        Delete
+                      </Button>
+                    )}
+                    {hasGenerate && (
                       <Button
-                        innerRef={button => (this.generateButton = button)}
-                        onClick={e => this.handleGenerate(e, props.values)}
+                        innerRef={(button) => (this.generateButton = button)}
+                        onClick={(e) => this.handleGenerate(e, props.values)}
                         color="success"
                       >
-                    {generateButtonText}
-                  </Button>
-                )}
+                        {generateButtonText}
+                      </Button>
+                    )}
                     {hasViewPDF && mode === "Edit" ? (
                       <Button onClick={this.props.handlePdfView} color="success">
-                    View PDF
-                  </Button>
-                ) : null}
-                {!hasGenerate && (
+                        View PDF
+                      </Button>
+                    ) : null}
+                    {!hasGenerate && (
                       <Button type="submit" color="success">
-                    {this.props.filter || this.props.metadata.griddef.isfilterform
+                        {this.props.filter || this.props.metadata.griddef.isfilterform
                           ? submitButtonText || " View "
                           : " Save "}
-                  </Button>
-                )}
+                      </Button>
+                    )}
 
                     {hasSaveAs && !saveAsMode && mode === "Edit" ? (
-                      <Button id="saveAsNew" color="success" onClick={e => this.handleSaveAs(e, props)}>
-                    Save As New
+                      <Button id="saveAsNew" color="success" onClick={(e) => this.handleSaveAs(e, props)}>
+                        Save As New
                         <UncontrolledTooltip placement="right" target="saveAsNew">
-                      <span> Save As A New Record </span>
-                    </UncontrolledTooltip>
-                  </Button>
-                ) : null}
+                          <span> Save As A New Record </span>
+                        </UncontrolledTooltip>
+                      </Button>
+                    ) : null}
 
-                {viewAllBtnText && (
-                      <Button color="success" onClick={e => this.handleViewAll(e, props)}>
-                    {viewAllBtnText}
-                  </Button>
-                )}
-              </ModalFooter>
+                    {viewAllBtnText && (
+                      <Button color="success" onClick={(e) => this.handleViewAll(e, props)}>
+                        {viewAllBtnText}
+                      </Button>
+                    )}
+                  </ModalFooter>
                 ) : (
                   <ModalFooter>{formActions}</ModalFooter>
-                  )}
+                )}
               </Container>
             </Form>
           )}
@@ -554,31 +594,28 @@ class DynamicForm extends Component {
       );
     };
 
-    this.handleDelete = async (values) => {
-      debugger
-      const {metadata,formData} = this.props;
-      const {hasPopupGrid} = metadata.formdef;
-      const handleDeleteExternal  = (metadata.actiondef && metadata.actiondef.handleDeleteExternal) ? true:false;
-       const {handleDelete,deleteRow} = formProps;
-        this.setState({isLoading: true});
-        //TODO To be removed later
-        if(hasPopupGrid){
-          let _id = $("#popupgrid").children(":first")[0].id;
+    this.deleteHandler = async (values) => {
+      debugger;
+      const { metadata, formData } = this.props;
+      const { hasPopupGrid } = metadata.formdef;
+      const { handleDelete } = formProps;
+      this.setState({ isLoading: true });
+      //TODO To be removed later
+      if (hasPopupGrid) {
+        let _id = $("#popupgrid").children(":first")[0].id;
         var rows = $("#" + _id).jqxGrid("selectedrowindexes");
-          var selectedRecords = new Array();
-          for (var m = 0; m < rows.length; m++) {
+        var selectedRecords = new Array();
+        for (var m = 0; m < rows.length; m++) {
           var row = $("#" + _id).jqxGrid("getrowdata", rows[m]);
-              selectedRecords[selectedRecords.length] = row;
-          }
+          selectedRecords[selectedRecords.length] = row;
+        }
         if (selectedRecords.length) {
           const { formProps, deleteGridData } = this.props;
           const { pgid } = formProps;
           await deleteGridData.deleteGridData(pgid, selectedRecords);
-          }
-      }else if(values){
-          handleDeleteExternal ?
-          handleDelete(values):
-          await deleteRow(formData.index);
+        }
+      } else if (values) {
+        handleDelete(formData.index, values);
       }
       this.setState({ isLoading: false });
       close();
