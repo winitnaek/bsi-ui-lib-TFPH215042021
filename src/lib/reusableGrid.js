@@ -54,9 +54,9 @@ class ReusableGrid extends React.Component {
         showAlert: false,
         aheader: "",
         abody: "",
-        abtnlbl: "Ok"
+        abtnlbl: "Ok",
       },
-      fieldData: this.props.fieldData
+      fieldData: this.props.fieldData,
     };
 
     this.editClick = (index, pgid) => {
@@ -86,11 +86,11 @@ class ReusableGrid extends React.Component {
         }
         setFilterFormData(dataRecord);
       }
-      const pgData = tftools.find(tool => tool.id === childId);
+      const pgData = tftools.find((tool) => tool.id === childId);
       renderGrid(pgData);
     };
 
-    this.dispatchGridData = async data => {
+    this.dispatchGridData = async (data) => {
       const { setGridData } = this.props;
       await setGridData(data);
     };
@@ -98,7 +98,7 @@ class ReusableGrid extends React.Component {
     this.handleParentGrid = () => {
       const { tftools, renderGrid } = this.props;
       const parentConfig = this.state.parentConfig.pgdef.pgid;
-      const pgData = tftools.filter(item => {
+      const pgData = tftools.filter((item) => {
         if (item.id === parentConfig) {
           return item;
         }
@@ -117,16 +117,16 @@ class ReusableGrid extends React.Component {
 
     this.handlePdfView = () => {
       this.setState({
-        viewPdfMode: !this.state.viewPdfMode
+        viewPdfMode: !this.state.viewPdfMode,
       });
     };
 
-    this.handleFilterForm = e => {
+    this.handleFilterForm = (e) => {
       const { formFilterData } = this.props;
       const payload = {
         formData: formFilterData,
         mode: "Edit",
-        index: null
+        index: null,
       };
       const { setFormData } = this.props;
       const setIsOpen = () => {
@@ -139,24 +139,43 @@ class ReusableGrid extends React.Component {
       dispatchAction(setFormData, setIsOpen);
     };
 
-    this.handleFilter = e => {
+    this.handleFilter = (e) => {
       e.preventDefault();
       // Either Render Parent Grid or Toggle isOpen to Open Modal
       const { parentConfig } = this.state;
       parentConfig ? this.handleChildGrid(parentConfig.pgdef.pgid) : this.handleFilterForm(e);
     };
 
-    this.handleSubmit = (pgid, payload, mode, rowid) => {
+    this.handleSubmit = async (payload, mode, pgid, formId, actions) => {
       const { saveGridData } = this.props;
-      saveGridData.saveGridData(pgid, payload, mode);
-      this.props.closeForm();
+      debugger;
+      saveGridData.saveGridData(pgid, payload, mode).then((saveStatus) => {
+        debugger;
+        if (saveStatus.status === "SUCCESS") {
+          this.renderMe(pgid, formValues, saveStatus);
+          let message = saveStatus.message;
+          alert(message);
+        } else if (saveStatus.status === "ERROR") {
+          let message = saveStatus.message;
+          alert(message);
+        }
+      });
+      actions.resetForm({});
+      this.toggle();
+    };
+
+    this.handleFilters = (pgid, values, actions) => {
+      debugger;
+      this.renderMe(pgid, values, filter);
+      actions.resetForm({});
+      this.toggle();
     };
 
     this.OpenHelp = () => {
       this.props.help(this.state.pgid);
     };
 
-    this.toggle = isSaveSuccess => {
+    this.toggle = (isSaveSuccess) => {
       this.setState({ isOpen: false, isSaveSuccess }, () => {
         window.setTimeout(() => {
           this.setState({ isSaveSuccess: false });
@@ -164,14 +183,14 @@ class ReusableGrid extends React.Component {
       });
     };
 
-    this.deleteRow = index => {
+    this.handleDelete = (index, values) => {
       const { pgid, index: rowIndex } = this.state;
       let _id = document.querySelector("div[role='grid']").id;
       const rowid = $("#" + _id).jqxGrid("getrowid", index || rowIndex);
       // need to uncomment below when hooking up to api
       // this.props.deleteGridData(pgid, rowid)
       const { deleteGridData } = this.props;
-      deleteGridData.deleteGridData(pgid, this.props.formData.data, "Edit").then(deleteStatus => {
+      deleteGridData.deleteGridData(pgid, this.props.formData.data, "Edit").then((deleteStatus) => {
         if (deleteStatus.status === "SUCCESS") {
           $("#" + _id).jqxGrid("deleterow", rowid);
           alert(deleteStatus.message);
@@ -183,7 +202,7 @@ class ReusableGrid extends React.Component {
 
     this.deleteAll = () => {
       this.setState({
-        showConfirm: true
+        showConfirm: true,
       });
     };
 
@@ -202,13 +221,13 @@ class ReusableGrid extends React.Component {
 
       $("#" + _id).jqxGrid("clear");
       this.setState({
-        showConfirm: false
+        showConfirm: false,
       });
     };
 
     this.handleCancel = () => {
       this.setState({
-        showConfirm: false
+        showConfirm: false,
       });
     };
 
@@ -216,16 +235,16 @@ class ReusableGrid extends React.Component {
       const { mapToolUsage } = this.props;
       const { pgid } = this.state;
       // TODO: Check for request payload format
-      mapToolUsage.createDefaultMapping(pgid, { id }).then(res => {
+      mapToolUsage.createDefaultMapping(pgid, { id }).then((res) => {
         const { alertInfo } = this.state;
         this.setState({
-          alertInfo: Object.assign({}, alertInfo, { abody: successMessage, showAlert: true })
+          alertInfo: Object.assign({}, alertInfo, { abody: successMessage, showAlert: true }),
         });
       });
     };
 
     this.handleAlertOk = () => {
-      const { pgid, filterFormData } = this.state;
+      const { pgid } = this.state;
       this.renderMe(pgid, filter, false);
     };
 
@@ -238,27 +257,27 @@ class ReusableGrid extends React.Component {
         this.setState({ filterFormData: values });
       }
 
-      let data = tftools.filter(tftool => {
+      let data = tftools.filter((tftool) => {
         if (tftool.id == pgid) return tftool;
       });
       renderGrid(data[0]);
     };
 
-    this.selectAll = event => {
+    this.selectAll = (event) => {
       event.preventDefault();
       this.setState({ allSelected: true });
       let _id = document.querySelector("div[role='grid']").id;
       $("#" + _id).jqxGrid("selectallrows");
     };
 
-    this.unselectAll = event => {
+    this.unselectAll = (event) => {
       event.preventDefault();
       this.setState({ allSelected: false });
       let _id = document.querySelector("div[role='grid']").id;
       $("#" + _id).jqxGrid("clearselection");
     };
 
-    this.toggleSelectAll = event => {
+    this.toggleSelectAll = (event) => {
       event.preventDefault();
       // if (this.state.allSelected) {
       this.unselectAll(event);
@@ -273,7 +292,7 @@ class ReusableGrid extends React.Component {
     const { fieldData } = this.state;
     fieldData[0].value = event.target.value;
     this.setState({
-      fieldData: [...fieldData]
+      fieldData: [...fieldData],
     });
   }
 
@@ -312,7 +331,7 @@ class ReusableGrid extends React.Component {
     this.setState(
       {
         showClipboard: true,
-        numOfRows: numOfRows
+        numOfRows: numOfRows,
       },
       () => {
         window.setTimeout(() => {
@@ -323,7 +342,7 @@ class ReusableGrid extends React.Component {
   }
 
   addColLinks(columns) {
-    return columns.map(column => {
+    return columns.map((column) => {
       if (column.link) {
         column = {
           text: column.text,
@@ -333,7 +352,7 @@ class ReusableGrid extends React.Component {
           cellsformat: "c2",
           cellsrenderer: function (ndex, datafield, value, defaultvalue, column, rowdata) {
             return `<a href='#' id='${datafield}-${ndex}' class='click' onClick={editClick(${ndex})}><div style="padding-left:4px">${value}</div></a>`;
-          }
+          },
         };
       }
       column.rendered = this.toolTipRenderer;
@@ -354,7 +373,7 @@ class ReusableGrid extends React.Component {
       let source = {
         datatype: "json",
         datafields: dataFields,
-        localdata: data
+        localdata: data,
       };
       dataAdapter = new $.jqx.dataAdapter(source);
     }
@@ -379,13 +398,14 @@ class ReusableGrid extends React.Component {
         beforeLoadComplete: function (records, sourceData) {},
         loadError: function (xhr, status, error) {
           throw new Error(error);
-        }
+        },
       });
       return dataAdapter;
     }
   }
 
   render() {
+    debugger;
     let metadata = this.props.metadata;
     const { pgdef } = this.state;
     const { hasDeleteAll, extraLinks } = pgdef;
@@ -398,7 +418,7 @@ class ReusableGrid extends React.Component {
     let newColumns = this.addColLinks(columns);
 
     if (this.state.recordEdit) {
-      const editCellsRenderer = rowIndex => {
+      const editCellsRenderer = (rowIndex) => {
         return ` <div id='edit-${rowIndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${rowIndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
       };
       const editColumn = {
@@ -411,7 +431,7 @@ class ReusableGrid extends React.Component {
         resizable: false,
         cellsrenderer: editCellsRenderer,
         menu: false,
-        rendered: this.toolTipRenderer
+        rendered: this.toolTipRenderer,
       };
 
       newColumns = [...newColumns, editColumn];
@@ -423,18 +443,18 @@ class ReusableGrid extends React.Component {
           SAVE: true,
           DELETE: true,
           RUN: true,
-          AUDIT: false
+          AUDIT: false,
         };
       }
 
       if (!permissions.SAVE) {
-        newColumns = newColumns.filter(item => {
+        newColumns = newColumns.filter((item) => {
           return item.text !== "Edit";
         });
       }
 
       if (!permissions.DELETE) {
-        newColumns = newColumns.filter(item => {
+        newColumns = newColumns.filter((item) => {
           return item.text !== "Delete";
         });
       }
@@ -457,25 +477,25 @@ class ReusableGrid extends React.Component {
         resizable: false,
         cellsrenderer: childCellsRenderer,
         menu: false,
-        rendered: this.toolTipRenderer
+        rendered: this.toolTipRenderer,
       }));
       newColumns.push(...childColumns);
     }
 
     const { title, cruddef, isfilterform, pgid, subtitle, noResultsFoundTxt, isOpen, griddef } = this.state;
-    const { deleteRow, handleChange, renderMe, handleSubmit } = this;
+    const { handleDelete, renderMe, handleSubmit, handleFilters } = this;
     let filter;
     if (isfilterform) filter = true;
     const close = this.toggle;
     const formProps = {
-      close,
-      handleChange,
       pgid,
+      filter,
+      close,
       permissions,
-      deleteRow,
-      handleSubmit,
+      handleDelete,
+      //handleSubmit,
+      //handleFilters,
       renderMe,
-      filter
     };
 
     module.exports = this.editClick;
@@ -498,7 +518,7 @@ class ReusableGrid extends React.Component {
       recentUsage,
       griddata,
       serverPaging,
-      filterComp = null // If no filter component then render nothing
+      filterComp = null, // If no filter component then render nothing
     } = this.props;
 
     return (
@@ -588,7 +608,7 @@ class ReusableGrid extends React.Component {
             {this.state.allSelected && (
               <span>
                 <span id="selectAll" style={{ marginRight: "10px" }}>
-                  <a href="" onClick={e => this.unselectAll(e)}>
+                  <a href="" onClick={(e) => this.unselectAll(e)}>
                     <i className="fas fa-check-square  fa-2x" />
                   </a>
                 </span>
@@ -612,7 +632,7 @@ class ReusableGrid extends React.Component {
             )}
 
             <span id="unselectAll">
-              <a href="" onClick={e => this.toggleSelectAll(e)}>
+              <a href="" onClick={(e) => this.toggleSelectAll(e)}>
                 <span>
                   <i className="fas fa-redo-alt fa-2x" />
                 </span>
@@ -635,7 +655,7 @@ class ReusableGrid extends React.Component {
                     textAlign: "center",
                     height: 30,
                     paddingTop: 3,
-                    display: "none"
+                    display: "none",
                   }}
                 >
                   Saved successfully
@@ -690,7 +710,7 @@ class ReusableGrid extends React.Component {
             pageable={true}
             autoheight={true}
             virtualmode={serverPaging ? true : false}
-            rendergridrows={obj => {
+            rendergridrows={(obj) => {
               if (serverPaging) this.dispatchGridData(obj);
               return obj.data;
             }}
@@ -764,7 +784,6 @@ class ReusableGrid extends React.Component {
             tftools={tftools}
             renderGrid={renderGrid}
             metadata={metadata}
-            filterFormData={this.state.filterFormData}
             recentUsage={recentUsage}
             getFormData={getFormData}
             saveGridData={saveGridData}
@@ -797,7 +816,7 @@ export const FilterValues = ({ fieldData = [], formFilterData, style }) => {
 
   fieldData.forEach(({ id, disable, hidden, datafield }) => {
     if (disable && disable.length && values[id]) {
-      disable.forEach(disabled => {
+      disable.forEach((disabled) => {
         delete values[disabled];
       });
     }
