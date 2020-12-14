@@ -333,6 +333,7 @@ class DynamicForm extends Component {
             isResetAll={this.state.isResetAll}
             resetFields={resetFields}
             onResetFields={this.onResetFields}
+            maxLength={item.fieldlength && item.fieldlength.maxlength}
             handleFieldMetadata={this.handleFieldMetadata}
             fieldMetadata={fieldMetadata}
             autoPopulateFields={item.autoPopulateFields}
