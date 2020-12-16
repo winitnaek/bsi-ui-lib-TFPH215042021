@@ -287,7 +287,7 @@ class CustomSelect extends Component {
           setFieldValue(id, selectedOption.id);
         } else {
           this.props.onChange(id, selectedOptions, null);
-          setFieldValue(id, selectedOption.label);
+          setFieldValue(id, selectedOption.id);
         }
       }
       let newFieldMetadata = fieldMetadata;
