@@ -32,6 +32,8 @@ class ReusableGrid extends React.Component {
       recordDelete: metadata.griddef.recordDelete,
       noResultsFoundTxt: metadata.griddef.noResultsFoundTxt || "",
       hasAddNew: metadata.pgdef.hasAddNew,
+      hasSave:  metadata.pgdef.hasSave,
+      hasViewPdf:  metadata.pgdef.hasViewPdf,
       actiondel: metadata.pgdef.actiondel,
       helpLabel: metadata.pgdef.helpLblTxt,
       isfilterform: metadata.griddef.isfilterform,
@@ -58,6 +60,8 @@ class ReusableGrid extends React.Component {
       },
       fieldData: this.props.fieldData,
       hasChildData: false,
+      isSaveAs: false,
+      pdfData: {},
     };
 
     this.editClick = (index, pgid) => {
@@ -88,12 +92,33 @@ class ReusableGrid extends React.Component {
       }
     };
 
-    this.saveAndRefresh = async (pgid, values, mode) => {
+    this.saveAndRefresh = async (pgid, values, mode, childPageId) => {
       const { saveGridData, renderGrid, tftools } = this.props;
-      let payload = await saveGridData.saveGridData(pgid, values, mode);
-      const pgData = tftools.find((tool) => tool.id === pgid);
+      let payload;
+      if(this.state.isSaveAs) {
+        payload = await saveGridData.saveAsGridData(childPageId || pgid, values, mode);
+        this.setState({ isSaveAs: false });
+      } else  {
+        payload = await saveGridData.saveGridData(childPageId || pgid, values, mode);
+      }
+      const pgData = tftools.find(tool => tool.id === pgid);
       renderGrid(pgData);
     };
+
+    this.saveSelectedData = async () => {
+      const modalGridId = document.querySelectorAll("div[role='grid']")[1].id;
+      const griddata = $("#" + modalGridId).jqxGrid("getdatainformation");
+      const payload = [];
+      for (let i = 0; i < griddata.rowscount; i++) {
+       const rowData = $("#" + modalGridId).jqxGrid("getrenderedrowdata", i);
+       if(rowData.locationTaxes) {
+        payload.push(rowData);
+       }
+      }
+     
+    const saveSuccessFull = await this.saveAndRefresh(this.props.parentPageid, payload, undefined, this.props.pageid);
+     console.log("save Success")
+    }
 
     this.handleChildGrid = (childId, rowIndex) => {
       const { setFilterFormData, tftools, renderGrid } = this.props;
@@ -127,18 +152,22 @@ class ReusableGrid extends React.Component {
       renderGrid(pgData[0]);
     };
 
-    this.handleNewForm = (e, formProps) => {
+    this.handleNewForm = (e, formProps, isSaveAs) => {
       e.preventDefault();
       const { values = {} } = formProps || {};
       const payload = { data: values, mode: "New" };
       const { setFormData } = this.props;
       setFormData(payload);
-      this.setState({ isOpen: true });
+      this.setState({ isOpen: true, isSaveAs: isSaveAs });
     };
 
-    this.handlePdfView = () => {
+    this.handlePdfView = async () => {
+      const { getPdfDataAPI, pageid, formData } = this.props;
+      const pdfData = await getPdfDataAPI.getPdfData(pageid, formData.data);
+      console.log("PDAPAAa", pdfData);
       this.setState({
         viewPdfMode: !this.state.viewPdfMode,
+        pdfData,
       });
     };
 
@@ -169,9 +198,7 @@ class ReusableGrid extends React.Component {
 
     this.handleSubmit = async (payload, mode, pgid, formId, actions) => {
       const { saveGridData } = this.props;
-      debugger;
       saveGridData.saveGridData(pgid, payload, mode).then((saveStatus) => {
-        debugger;
         if (saveStatus.status === "SUCCESS") {
           this.renderMe(pgid, formValues, saveStatus);
           let message = saveStatus.message;
@@ -186,7 +213,6 @@ class ReusableGrid extends React.Component {
     };
 
     this.handleFilters = (pgid, values, actions) => {
-      debugger;
       this.renderMe(pgid, values, filter);
       actions.resetForm({});
       this.toggle();
@@ -307,6 +333,7 @@ class ReusableGrid extends React.Component {
     this.columnCounter = 1;
     this.toolTipRenderer = this.toolTipRenderer.bind(this);
     this.onDateFilterChange = this.onDateFilterChange.bind(this);
+    this.handlePdfView = this.handlePdfView.bind(this);
   }
 
   onDateFilterChange(event) {
@@ -334,7 +361,7 @@ class ReusableGrid extends React.Component {
 
   componentDidMount() {
     if (!this.props.griddata) {
-      this.setState({ noResultsFoundTxt: metadata.griddef.noResultsFoundTxt });
+      this.setState({ noResultsFoundTxt: this.props.metadata.griddef.noResultsFoundTxt });
     }
   }
 
@@ -426,7 +453,6 @@ class ReusableGrid extends React.Component {
   }
 
   render() {
-    debugger;
     let metadata = this.props.metadata;
     const { pgdef } = this.state;
     const { hasDeleteAll, extraLinks } = pgdef;
@@ -437,7 +463,6 @@ class ReusableGrid extends React.Component {
     const { columns, showClipboard, isSaveSuccess } = this.state;
 
     let newColumns = this.addColLinks(columns);
-
     if (this.state.recordEdit) {
       const editCellsRenderer = (rowIndex) => {
         return ` <div id='edit-${rowIndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${rowIndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
@@ -702,6 +727,38 @@ class ReusableGrid extends React.Component {
                 </UncontrolledTooltip>
               </span>
             )}
+             {this.state.hasViewPdf && (
+              <span
+                style={
+                   { paddingRight: 46 }
+                }
+              >
+                <span id="viewPdf">
+                  <span onClick={this.handlePdfView}>
+                    <i className="fa fa-file-pdf fa-lg fa-2x" />
+                  </span>
+                </span>
+                <UncontrolledTooltip placement="right" target="viewPdf">
+                  <span> View PDF</span>
+                </UncontrolledTooltip>
+              </span>
+            )}
+             {this.state.hasSave && (
+              <span
+                // style={
+                //    { paddingLeft: 46 }
+                // }
+              >
+                <span id="saveGrid">
+                  <span onClick={() => this.saveSelectedData(this.state.pgid)}>
+                    <i className="fas fa-save fa-lg fa-2x" />
+                  </span>
+                </span>
+                <UncontrolledTooltip placement="right" target="saveGrid">
+                  <span> Save Me</span>
+                </UncontrolledTooltip>
+              </span>
+            )}
             {this.state.actiondel ? (
               <span
                 style={
@@ -744,6 +801,8 @@ class ReusableGrid extends React.Component {
             showfilterrow={true}
             columnsautoresize={true}
             columnsresize={true}
+            editable={griddef.editable}
+            editmode={griddef.editmode || ""}
           />
         </Row>
 
@@ -795,7 +854,7 @@ class ReusableGrid extends React.Component {
               ))
             : null}
         </Row>
-        <ViewPDF view={this.state.viewPdfMode} handleHidePDF={this.handlePdfView} />
+        <ViewPDF view={this.state.viewPdfMode} handleHidePDF={this.handlePdfView} pdfData={this.state.pdfData} />
 
         <ReusableModal open={isOpen} close={this.toggle} title={title} cruddef={cruddef} styles={styles}>
           <DynamicForm

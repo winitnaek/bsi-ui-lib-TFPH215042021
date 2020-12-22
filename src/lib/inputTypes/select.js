@@ -8,7 +8,7 @@ class CustomSelect extends Component {
     super(props);
     this.state = {
       isLoading: false,
-      options: [],
+      options: props.fieldinfo.options || [],
       defaultSelected: "",
       showAllOptions: false,
       query: "",
@@ -130,7 +130,6 @@ class CustomSelect extends Component {
         });
       else filterByFields[0] = (fieldinfo.labelMapping && fieldinfo.fieldDisplayInfo[0].field) || "label";
       const primaryId = (fieldinfo.labelMapping && fieldinfo.fieldDisplayInfo[0].field) || "label";
-      debugger;
       let mappedFieldLength = (fieldinfo.labelMapping && fieldinfo.fieldDisplayInfo.length) || 0;
       return (
         <InputGroup>
@@ -276,7 +275,6 @@ class CustomSelect extends Component {
         Object.keys(newFieldValues).map((k) => (newFieldValues[k] = newFieldValues[k].trim()));
         setValues(newFieldValues);
       } else {
-        debugger;
         if (fieldinfo.fieldDisplayInfo) {
           setFieldValue(id, selectedOption[id]);
         } else if (fieldinfo.autoPopulateFields) {
@@ -336,7 +334,6 @@ class CustomSelect extends Component {
   // }
 
   async componentDidMount() {
-    debugger;
     const { value, fieldinfo, id, updateFieldData, getFormData } = this.props;
     this.setState({ defaultSelected: { id: value, label: value } });
     if (value && fieldinfo.isasync && fieldinfo.options && fieldinfo.options.length == 0) {
