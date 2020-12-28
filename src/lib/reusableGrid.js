@@ -34,6 +34,7 @@ class ReusableGrid extends React.Component {
       hasAddNew: metadata.pgdef.hasAddNew,
       hasSave:  metadata.pgdef.hasSave,
       hasViewPdf:  metadata.pgdef.hasViewPdf,
+      hasCheckbox:  metadata.pgdef.hasCheckbox,
       actiondel: metadata.pgdef.actiondel,
       helpLabel: metadata.pgdef.helpLblTxt,
       isfilterform: metadata.griddef.isfilterform,
@@ -105,7 +106,8 @@ class ReusableGrid extends React.Component {
       renderGrid(pgData);
     };
 
-    this.saveSelectedData = async () => {
+    this.saveSelectedData = async (event) => {
+      event.preventDefault();
       const modalGridId = document.querySelectorAll("div[role='grid']")[1].id;
       const griddata = $("#" + modalGridId).jqxGrid("getdatainformation");
       const payload = [];
@@ -161,7 +163,8 @@ class ReusableGrid extends React.Component {
       this.setState({ isOpen: true, isSaveAs: isSaveAs });
     };
 
-    this.handlePdfView = async () => {
+    this.handlePdfView = async (event) => {
+      event.preventDefault();
       const { getPdfDataAPI, pageid, formData } = this.props;
       const pdfData = await getPdfDataAPI.getPdfData(pageid, formData.data);
       console.log("PDAPAAa", pdfData);
@@ -727,38 +730,6 @@ class ReusableGrid extends React.Component {
                 </UncontrolledTooltip>
               </span>
             )}
-             {this.state.hasViewPdf && (
-              <span
-                style={
-                   { paddingRight: 46 }
-                }
-              >
-                <span id="viewPdf">
-                  <span onClick={this.handlePdfView}>
-                    <i className="fa fa-file-pdf fa-lg fa-2x" />
-                  </span>
-                </span>
-                <UncontrolledTooltip placement="right" target="viewPdf">
-                  <span> View PDF</span>
-                </UncontrolledTooltip>
-              </span>
-            )}
-             {this.state.hasSave && (
-              <span
-                // style={
-                //    { paddingLeft: 46 }
-                // }
-              >
-                <span id="saveGrid">
-                  <span onClick={() => this.saveSelectedData(this.state.pgid)}>
-                    <i className="fas fa-save fa-lg fa-2x" />
-                  </span>
-                </span>
-                <UncontrolledTooltip placement="right" target="saveGrid">
-                  <span> Save Me</span>
-                </UncontrolledTooltip>
-              </span>
-            )}
             {this.state.actiondel ? (
               <span
                 style={
@@ -836,6 +807,32 @@ class ReusableGrid extends React.Component {
               </UncontrolledTooltip>
             </Fragment>
           ) : null}
+           {this.state.hasViewPdf && (
+              <a href="#"
+                style={styles.gridLinkStyle}
+              >
+                <span id="viewPdf">
+                  <span onClick={(event) => this.handlePdfView(event)}>
+                    <i className="fa fa-file-pdf fa-lg fa-2x" />
+                  </span>
+                </span>
+                <UncontrolledTooltip placement="right" target="viewPdf">
+                  <span> View PDF</span>
+                </UncontrolledTooltip>
+              </a>
+            )}
+            {this.state.hasSave && (
+              <a href="#" style={styles.gridLinkStyle}>
+                <span id="saveGrid">
+                  <span onClick={(event) => this.saveSelectedData(event,this.state.pgid)}>
+                    <i className="fas fa-save fa-lg fa-2x" />
+                  </span>
+                </span>
+                <UncontrolledTooltip placement="right" target="saveGrid">
+                  <span> Save Me</span>
+                </UncontrolledTooltip>
+              </a>
+            )}
           {extraLinks
             ? extraLinks.map(({ id, description, icon, successMessage, errorMessage }) => (
                 <Fragment>
@@ -853,6 +850,15 @@ class ReusableGrid extends React.Component {
                 </Fragment>
               ))
             : null}
+        </Row>
+        <Row style={styles.gridRowStyle}>
+          {this.state.hasCheckbox 
+            ? <div>
+            <input type="checkbox" name="displaylocaltax" id="displayLocalTax" onChange={(event) => this.props.clickCheckBox(event)} style={{width: "15px", height: "15px", marginRight: "10px"}} />
+            <label for="displaylocaltax">Display Local Tax Codes by Location</label>
+          </div>
+          : null}
+          
         </Row>
         <ViewPDF view={this.state.viewPdfMode} handleHidePDF={this.handlePdfView} pdfData={this.state.pdfData} />
 

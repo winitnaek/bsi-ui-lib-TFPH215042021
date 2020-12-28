@@ -35,8 +35,8 @@ class ViewPDF extends Component {
     }
   }
 
-  toggle() {
-    this.props.handleHidePDF();
+  toggle(event) {
+    this.props.handleHidePDF(event);
   }
   componentDidMount() {
     this.getPDF(this.props);
