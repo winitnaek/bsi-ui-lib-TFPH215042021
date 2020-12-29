@@ -3,6 +3,18 @@ import {Input, Col, FormGroup} from "reactstrap";
 import {FieldLabel, FieldMessage, FieldHeader} from "../field";
 
 class CustomInput extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+    this.handleChange = (e) => {
+      const { id, onChange, setFormMetadata, formMetadata } = this.props;
+      let formInfo = formMetadata || [];
+      formInfo[id] = e.target.value;
+      setFormMetadata(formInfo);
+      onChange(e);
+    };
+  }
+
   render() {
     const {name,error,touched,description,required,label,fieldHeader,
            disabled,placeholder,value,onChange,onBlur,index,maxLength,hidden} = this.props;
@@ -16,7 +28,7 @@ class CustomInput extends Component {
                     name={name}
                     placeholder={placeholder}
                     value={value}
-                    onChange={onChange}
+                    onChange={this.handleChange}
                     onBlur={onBlur}
                     invalid={error && touched}
                     disabled={disabled}

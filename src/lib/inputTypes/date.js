@@ -6,14 +6,22 @@ import moment from "moment";
 class CustomDate extends Component {
   constructor() {
     super();
-    // this.getValue = value => {
-    //   const momentObj = moment(value);
-    //   if (momentObj.isValid()) {
-    //     return momentObj.format("YYYY-MM-DD");
-    //   }
-    //   return value;
-    // };
+    this.getValue = value => {
+       const momentObj = moment(value);
+       if (momentObj.isValid()) {
+         return momentObj.format("YYYY-MM-DD");
+       }
+       return value;
+     };
+     this.handleChange = (e) => {
+      const { id, onChange, setFormMetadata, formMetadata } = this.props;
+      let formInfo = formMetadata || [];
+      formInfo[id] = e.target.value;
+      setFormMetadata(formInfo);
+      onChange(e);
+    };
   }
+
   render() {
     const {
       name,
@@ -46,8 +54,8 @@ class CustomDate extends Component {
             type={"date"}
             name={name}
             placeholder={placeholder}
-            value={value}
-            onChange={onChange}
+            value={this.getValue(value)}
+            onChange={this.handleChange}
             onBlur={onBlur}
             invalid={error && touched}
             disabled={disabled}
