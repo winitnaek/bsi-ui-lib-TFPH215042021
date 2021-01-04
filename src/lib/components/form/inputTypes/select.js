@@ -8,7 +8,7 @@ class CustomSelect extends Component {
     super(props);
     this.state = {
       isLoading: false,
-      options: [],
+      options: props.fieldinfo.options || [],
       defaultSelected: "",
       showAllOptions: false,
       query: "",
@@ -275,7 +275,6 @@ class CustomSelect extends Component {
         Object.keys(newFieldValues).map((k) => (newFieldValues[k] = newFieldValues[k].trim()));
         setValues(newFieldValues);
       } else {
-        debugger;
         if (fieldinfo.fieldDisplayInfo) {
           setFieldValue(id, selectedOption[id]);
         } else if (fieldinfo.autoPopulateFields) {
@@ -286,7 +285,7 @@ class CustomSelect extends Component {
           setFieldValue(id, selectedOption.id);
         } else {
           this.props.onChange(id, selectedOptions, null);
-          setFieldValue(id, selectedOption.label);
+          setFieldValue(id, selectedOption.id);
         }
       }
       let newFieldMetadata = fieldMetadata;

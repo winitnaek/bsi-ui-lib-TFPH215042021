@@ -26,7 +26,7 @@ class DynamicForm extends Component {
       const payType = (
         formData.data[fieldData[0].dynamicFormKey] || formData.data[fieldData[0].dynamicFormKey.toLowerCase()]
       ).charAt(0);
-      const otherFields = fieldData[1][payType];
+      const otherFields = fieldData[fieldData.length - 1][payType];
       fieldDataCopy = [].concat([fieldData[0], ...otherFields]);
     }
     this.state = {
@@ -50,7 +50,7 @@ class DynamicForm extends Component {
     this.handleSaveAs = (e, props) => {
       e.preventDefault();
       this.setState({ saveAsMode: true }, () => {
-        this.props.handleSaveAs(e, props);
+          this.props.handleSaveAs(e, props, this.state.saveAsMode);
       });
     };
 
@@ -88,7 +88,6 @@ class DynamicForm extends Component {
     //On Click of View. Used to handle the popup filter form.
     this.handleFilters = (pgid, values, filter, actions) => {
       const { formProps } = this.props;
-      debugger;
       if (formProps && formProps.handleFilters) {
         // External Filter Handler
         formProps.handleFilters(pgid, values, actions);
@@ -101,7 +100,6 @@ class DynamicForm extends Component {
     };
 
     this.handleSubmit = (values, mode, pgid, formId, actions) => {
-      debugger;
       const { formProps, saveGridData } = this.props;
       if (formProps && formProps.handleSubmit) {
         //External Handler
@@ -205,13 +203,15 @@ class DynamicForm extends Component {
         const payType = (
           selected[0][fieldData[0].dynamicFormKey] || selected[0][fieldData[0].dynamicFormKey.toLowerCase()]
         ).charAt(0);
-        const otherFields = this.props.fieldData[1][payType];
+        const otherFields = this.props.fieldData[this.props.fieldData.length - 1][payType];
         this.props.fieldData[0].value = selected[0].label;
         fieldData = [].concat([this.props.fieldData[0], ...otherFields]);
       }
 
+      // DO NOT UPDATE BELOW CODE
       this.setState({
         disabledFields,
+        fieldData,
       });
     }
   }
@@ -307,6 +307,7 @@ class DynamicForm extends Component {
 
   renderFormElements(props, fieldInfo, popupGrids, getFormData, setFormData, mode) {
     if (this.state.isResetAll) this.setState({ isResetAll: false });
+    const {values}=props;
     return fieldInfo.map((item, index) => {
       const fieldMap = {
         text: Input,
@@ -320,11 +321,26 @@ class DynamicForm extends Component {
       const Component = fieldMap[item.fieldtype];
       let error = props.errors.hasOwnProperty(item.id) && props.errors[item.id];
       let touched = props.touched.hasOwnProperty(item.id) && props.touched[item.id];
+      let show = true;
+
+      if(item.show){
+        const keys = Object.keys(item.show);
+        for(let length=keys.length-1;length>=0;length--  ){
+          const key = keys[length];
+          const showForValues = item.show[key];
+          show = show && showForValues.indexOf(values[key]) !== -1
+        }
+        const nextField = fieldInfo[index + 1];
+        if (nextField && item.nextFieldHeader) {
+          nextField.fieldHeader = (!show && item.nextFieldHeader) || '';
+        }
+      }
+
       if (!this.props.hasChildData && item.dataDependent) {
         return null;
       }
 
-      if (item.fieldtype && !item.hidden) {
+      if (item.fieldtype && !item.hidden && show) {
         return (
           <Component
             index={index}
@@ -399,9 +415,9 @@ class DynamicForm extends Component {
     const { pgid, filter, close, permissions, handleDelete, handleSubmit, handleFilters, renderMe } = formProps;
     const { mode } = this.props.formData;
     const { popupGrids } = metadata.pgdef;
-    const fieldInfo = fieldData;
+    //DO NOT UPDATE BELOW LINE
+    const fieldInfo = this.state.fieldData;
     let initialValues = {};
-    debugger;
     if (mode == "Edit") {
       initialValues = this.props.formData.data;
     } else {
@@ -454,13 +470,11 @@ class DynamicForm extends Component {
           validateOnChange={true}
           validateOnBlur={true}
           onSubmit={(values, actions) => {
-            debugger;
             try {
               debugger;
               if (filter) this.handleFilters(pgid, values, filter, actions);
               else this.handleSubmit(values, mode, pgid, formId, actions);
             } catch (error) {
-              debugger;
               console.log(error.message);
               actions.setSubmitting(false);
               actions.setErrors({ submit: error.message });
@@ -596,7 +610,6 @@ class DynamicForm extends Component {
     };
 
     this.deleteHandler = async (values) => {
-      debugger;
       const { metadata, formData } = this.props;
       const { hasPopupGrid } = metadata.formdef;
       const { handleDelete } = formProps;

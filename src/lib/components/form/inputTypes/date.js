@@ -3,18 +3,22 @@ import { Input, Col, FormGroup, Label } from "reactstrap";
 import { FieldLabel, FieldMessage, FieldHeader } from "../field";
 
 class CustomDate extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange(e) {
-    const { id, onChange, setFormMetadata, formMetadata } = this.props;
-    let formInfo = formMetadata || [];
-    formInfo[id] = e.target.value;
-    setFormMetadata(formInfo);
-    onChange(e);
+  constructor() {
+    super();
+    this.getValue = (value) => {
+      const momentObj = moment(value);
+      if (momentObj.isValid()) {
+        return momentObj.format("YYYY-MM-DD");
+      }
+      return value;
+    };
+    this.handleChange = (e) => {
+      const { id, onChange, setFormMetadata, formMetadata } = this.props;
+      let formInfo = formMetadata || [];
+      formInfo[id] = e.target.value;
+      setFormMetadata(formInfo);
+      onChange(e);
+    };
   }
 
   render() {
@@ -42,7 +46,7 @@ class CustomDate extends Component {
             type={"date"}
             name={name}
             placeholder={placeholder}
-            value={value}
+            value={this.getValue(value)}
             onChange={this.handleChange}
             onBlur={onBlur}
             invalid={error && touched}
