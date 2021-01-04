@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import { Row, UncontrolledTooltip, Col } from "reactstrap";
-import { copyToClipboard } from "../../utils/copyToClipboard";
+import { copyToClipboard } from "../toast/copyToClipboard";
 
 // Component Used to handle export functionality.
 export default class PageFooter extends React.Component {

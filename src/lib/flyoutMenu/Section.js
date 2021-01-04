@@ -10,13 +10,13 @@ class Section extends Component {
   }
 
   setFavorite(fav) {
-    if (!this.props.favorites.some(favItem => favItem.id === fav.id)) {
+    if (!this.props.favorites.some((favItem) => favItem.id === fav.id)) {
       this.props.setFavorite([...this.props.favorites, fav]);
     }
   }
 
   setUnFavorite(fav) {
-    const favorites = this.props.favorites.filter(option => option.id !== fav.id);
+    const favorites = this.props.favorites.filter((option) => option.id !== fav.id);
     this.props.setFavorite(favorites);
   }
 
@@ -33,7 +33,7 @@ class Section extends Component {
 
   render() {
     const { sectionHeader, section, renderApplication, options, favorites, sectionIcon, from, to } = this.props;
-    let sectionOptions = options.filter(option => section === option.section);
+    let sectionOptions = options.filter((option) => section === option.section);
 
     if (from !== undefined) {
       if (to !== undefined) {
@@ -52,14 +52,14 @@ class Section extends Component {
             </Fragment>
           ) : null}
         </p>
-        {sectionOptions.sort(this.GetSortOrder("label")).map(option => (
+        {sectionOptions.sort(this.GetSortOrder("label")).map((option) => (
           <div className="d-flex menu-link">
-            {favorites.some(fav => fav.id === option.id) ? (
-              <button className="fav-icon" style={buttonColStyle} onClick={e => this.setUnFavorite(option)}>
+            {favorites.some((fav) => fav.id === option.id) ? (
+              <button className="fav-icon" style={buttonColStyle} onClick={(e) => this.setUnFavorite(option)}>
                 <i class="far fa-star fav" style={goldStar}></i>
               </button>
             ) : (
-              <button className="fav-icon" style={buttonColStyle} onClick={e => this.setFavorite(option)}>
+              <button className="fav-icon" style={buttonColStyle} onClick={(e) => this.setFavorite(option)}>
                 <i class="far fa-star" style={star}></i>
               </button>
             )}
@@ -72,7 +72,7 @@ class Section extends Component {
                   : renderApplication(option)
               }
               className="d-block p-0"
-              style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textAlign:'left' }}
+              style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textAlign: "left" }}
             >
               {option.label}
             </Button>

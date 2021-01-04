@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Col, Collapse, Button, ListGroup, ListGroupItem, Row } from "reactstrap";
-import Grid from "../../src/deps/jqwidgets-react/react_jqxgrid";
+import Grid from "../../../deps/jqwidgets-react/react_jqxgrid";
 
 class PopupGrid extends Component {
   constructor(props) {

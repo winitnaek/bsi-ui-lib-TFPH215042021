@@ -1,18 +1,20 @@
 import React, { Component } from "react";
-import { Input, Col, FormGroup, Label } from "reactstrap";
+import { Input, Col, FormGroup } from "reactstrap";
 import { FieldLabel, FieldMessage, FieldHeader } from "../field";
-import moment from "moment";
 
-class CustomDate extends Component {
-  constructor() {
-    super();
-    // this.getValue = value => {
-    //   const momentObj = moment(value);
-    //   if (momentObj.isValid()) {
-    //     return momentObj.format("YYYY-MM-DD");
-    //   }
-    //   return value;
-    // };
+class CustomInput extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(e) {
+    const { id, onChange, setFormMetadata, formMetadata } = this.props;
+    let formInfo = formMetadata || [];
+    formInfo[id] = e.target.value;
+    setFormMetadata(formInfo);
+    onChange(e);
   }
   render() {
     const {
@@ -29,29 +31,25 @@ class CustomDate extends Component {
       onChange,
       onBlur,
       index,
-      classNames="",
-      colClassNames="",
-      labelClassNames="",
-      inputClassNames=""
+      maxLength,
+      hidden,
     } = this.props;
-
     return (
-      <FormGroup className={classNames}>
-        <Col className={colClassNames}>
+      <FormGroup>
+        <Col>
           {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
-          {label && (
-            <FieldLabel label={label} required={required} className={labelClassNames} />
-          )}
+          {label && <FieldLabel label={label} required={required} hidden={hidden ? "hidden" : ""} />}
           <Input
-            type={"date"}
+            type={"input"}
             name={name}
             placeholder={placeholder}
             value={value}
-            onChange={onChange}
+            onChange={this.handleChange}
             onBlur={onBlur}
             invalid={error && touched}
             disabled={disabled}
-            className={inputClassNames}
+            maxLength={maxLength}
+            hidden={hidden ? "hidden" : ""}
           />
           <FieldMessage error={error} touched={touched} description={description} />
         </Col>
@@ -60,4 +58,4 @@ class CustomDate extends Component {
   }
 }
 
-export default CustomDate;
+export default CustomInput;

@@ -1,16 +1,16 @@
 import React, { Fragment } from "react";
 import ReactDOM from "react-dom";
-import JqxTooltip from "../../src/deps/jqwidgets-react/react_jqxtooltip";
-import { copyToClipboard } from "./utils/copyToClipboard";
-import ClipboardToast from "./clipboardToast";
+import JqxTooltip from "../../../deps/jqwidgets-react/react_jqxtooltip";
+import { copyToClipboard } from "../toast/copyToClipboard";
+import ClipboardToast from "../toast/clipboardToast";
 import { Col, Row, UncontrolledTooltip, Badge } from "reactstrap";
-import ReusableModal from "./reusableModal";
-import DynamicForm from "./dynamicForm";
-import CustomDate from "./inputTypes/date";
-import ConfirmModal from "./confirmModal";
-import ReusableAlert from "./reusableAlert";
-import Grid from "../../src/deps/jqwidgets-react/react_jqxgrid";
-import ViewPDF from "./viewPDF";
+import ReusableModal from "../modal/reusableModal";
+import DynamicForm from "../form/dynamicForm";
+import CustomDate from "../form/inputTypes/date";
+import ConfirmModal from "../modal/confirmModal";
+import ReusableAlert from "../modal/reusableAlert";
+import Grid from "../../../deps/jqwidgets-react/react_jqxgrid";
+import ViewPDF from "../pdf/viewPDF";
 
 class ReusableGrid extends React.Component {
   constructor(props) {

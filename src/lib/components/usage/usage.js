@@ -4,11 +4,9 @@ import { Col, Collapse, Button } from "reactstrap";
 class Usage extends Component {
   constructor(props) {
     super(props);
-    console.log("this.props.recentUsage");
-    console.log(this.props.recentUsage);
     this.state = {
       isOpen: false,
-      recentUsage: []
+      recentUsage: [],
     };
     this.toggle = this.toggle.bind(this);
   }
@@ -28,7 +26,7 @@ class Usage extends Component {
 
   toggle() {
     this.setState({
-      isOpen: !this.state.isOpen
+      isOpen: !this.state.isOpen,
     });
   }
 

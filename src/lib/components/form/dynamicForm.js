@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from "react";
 import { Formik, Form } from "formik";
-import { Col, Button, Row, Label, Container, ModalBody, ModalFooter, FormGroup } from "reactstrap";
+import { Col, Button, Row, Label, Container, ModalBody, ModalFooter, FormGroup, UncontrolledTooltip } from "reactstrap";
 import Input from "./inputTypes/input";
 import Select from "./inputTypes/select";
 import Radio from "./inputTypes/radio";
@@ -9,9 +9,9 @@ import moment from "moment";
 //import MappedInput from "./inputTypes/mappedInput";
 import Date from "./inputTypes/date";
 import FileUpload from "./inputTypes/fileUpload";
-import Usage from "./usage";
-import PopupGrid from "./popupGrid";
-import { createYupSchema } from "./utils/createYupSchema";
+import Usage from "../usage/usage";
+import PopupGrid from "../modal/popupGrid";
+import { createYupSchema } from "../../utils/createYupSchema";
 import * as yup from "yup";
 
 var fieldMetadata = {};
@@ -456,6 +456,7 @@ class DynamicForm extends Component {
           onSubmit={(values, actions) => {
             debugger;
             try {
+              debugger;
               if (filter) this.handleFilters(pgid, values, filter, actions);
               else this.handleSubmit(values, mode, pgid, formId, actions);
             } catch (error) {

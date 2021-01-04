@@ -15,10 +15,10 @@ class CustomCheckbox extends Component {
       onDisableField(fieldsToDisable);
     }
   }
-  isSingleCheckBox(fieldinfo){
+  isSingleCheckBox(fieldinfo) {
     return fieldinfo && fieldinfo.options && fieldinfo.options.length === 1;
   }
-  
+
   handleChange(event) {
     const { currentTarget: target } = event;
     const { fieldinfo, value, onChange, id, fieldsToDisable, onDisableField } = this.props;
@@ -51,8 +51,8 @@ class CustomCheckbox extends Component {
   render() {
     const { error, id, description, required, fieldHeader, value, label, fieldinfo, touched, index } = this.props;
 
-    const isChecked = (this.isSingleCheckBox(fieldinfo) && value);
-    
+    const isChecked = this.isSingleCheckBox(fieldinfo) && value;
+
     return (
       <Col>
         <FormGroup>
@@ -60,8 +60,14 @@ class CustomCheckbox extends Component {
           {label && fieldinfo && fieldinfo.options && <FieldLabel label={label} required={required} />}
           {fieldinfo &&
             fieldinfo.options &&
-            fieldinfo.options.map(opt => {
-              return this.CheckBoxItem(opt.id, opt.value, opt.label, (isChecked || (value && value.indexOf(opt.id) !== -1)), this.handleChange);
+            fieldinfo.options.map((opt) => {
+              return this.CheckBoxItem(
+                opt.id,
+                opt.value,
+                opt.label,
+                isChecked || (value && value.indexOf(opt.id) !== -1),
+                this.handleChange
+              );
             })}
           {!fieldinfo && this.RadioItem(id, value, label, this.handleChange)}
           <FieldMessage error={error} touched={touched} description={description} />

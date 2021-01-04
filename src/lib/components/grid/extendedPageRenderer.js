@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
-import ConfirmModal from "../../confirmModal";
-import ReusableAlert from "../../reusableAlert";
+import ConfirmModal from "../modal/confirmModal";
+import ReusableAlert from "../modal/reusableAlert";
 import PageTitle from "../header/pageTitle";
 import PageFilters from "../header/pageFilters";
 import PageActions from "../header/pageActions";
