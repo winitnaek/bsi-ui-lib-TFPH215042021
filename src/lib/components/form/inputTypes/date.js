@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import moment from 'moment'
 import { Input, Col, FormGroup, Label } from "reactstrap";
 import { FieldLabel, FieldMessage, FieldHeader } from "../field";
 import moment from "moment";
