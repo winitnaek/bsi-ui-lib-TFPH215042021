@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Input, Col, FormGroup, Label } from "reactstrap";
 import { FieldLabel, FieldMessage, FieldHeader } from "../field";
+import moment from "moment";
 
 class CustomDate extends Component {
   constructor() {
