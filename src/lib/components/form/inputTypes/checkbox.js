@@ -49,7 +49,7 @@ class CustomCheckbox extends Component {
   }
 
   render() {
-    const { error, id, description, required, fieldHeader, value, label, fieldinfo, touched, index } = this.props;
+    const { error, id, description, required, fieldHeader, value, label, fieldinfo, touched, index, disabled } = this.props;
 
     const isChecked = this.isSingleCheckBox(fieldinfo) && value;
 
@@ -66,20 +66,24 @@ class CustomCheckbox extends Component {
                 opt.value,
                 opt.label,
                 isChecked || (value && value.indexOf(opt.id) !== -1),
-                this.handleChange
+                this.handleChange,
+                disabled
               );
             })}
-          {!fieldinfo && this.RadioItem(id, value, label, this.handleChange)}
+          {/* {!fieldinfo && this.RadioItem(id, value, label, this.handleChange)} */}
           <FieldMessage error={error} touched={touched} description={description} />
         </FormGroup>
       </Col>
     );
   }
-  CheckBoxItem(id, value, label, checked, onChange) {
+  CheckBoxItem(id, value, label, checked, onChange, disabled) {
     return (
       <Col>
         <Label check>
-          <Input type="checkbox" name={id} id={id} value={value} onChange={onChange} checked={checked} />
+          {disabled 
+          ? <Input disabled type="checkbox" name={id} id={id} value={value} onChange={onChange} checked={checked} /> 
+          : <Input type="checkbox" name={id} id={id} value={value} onChange={onChange} checked={checked} />}
+        
           {label}
         </Label>
       </Col>

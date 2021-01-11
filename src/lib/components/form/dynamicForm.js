@@ -172,7 +172,7 @@ class DynamicForm extends Component {
 
   handleFieldChange(event, selected, autoPopulateFields, item, props) {
     if (item.fieldtype === "checkbox") {
-      props.setFieldValue(event, selected.id);
+      props.setFieldValue(event, selected);
     } else {
       props.handleChange(event);
     }

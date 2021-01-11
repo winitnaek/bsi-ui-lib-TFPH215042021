@@ -78,7 +78,13 @@ class CustomSelect extends Component {
     if (fieldinfo && fieldinfo.autoPopulateFields && fieldinfo.autoPopulateFields.length) {
       fieldinfo.autoPopulateFields.forEach((depentFieldId) => {
         getFormData.getFormData(depentFieldId, parentSelectedValue).then((options) => {
-          updateFieldData && updateFieldData(depentFieldId, options);
+          let newOptions = [];
+          options.forEach(option => {
+            if(option.id) {
+              newOptions.push({ id: option.id, label: option.label})
+            }
+          })
+          updateFieldData && updateFieldData(depentFieldId, newOptions);
         });
       });
     }
