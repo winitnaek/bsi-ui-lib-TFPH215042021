@@ -133,6 +133,9 @@ class ReusableGrid extends React.Component {
           dataRecord[id] = value;
         }
         setFilterFormData(dataRecord);
+        if(this.props.setParentInfo){//Do not remove this. To Handle New with values from parent
+          this.props.setParentInfo(dataRecord);
+        }
       }
       const pgData = tftools.find((tool) => tool.id === childId);
       renderGrid(pgData);
@@ -882,6 +885,7 @@ class ReusableGrid extends React.Component {
             hasChildData={formData.mode == "New" ? false : this.state.hasChildData}
             saveAndRefresh={this.saveAndRefresh}
             deleteAndRefresh={this.deleteRow}
+            fillParentInfo ={this.props.fillParentInfo}
           />
         </ReusableModal>
         {metadata.confirmdef ? (

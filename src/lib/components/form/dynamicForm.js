@@ -40,7 +40,6 @@ class DynamicForm extends Component {
     };
 
     this.updateFieldData = this.updateFieldData.bind(this);
-    this.populateIdForEntity = this.populateIdForEntity.bind(this);
     this.handleViewAll = (event, { values }) => {
       event.preventDefault();
       const { formProps, formData } = this.props;
@@ -272,16 +271,6 @@ class DynamicForm extends Component {
     });
   }
 
-  populateIdForEntity(initialValues, pageId) {
-    if (pageId == this.state.type2PgIds[0]) {
-      initialValues.taxCode = this.props.formFilterData.taxCode;
-    } else if (pageId == this.state.type2PgIds[1]) {
-      initialValues.company = this.props.formFilterData.company;
-      initialValues.companyName = this.props.formFilterData.companyName;
-    }
-    return initialValues;
-  }
-
   disabledHandler(id) {
     const { disabledFields } = this.state;
     const { metadata, formProps } = this.props;
@@ -462,6 +451,9 @@ class DynamicForm extends Component {
         generateButtonText,
       } = metadata.formdef;
       const { saveAsMode } = this.state;
+      if(mode === 'New' && this.props.fillParentInfo){//Do not remove this. To Handle New with values from parent
+        initialValues = this.props.fillParentInfo(fieldInfo,initialValues,pgid);
+      }
       return (
         <Formik
           initialValues={initialValues}
