@@ -50,7 +50,7 @@ class DynamicForm extends Component {
     this.handleSaveAs = (e, props) => {
       e.preventDefault();
       this.setState({ saveAsMode: true }, () => {
-          this.props.handleSaveAs(e, props, this.state.saveAsMode);
+        this.props.handleSaveAs(e, props, this.state.saveAsMode);
       });
     };
 
@@ -307,7 +307,7 @@ class DynamicForm extends Component {
 
   renderFormElements(props, fieldInfo, popupGrids, getFormData, setFormData, mode) {
     if (this.state.isResetAll) this.setState({ isResetAll: false });
-    const {values}=props;
+    const { values } = props;
     return fieldInfo.map((item, index) => {
       const fieldMap = {
         text: Input,
@@ -323,16 +323,16 @@ class DynamicForm extends Component {
       let touched = props.touched.hasOwnProperty(item.id) && props.touched[item.id];
       let show = true;
 
-      if(item.show){
+      if (item.show) {
         const keys = Object.keys(item.show);
-        for(let length=keys.length-1;length>=0;length--  ){
+        for (let length = keys.length - 1; length >= 0; length--) {
           const key = keys[length];
           const showForValues = item.show[key];
-          show = show && showForValues.indexOf(values[key]) !== -1
+          show = show && showForValues.indexOf(values[key]) !== -1;
         }
         const nextField = fieldInfo[index + 1];
         if (nextField && item.nextFieldHeader) {
-          nextField.fieldHeader = (!show && item.nextFieldHeader) || '';
+          nextField.fieldHeader = (!show && item.nextFieldHeader) || "";
         }
       }
 
@@ -626,7 +626,8 @@ class DynamicForm extends Component {
         if (selectedRecords.length) {
           const { formProps, deleteGridData } = this.props;
           const { pgid } = formProps;
-          await deleteGridData.deleteGridData(pgid, selectedRecords);
+          //await deleteGridData.deleteGridData(pgid, selectedRecords);
+          handleDelete(formData.index, selectedRecords);
         }
       } else if (values) {
         handleDelete(formData.index, values);

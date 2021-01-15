@@ -270,9 +270,15 @@ class CustomSelect extends Component {
             fieldData[item] = selectedOption[item];
           }
         });
-        fieldData[id] = selectedOption[id];
+        if (fieldinfo.fieldDisplayInfo) {
+          fieldData[id] = selectedOption[fieldinfo.fieldDisplayInfo[0].field];
+        } else {
+          fieldData[id] = selectedOption[id];
+        }
         let newFieldValues = Object.assign(formValues, fieldData);
-        Object.keys(newFieldValues).map((k) => (newFieldValues[k] = newFieldValues[k].trim()));
+        Object.keys(newFieldValues).map(
+          (k) => (newFieldValues[k] = newFieldValues[k] && newFieldValues[k].toString().trim())
+        );
         setValues(newFieldValues);
       } else {
         if (fieldinfo.fieldDisplayInfo) {
