@@ -78,7 +78,13 @@ class CustomSelect extends Component {
     if (fieldinfo && fieldinfo.autoPopulateFields && fieldinfo.autoPopulateFields.length) {
       fieldinfo.autoPopulateFields.forEach((depentFieldId) => {
         getFormData.getFormData(depentFieldId, parentSelectedValue).then((options) => {
-          updateFieldData && updateFieldData(depentFieldId, options);
+          let newOptions = [];
+          options.forEach(option => {
+            if(option.id) {
+              newOptions.push({ id: option.id, label: option.label})
+            }
+          })
+          updateFieldData && updateFieldData(depentFieldId, newOptions);
         });
       });
     }
@@ -282,7 +288,8 @@ class CustomSelect extends Component {
         setValues(newFieldValues);
       } else {
         if (fieldinfo.fieldDisplayInfo) {
-          setFieldValue(id, selectedOption[id]);
+          let field = fieldinfo.fieldKey ? fieldinfo.fieldKey :fieldinfo.fieldDisplayInfo[0].field;
+          setFieldValue(id, selectedOption[field]);
         } else if (fieldinfo.autoPopulateFields) {
           // For single select the selectedOption is always string as per the above code
           // TODO: Check what should be the pattern for multi select and update.
