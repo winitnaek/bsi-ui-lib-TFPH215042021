@@ -9,10 +9,13 @@ class CustomCheckbox extends Component {
     this.CheckBoxItem = this.CheckBoxItem.bind(this);
   }
   componentDidMount() {
-    const { value, fieldsToDisable = [], onDisableField, fieldinfo } = this.props;
+    const { value, fieldsToDisable = [], onDisableField, fieldinfo, fieldsToEnable = [], onEnableField } = this.props;
     const isSingleCheck = this.isSingleCheckBox(fieldinfo);
     if ((isSingleCheck && value) || (value && value.length && fieldsToDisable && fieldsToDisable.length)) {
       onDisableField(fieldsToDisable);
+    }
+    if ((isSingleCheck && value) || (value && value.length && fieldsToEnable && fieldsToEnable.length)) {
+      onEnableField(fieldsToEnable);
     }
   }
   isSingleCheckBox(fieldinfo) {
@@ -21,7 +24,7 @@ class CustomCheckbox extends Component {
 
   handleChange(event) {
     const { currentTarget: target } = event;
-    const { fieldinfo, value, onChange, id, fieldsToDisable, onDisableField } = this.props;
+    const { fieldinfo, value, onChange, id, fieldsToDisable, onDisableField, fieldsToEnable, onEnableField } = this.props;
     let valueArray = value || [];
 
     if (this.isSingleCheckBox(fieldinfo)) {
@@ -43,8 +46,12 @@ class CustomCheckbox extends Component {
       if (fieldsToDisable) {
         onDisableField(fieldsToDisable);
       }
+      if (fieldsToEnable) {
+        onEnableField(fieldsToEnable);
+      }
     } else {
       onDisableField([]);
+      onEnableField([]);
     }
   }
 

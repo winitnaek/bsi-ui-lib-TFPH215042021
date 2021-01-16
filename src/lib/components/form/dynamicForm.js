@@ -35,6 +35,7 @@ class DynamicForm extends Component {
       isLoading: false,
       saveAsMode: false,
       disabledFields: [],
+      enabledFields: [],
       formMetadata: [],
       fieldData: fieldDataCopy,
     };
@@ -137,6 +138,10 @@ class DynamicForm extends Component {
     this.onDisableField = (fields) => {
       this.setState({ disabledFields: fields });
     };
+    // list of field id's that needs to be enabled
+    this.onEnableField = (fields) => {
+      this.setState({ enabledFields: fields });
+    };
 
     this.handleClose = () => {
       const { formProps } = this.props;
@@ -181,9 +186,12 @@ class DynamicForm extends Component {
     }
 
     if (selected) {
-      let { disabledFields } = this.state;
+      let { disabledFields, enabledFields } = this.state;
       if (selected.disable) {
         disabledFields.push(...selected.disable);
+      }
+      if (selected.enable) {
+        enabledFields.push(...selected.enable);
       }
       if (selected.enable) {
         const filteredDisabledFields = disabledFields.filter((field) => selected.enable.indexOf(field) === -1);
@@ -211,6 +219,7 @@ class DynamicForm extends Component {
       this.setState({
         disabledFields,
         fieldData,
+        enabledFields,
       });
     }
   }
@@ -234,30 +243,6 @@ class DynamicForm extends Component {
       }
     });
   }
-
-  disabledHandler(id) {
-    const { disabledFields } = this.state;
-    const { metadata } = this.props;
-    try {
-      let row = disabledFields.filter((r) => id == r);
-      if (row.length > 0) return true;
-      let formflds = metadata.formdef.formflds;
-      if (formflds) {
-        row = formflds.filter((r) => id == r.id);
-        if (row.length > 0) {
-          if (row[0].isReadOnlyOnEdit == true && this.props.formData.mode == "Edit") {
-            return true;
-          } else if (row[0].isReadOnlyOnNew == true && this.props.formData.mode != "Edit") {
-            return true;
-          }
-        }
-      }
-      return false;
-    } catch (error) {
-      console.log("error", error);
-    }
-  }
-
   updateFieldData(fieldId, options) {
     const { fieldData } = this.state;
     const updatedFieldData = fieldData.map((field) => {
@@ -272,9 +257,10 @@ class DynamicForm extends Component {
   }
 
   disabledHandler(id) {
-    const { disabledFields } = this.state;
+    const { disabledFields,enabledFields } = this.state;
     const { metadata, formProps } = this.props;
     try {
+      if(enabledFields.includes(id))return;
       let row = disabledFields.filter((r) => id == r);
       if (row.length > 0) return true;
       let formflds = metadata.formdef.formflds;
@@ -344,6 +330,7 @@ class DynamicForm extends Component {
             description={item.description}
             disabled={this.disabledHandler(item.id)}
             onDisableField={this.onDisableField}
+            onEnableField={this.onEnableField}
             popupGrids={popupGrids}
             getFormData={getFormData}
             setFormData={setFormData}
@@ -351,6 +338,7 @@ class DynamicForm extends Component {
             setFormMetadata={this.setFormMetadata}
             formValues={props.values}
             fieldsToDisable={item.disable}
+            fieldsToEnable={item.enable}
             value={props.values[item.id]}
             required={item.validation && item.validation.required}
             onChange={(event, selected, autoPopulateFields) => {
