@@ -40,6 +40,7 @@ class CustomInput extends Component {
           {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
           {label && <FieldLabel label={label} required={required} hidden={hidden ? "hidden" : ""} />}
           <Input
+            id={name}
             type={"input"}
             name={name}
             placeholder={placeholder}

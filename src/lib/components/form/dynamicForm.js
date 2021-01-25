@@ -408,6 +408,7 @@ class DynamicForm extends Component {
     const fieldInfo = this.state.fieldData;
     let initialValues = {};
     if (mode == "Edit") {
+      debugger;
       initialValues = this.props.formData.data;
     } else {
       fieldInfo.forEach((item, index) => {
@@ -451,8 +452,9 @@ class DynamicForm extends Component {
         generateButtonText,
       } = metadata.formdef;
       const { saveAsMode } = this.state;
-      if(mode === 'New' && this.props.fillParentInfo){//Do not remove this. To Handle New with values from parent
-        initialValues = this.props.fillParentInfo(fieldInfo,initialValues,pgid);
+      if (mode === "New" && this.props.fillParentInfo) {
+        //Do not remove this. To Handle New with values from parent
+        initialValues = this.props.fillParentInfo(fieldInfo, initialValues, pgid);
       }
       return (
         <Formik
