@@ -7,6 +7,7 @@ class CustomInput extends Component {
     super(props);
     this.state = {};
     this.handleChange = this.handleChange.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
 
   handleChange(e) {
@@ -15,6 +16,14 @@ class CustomInput extends Component {
     formInfo[id] = e.target.value;
     setFormMetadata(formInfo);
     onChange(e);
+  }
+
+  onClick(event) {
+      const {  fieldsToDisable, onDisableField } = this.props;
+      if(fieldsToDisable) { 
+        onDisableField(fieldsToDisable || []);
+      }
+     
   }
   render() {
     const {
@@ -50,6 +59,7 @@ class CustomInput extends Component {
             invalid={error && touched}
             disabled={disabled}
             maxLength={maxLength}
+            onClick={this.onClick}
             hidden={hidden ? "hidden" : ""}
           />
           <FieldMessage error={error} touched={touched} description={description} />

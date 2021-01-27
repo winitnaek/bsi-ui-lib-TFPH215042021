@@ -35,6 +35,7 @@ class ReusableGrid extends React.Component {
       hasSave:  metadata.pgdef.hasSave,
       hasViewPdf:  metadata.pgdef.hasViewPdf,
       hasCheckbox:  metadata.pgdef.hasCheckbox,
+      checkBoxLabel:  metadata.pgdef.checkBoxLabel,
       actiondel: metadata.pgdef.actiondel,
       helpLabel: metadata.pgdef.helpLblTxt,
       isfilterform: metadata.griddef.isfilterform,
@@ -63,6 +64,7 @@ class ReusableGrid extends React.Component {
       hasChildData: false,
       isSaveAs: false,
       pdfData: {},
+      addtionalcheckbox: false,
     };
 
     this.editClick = (index, pgid) => {
@@ -94,16 +96,20 @@ class ReusableGrid extends React.Component {
     };
 
     this.saveAndRefresh = async (pgid, values, mode, childPageId) => {
-      const { saveGridData, renderGrid, tftools } = this.props;
+      const { saveGridData, renderGrid, tftools, renderAdditionalInfo, metadata } = this.props;
       let payload;
-      if(this.state.isSaveAs) {
-        payload = await saveGridData.saveAsGridData(childPageId || pgid, values, mode);
-        this.setState({ isSaveAs: false });
-      } else  {
-        payload = await saveGridData.saveGridData(childPageId || pgid, values, mode);
+      if(metadata.griddef.hasAlert) {
+        renderAdditionalInfo(childPageId || pgid, values, mode);
+      } else {
+        if(this.state.isSaveAs) {
+          payload = await saveGridData.saveAsGridData(childPageId || pgid, values, mode);
+          this.setState({ isSaveAs: false });
+        } else  {
+          payload = await saveGridData.saveGridData(childPageId || pgid, values, mode);
+        }
+        const pgData = tftools.find(tool => tool.id === pgid);
+        renderGrid(pgData);
       }
-      const pgData = tftools.find(tool => tool.id === pgid);
-      renderGrid(pgData);
     };
 
     this.saveSelectedData = async (event) => {
@@ -113,7 +119,8 @@ class ReusableGrid extends React.Component {
       const payload = [];
       for (let i = 0; i < griddata.rowscount; i++) {
        const rowData = $("#" + modalGridId).jqxGrid("getrenderedrowdata", i);
-       if(rowData.locationTaxes) {
+       const checkBoxKey = Object.keys(rowData).filter(k => rowData[k] === true);
+       if(rowData[checkBoxKey]) {
         payload.push(rowData);
        }
       }
@@ -318,16 +325,71 @@ class ReusableGrid extends React.Component {
 
     this.selectAll = (event) => {
       event.preventDefault();
-      this.setState({ allSelected: true });
-      let _id = document.querySelector("div[role='grid']").id;
+      const isModal = this.props.hideModal;
+      this.setState({ allSelected: true, addtionalcheckbox: true });
+      let _id = isModal ?  document.querySelectorAll("div[role='grid']")[1].id : document.querySelector("div[role='grid']").id;
       $("#" + _id).jqxGrid("selectallrows");
+
+      const griddata = $("#" + _id).jqxGrid("getdatainformation");
+      const updatedData = [];
+      for (let i = 0; i < griddata.rowscount; i++) {
+      const rowData = $("#" + _id).jqxGrid("getrenderedrowdata", i);
+      Object.keys(rowData).forEach(k => {
+        if(typeof rowData[k] === "boolean" || rowData[k] === undefined) {
+          rowData[k] = true;
+          rowData.disabled = true;
+        }
+      });
+      updatedData.push(rowData);
+      }
+
+      this.props.handleHTML && this.props.handleHTML(true);
+
+      let source = {
+        datatype: "json",
+        datafields: this.props.datafields,
+        localdata: updatedData,
+      };
+
+      console.log("griddata", updatedData);
+     const dataAdapter = new $.jqx.dataAdapter(source);
+      $("#" + _id).jqxGrid({ source: dataAdapter, editable: false, editMode: false });
+      if(this.props.selectAllOutside) {
+        this.props.selectAllOutside(true);
+      }
     };
 
     this.unselectAll = (event) => {
       event.preventDefault();
-      this.setState({ allSelected: false });
-      let _id = document.querySelector("div[role='grid']").id;
+      this.setState({ allSelected: false, addtionalcheckbox: false });
+      const isModal = this.props.hideModal;
+      let _id = isModal ?  document.querySelectorAll("div[role='grid']")[1].id : document.querySelector("div[role='grid']").id;
       $("#" + _id).jqxGrid("clearselection");
+      const griddata = $("#" + _id).jqxGrid("getdatainformation");
+      const updatedData = [];
+      for (let i = 0; i < griddata.rowscount; i++) {
+      const rowData = $("#" + _id).jqxGrid("getrenderedrowdata", i);
+      Object.keys(rowData).forEach(k => {
+        if(typeof rowData[k] === "boolean" || rowData[k] === undefined) {
+          rowData[k] = false;
+          rowData.disabled = false;
+        }
+      });
+      updatedData.push(rowData);
+      }
+
+      let source = {
+        datatype: "json",
+        datafields: this.props.datafields,
+        localdata: updatedData,
+      };
+
+      console.log("griddata", updatedData);
+     const dataAdapter = new $.jqx.dataAdapter(source);
+      $("#" + _id).jqxGrid({ source: dataAdapter, editable: true, editMode: true });
+      if(this.props.selectAllOutside) {
+        this.props.selectAllOutside(false);
+      }
     };
 
     this.toggleSelectAll = (event) => {
@@ -340,6 +402,7 @@ class ReusableGrid extends React.Component {
     this.toolTipRenderer = this.toolTipRenderer.bind(this);
     this.onDateFilterChange = this.onDateFilterChange.bind(this);
     this.handlePdfView = this.handlePdfView.bind(this);
+    this.additionalCheckBox = this.additionalCheckBox.bind(this);
   }
 
   onDateFilterChange(event) {
@@ -456,6 +519,15 @@ class ReusableGrid extends React.Component {
       });
       return dataAdapter;
     }
+  }
+
+  additionalCheckBox(event) {
+    this.setState({ addtionalcheckbox: !this.state.addtionalcheckbox})
+    this.props.clickCheckBox(event)
+  }
+  
+  setFormMetadata(formMetaData) {
+    console.log(formMetaData);
   }
 
   render() {
@@ -577,7 +649,7 @@ class ReusableGrid extends React.Component {
     return (
       <Fragment>
         <Row className={this.props.className}>
-          <h1 style={styles.pagetitle}>{this.state.title}</h1>
+          {!this.props.hideLabel ? <h1 style={styles.pagetitle}>{this.state.title}</h1> : null}
           {this.state.helpLabel && (
             <span style={styles.helpMargin}>
               <span id="help">
@@ -632,14 +704,17 @@ class ReusableGrid extends React.Component {
         ) : null}
 
         {this.state.isDateFilter ? (
-          <CustomDate
-            {...this.state.fieldData[0]}
-            onChange={this.onDateFilterChange}
-            classNames="row"
-            colClassNames="d-flex p-0 align-items-center"
-            inputClassNames="w-25"
-            labelClassNames="mb-0 mr-2"
-          />
+          <div style={{ marginTop: '57px' }}>
+            <CustomDate
+              {...this.state.fieldData[0]}
+              onChange={this.onDateFilterChange}
+              classNames="row"
+              colClassNames="d-flex p-0 align-items-center"
+              inputClassNames="w-25"
+              labelClassNames="mb-0 mr-2"
+              setFormMetadata={this.setFormMetadata}
+            />
+          </div>
         ) : null}
 
         {this.state.isfilter ? (
@@ -660,38 +735,38 @@ class ReusableGrid extends React.Component {
           <Col sm="2" style={styles.iconPaddingLeft}>
             {this.state.allSelected && (
               <span>
-                <span id="selectAll" style={{ marginRight: "10px" }}>
+                <span id={`selectAll-${this.props.hideModal ? '1': '0'}`} style={{ marginRight: "10px" }}>
                   <a href="" onClick={(e) => this.unselectAll(e)}>
                     <i className="fas fa-check-square  fa-2x" />
                   </a>
                 </span>
-                <UncontrolledTooltip placement="right" target="selectAll">
-                  <span> Select All </span>
+                <UncontrolledTooltip placement="right" target={`selectAll-${this.props.hideModal ? '1': '0'}`}>
+                  <span> {metadata.griddef.selectAllLabel || "Select All"} </span>
                 </UncontrolledTooltip>
               </span>
             )}
 
             {!this.state.allSelected && (
               <span>
-                <span id="unselectAll" style={{ marginRight: "10px" }}>
+                <span id={`unselectAll-${this.props.hideModal ? '1': '0'}`} style={{ marginRight: "10px" }}>
                   <a href="" onClick={this.selectAll}>
                     <i className="far fa-square  fa-2x" />
                   </a>
                 </span>
-                <UncontrolledTooltip placement="right" target="unselectAll">
+                <UncontrolledTooltip placement="right" target={`unselectAll-${this.props.hideModal ? '1': '0'}`}>
                   <span> Select All </span>
                 </UncontrolledTooltip>
               </span>
             )}
 
-            <span id="unselectAll">
+            <span id={`unselectAll-${this.props.hideModal ? '1': '0'}`}>
               <a href="" onClick={(e) => this.toggleSelectAll(e)}>
                 <span>
                   <i className="fas fa-redo-alt fa-2x" />
                 </span>
               </a>
             </span>
-            <UncontrolledTooltip placement="right" target="unselectAll">
+            <UncontrolledTooltip placement="right" target={`unselectAll-${this.props.hideModal ? '1': '0'}`}>
               <span> Unselect All </span>
             </UncontrolledTooltip>
           </Col>
@@ -832,7 +907,7 @@ class ReusableGrid extends React.Component {
                   </span>
                 </span>
                 <UncontrolledTooltip placement="right" target="saveGrid">
-                  <span> Save Me</span>
+                  <span> {(typeof this.state.hasSave  === "string") ? this.state.hasSave : "Save Me"}</span>
                 </UncontrolledTooltip>
               </a>
             )}
@@ -857,8 +932,8 @@ class ReusableGrid extends React.Component {
         <Row style={styles.gridRowStyle}>
           {this.state.hasCheckbox 
             ? <div>
-            <input type="checkbox" name="displaylocaltax" id="displayLocalTax" onChange={(event) => this.props.clickCheckBox(event)} style={{width: "15px", height: "15px", marginRight: "10px"}} />
-            <label for="displaylocaltax">Display Local Tax Codes by Location</label>
+            <input disabled={this.state.allSelected} checked={this.state.addtionalcheckbox} type="checkbox" name="displaylocaltax" id="displayLocalTax" onChange={(event) => this.additionalCheckBox(event)} style={{width: "15px", height: "15px", marginRight: "10px"}} />
+            <label for="displaylocaltax">{this.state.checkBoxLabel}</label>
           </div>
           : null}
           
@@ -882,7 +957,7 @@ class ReusableGrid extends React.Component {
             handleCancel={this.handleFilterForm}
             handlePdfView={this.handlePdfView}
             formFilterData={this.props.formFilterData}
-            hasChildData={formData.mode == "New" ? false : this.state.hasChildData}
+            hasChildData={formData && formData.mode == "New" ? false : this.state.hasChildData}
             saveAndRefresh={this.saveAndRefresh}
             deleteAndRefresh={this.deleteRow}
             fillParentInfo ={this.props.fillParentInfo}

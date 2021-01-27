@@ -17,7 +17,7 @@ class ViewPDF extends Component {
   }
 
   getPDF(props) {
-    if(props.pdfData.docData) {
+    if(props.pdfData && props.pdfData.docData) {
         var pdfData = window.atob(props.pdfData.docData);
         //var raw = window.atob(eew2pdf);
         var rawLength = pdfData.length;

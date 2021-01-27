@@ -6,6 +6,24 @@ class CustomRadio extends Component {
   constructor(props) {
     super(props);
     this.RadioItem = this.RadioItem.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {
+    const { currentTarget: target } = event;
+    const { fieldinfo, value, onChange, id, fieldsToDisable, onDisableField } = this.props;
+    let valueArray = value || [];
+
+    valueArray = target.checked;
+    onChange(id, valueArray);
+
+    if (valueArray.length || valueArray) {
+      if (fieldsToDisable) {
+        onDisableField(fieldsToDisable);
+      }
+    } else {
+      onDisableField([]);
+    }
   }
   render() {
     const {
@@ -20,6 +38,8 @@ class CustomRadio extends Component {
       onChange,
       index,
       fieldinfo,
+      disabled,
+      name,
     } = this.props;
     return (
       <Col>
@@ -29,19 +49,19 @@ class CustomRadio extends Component {
           {fieldinfo &&
             fieldinfo.options &&
             fieldinfo.options.map((opt) => {
-              return this.RadioItem(id, opt.id, opt.value, opt.label, onChange);
+              return this.RadioItem(id, opt.id, opt.value, opt.label, onChange, disabled, name);
             })}
-          {!fieldinfo && this.RadioItem(id, null, value, label, onChange)}
+          {!fieldinfo && this.RadioItem(id, null, value, label, onChange, disabled, name)}
           <FieldMessage error={error} touched={touched} description={description} />
         </FormGroup>
       </Col>
     );
   }
-  RadioItem(id, cid, value, label, onChange) {
+  RadioItem(id, cid, value, label, onChange, disabled, name) {
     return (
       <Col>
         <Label check>
-          <Input type="radio" name={id} id={cid ? cid : id} value={value} onChange={onChange} /> {label ? label : id}
+          <Input disabled={disabled} type="radio" name={name || id} id={cid ? cid : id} value={value} onChange={this.handleChange} /> {label ? label : id}
         </Label>
       </Col>
     );
