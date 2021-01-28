@@ -188,9 +188,13 @@ class DynamicForm extends Component {
     }
 
     if (selected) {
-      let { disabledFields, enabledFields } = this.state;
+      let { disabledFields = [], enabledFields } = this.state;
       if (selected.disable) {
         disabledFields.push(...selected.disable);
+      }
+      if (selected.disable) {
+        const filteredEnabledFields = enabledFields.filter((field) => selected.disable.indexOf(field) === -1);
+        enabledFields = filteredEnabledFields;
       }
       if (selected.enable) {
         enabledFields.push(...selected.enable);
@@ -334,7 +338,7 @@ class DynamicForm extends Component {
             mode={mode}
             label={item.label}
             fieldinfo={item.fieldinfo && item.fieldinfo}
-            name={item.id}
+            name={item.name || item.id}
             id={item.id}
             placeholder={item.placeholder}
             description={item.description}
@@ -465,8 +469,7 @@ class DynamicForm extends Component {
           validateOnChange={true}
           validateOnBlur={true}
           onSubmit={(values, actions) => {
-            try {
-              debugger;
+            try {              
               if (filter) this.handleFilters(pgid, values, filter, actions);
               else this.handleSubmit(values, mode, pgid, formId, actions);
             } catch (error) {
