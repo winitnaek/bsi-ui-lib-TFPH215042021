@@ -31,6 +31,7 @@ class DynamicForm extends Component {
     }
     this.state = {
       showDelete: false,
+      showSave: true,
       isResetAll: false,
       isLoading: false,
       saveAsMode: false,
@@ -153,6 +154,7 @@ class DynamicForm extends Component {
     this.handleGenerate = this.handleGenerate.bind(this);
     this.handleFieldChange = this.handleFieldChange.bind(this);
     this.resetDependentFields = this.resetDependentFields.bind(this);
+    this.getPermissions = this.getPermissions.bind(this);
   }
 
   /*
@@ -256,11 +258,19 @@ class DynamicForm extends Component {
     });
   }
 
+  getPermissions(tftools, pgid) {
+    debugger;
+    let currScreen = tftools.filter((tftool) => {
+      if (tftool.id == pgid) return tftool;
+    });
+    return currScreen[0].permissions || null;
+  }
+
   disabledHandler(id) {
-    const { disabledFields,enabledFields } = this.state;
+    const { disabledFields, enabledFields } = this.state;
     const { metadata, formProps } = this.props;
     try {
-      if(enabledFields.includes(id))return;
+      if (enabledFields.includes(id)) return;
       let row = disabledFields.filter((r) => id == r);
       if (row.length > 0) return true;
       let formflds = metadata.formdef.formflds;
@@ -367,13 +377,16 @@ class DynamicForm extends Component {
   componentDidMount() {
     fieldMetadata = {};
     resetFields = {};
-    const hasDelete = this.props.metadata.formdef.hasDelete;
-    const mode = this.props.formData.mode;
-    const hasDeletePermission = this.props.formProps.permissions && this.props.formProps.permissions.DELETE;
-    let isEdit = false;
-    if (mode === "Edit") isEdit = true;
+    debugger;
+    const { formData, tftools, metadata, formProps } = this.props;
+    const hasDelete = metadata.formdef.hasDelete;
+    const mode = formData.mode;
+    let permissions = this.getPermissions(tftools, formProps.pgid);
+    let isEdit = mode === "Edit" ? true : false;
+    if (permissions) this.setState({ showDelete: permissions.DELETE && isEdit, showSave: permissions.SAVE });
+    else this.setState({ showDelete: hasDelete && isEdit });
+    // const hasDeletePermission = this.props.formProps.permissions && this.props.formProps.permissions.DELETE;
     //this.setState({showDelete: hasDelete && isEdit && hasDeletePermission});
-    this.setState({ showDelete: hasDelete && isEdit });
   }
 
   render() {
@@ -439,7 +452,7 @@ class DynamicForm extends Component {
         hasGenerate,
         generateButtonText,
       } = metadata.formdef;
-      const { saveAsMode } = this.state;
+      const { saveAsMode, showDelete, showSave } = this.state;
       if (mode === "New" && this.props.fillParentInfo) {
         //Do not remove this. To Handle New with values from parent
         initialValues = this.props.fillParentInfo(fieldInfo, initialValues, pgid);
@@ -539,7 +552,7 @@ class DynamicForm extends Component {
                         </Button>
                       </Fragment>
                     )}
-                    {this.state.showDelete && (
+                    {showDelete && (
                       <Button onClick={(e) => this.deleteHandler(props.values, props)} color="danger">
                         Delete
                       </Button>
@@ -558,7 +571,7 @@ class DynamicForm extends Component {
                         View PDF
                       </Button>
                     ) : null}
-                    {!hasGenerate && (
+                    {!hasGenerate && showSave && (
                       <Button type="submit" color="success">
                         {this.props.filter || this.props.metadata.griddef.isfilterform
                           ? submitButtonText || " View "
