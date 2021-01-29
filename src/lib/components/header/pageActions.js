@@ -18,7 +18,6 @@ export default class PageActions extends React.Component {
   // Displays Popup Filter Form/
   handleFilterForm(e) {
     const { formFilterData, setFormData, setIsOpen } = this.props;
-    debugger;
     const payload = {
       formData: formFilterData,
       mode: "Edit",
@@ -30,7 +29,6 @@ export default class PageActions extends React.Component {
 
   //To be implemented.
   refreshGridWithouthFilters(event) {
-    debugger;
     let _id = document.querySelector("div[role='grid']").id;
     $("#" + _id).jqxGrid("clearfilters");
     this.unselectAll(event);
@@ -38,7 +36,6 @@ export default class PageActions extends React.Component {
 
   //To be implemented.
   refreshGridWithFilters(event) {
-    debugger;
     let _id = document.querySelector("div[role='grid']").id;
     $("#" + _id).jqxGrid("updatebounddata", "data");
     this.unselectAll(event);
@@ -46,7 +43,6 @@ export default class PageActions extends React.Component {
 
   //To be implemented.
   unselectAll(event) {
-    debugger;
     event.preventDefault();
     this.setState({ allSelected: false });
     let _id = document.querySelector("div[role='grid']").id;
@@ -76,7 +72,6 @@ export default class PageActions extends React.Component {
     const { hasFilter, isfilter, selectionmode } = metadata.griddef;
     const { hasAddNew, actiondel, addNewLabel, parentConfig } = metadata.pgdef;
     const { allSelected } = this.state;
-    debugger;
     return (
       <Row style={(styles.rowTop, { justifyContent: "space-between", marginRight: 0, marginTop: 16 })}>
         <Col style={styles.iconPaddingLeft}>
