@@ -10,8 +10,8 @@ export default class PageActions extends React.Component {
     this.handleFilterForm = this.handleFilterForm.bind(this);
     this.unselectAll = this.unselectAll.bind(this);
     this.selectAll = this.selectAll.bind(this);
-    this.refreshGrid = this.refreshGrid.bind(this);
-    this.clearFilters = this.clearFilters.bind(this);
+    this.refreshGridWithFilters = this.refreshGridWithFilters.bind(this);
+    this.refreshGridWithouthFilters = this.refreshGridWithouthFilters.bind(this);
     this.handleNewForm = this.handleNewForm.bind(this);
   }
 
@@ -29,13 +29,18 @@ export default class PageActions extends React.Component {
   }
 
   //To be implemented.
-  clearFilters() {
+  refreshGridWithouthFilters(event) {
     debugger;
+    let _id = document.querySelector("div[role='grid']").id;
+    $("#" + _id).jqxGrid("clearfilters");
+    this.unselectAll(event);
   }
 
   //To be implemented.
-  refreshGrid(event) {
-    event.preventDefault();
+  refreshGridWithFilters(event) {
+    debugger;
+    let _id = document.querySelector("div[role='grid']").id;
+    $("#" + _id).jqxGrid("updatebounddata", "data");
     this.unselectAll(event);
   }
 
@@ -102,26 +107,26 @@ export default class PageActions extends React.Component {
           )}
           <span>
             <span id="refreshGrid" style={{ marginRight: "16px" }}>
-              <a href="" onClick={(e) => this.refreshGrid(e)}>
+              <a href="" onClick={(e) => this.refreshGridWithFilters(e)}>
                 <span>
                   <i className="fas fa-redo-alt fa-2x" />
                 </span>
               </a>
             </span>
             <UncontrolledTooltip placement="right" target="refreshGrid">
-              <span> Refresh Records </span>
+              <span> Refresh Grid With Filters </span>
             </UncontrolledTooltip>
           </span>
           <span>
             <span id="clearFilters" style={{ marginRight: "16px" }}>
-              <a href="" onClick={(e) => this.clearFilters(e)}>
+              <a href="" onClick={(e) => this.refreshGridWithouthFilters(e)}>
                 <span>
                   <i className="fas fa-eraser fa-2x" />
                 </span>
               </a>
             </span>
             <UncontrolledTooltip placement="right" target="clearFilters">
-              <span> Clear Filters </span>
+              <span> Refresh Grid Without Filters </span>
             </UncontrolledTooltip>
           </span>
         </Col>
