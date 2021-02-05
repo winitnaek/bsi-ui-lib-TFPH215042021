@@ -45,7 +45,7 @@ class DynamicForm extends Component {
     this.handleViewAll = (event, { values }) => {
       event.preventDefault();
       const { formProps, formData } = this.props;
-      this.props.handleFieldMetadataGrid();
+      //this.props.handleFieldMetadataGrid();
     };
 
     this.handleSaveAs = (e, props) => {
