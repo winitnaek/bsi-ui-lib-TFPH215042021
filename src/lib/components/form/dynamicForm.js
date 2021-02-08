@@ -5,6 +5,7 @@ import Input from "./inputTypes/input";
 import Select from "./inputTypes/select";
 import Radio from "./inputTypes/radio";
 import Checkbox from "./inputTypes/checkbox";
+import Password from "./inputTypes/password";
 import moment from "moment";
 //import MappedInput from "./inputTypes/mappedInput";
 import Date from "./inputTypes/date";
@@ -305,6 +306,7 @@ class DynamicForm extends Component {
         checkbox: Checkbox,
         radio: Radio,
         fileUpload: FileUpload,
+        password: Password,
         //mappedInput:MappedInput
       };
       const Component = fieldMap[item.fieldtype];
