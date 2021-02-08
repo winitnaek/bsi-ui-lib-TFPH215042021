@@ -72,7 +72,6 @@ class BaseGrid extends React.Component {
   // Renders the Grid
   render() {
     const { styles, metadata } = this.props;
-    debugger;
     const { pgdef, griddef } = metadata;
     let dataAdapter = this.buildDataAdapter();
     let newColumns = columnModifier(griddef, null);

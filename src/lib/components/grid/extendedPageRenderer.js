@@ -50,7 +50,6 @@ class ExtendedPageRenderer extends React.Component {
     const { isOpen } = this.state;
     const { styles, fieldData, formFilterData, metadata, setFormData, mapToolUsage, exportHandler } = this.props;
     const { hidePageTitle, hidePageFilter, hidePageActions, hidePageFooter } = metadata.pgdef;
-    debugger;
     return (
       <Fragment>
         {!hidePageTitle && <PageTitle styles={styles} help={this.props.help} metadata={metadata} />}
