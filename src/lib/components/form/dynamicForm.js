@@ -100,11 +100,11 @@ class DynamicForm extends Component {
       }
     };
 
-    this.handleSubmit = (values, mode, pgid, formId, actions) => {
+    this.handleSubmit = (values, mode, pgid, formId, actions, formMetadata) => {
       const { formProps, saveGridData } = this.props;
       if (formProps && formProps.handleSubmit) {
         //External Handler
-        formProps.handleSubmit(values, mode, pgid, formId, actions);
+        formProps.handleSubmit(values, mode, pgid, formId, actions, formMetadata);
       } else {
         // Handles the submit of the form which is launched directly from a link
         const formValues = this.getFilteredValues(Object.assign({}, values));
@@ -456,7 +456,7 @@ class DynamicForm extends Component {
         hasGenerate,
         generateButtonText,
       } = metadata.formdef;
-      const { saveAsMode, showDelete, showSave } = this.state;
+      const { saveAsMode, showDelete, showSave, formMetadata } = this.state;
       if (mode === "New" && this.props.fillParentInfo) {
         //Do not remove this. To Handle New with values from parent
         initialValues = this.props.fillParentInfo(fieldInfo, initialValues, pgid);
@@ -469,9 +469,10 @@ class DynamicForm extends Component {
           validateOnChange={true}
           validateOnBlur={true}
           onSubmit={(values, actions) => {
-            try {              
+            debugger;
+            try {
               if (filter) this.handleFilters(pgid, values, filter, actions);
-              else this.handleSubmit(values, mode, pgid, formId, actions);
+              else this.handleSubmit(values, mode, pgid, formId, actions, formMetadata);
             } catch (error) {
               console.log(error.message);
               actions.setSubmitting(false);

@@ -50,10 +50,13 @@ class CustomSelect extends Component {
     } else if (fieldinfo.options) {
       this.setState({ showAllOptions: !showAllOptions, options: fieldinfo.options });
       this.typeahead.focus();
+    } else {
+      this.setState({ showAllOptions: !showAllOptions });
     }
   }
 
   handleSelectFieldChange(event) {
+    const { id, onResetFields, handleFieldMetadata, fieldMetadata, formMetadata, setFormMetadata } = this.props;
     const { value } = event.target;
     const { options } = this.state;
     let { defaultSelected } = this.state;
@@ -70,6 +73,14 @@ class CustomSelect extends Component {
     }
 
     this.updateDependentField(value);
+
+    let newFieldMetadata = fieldMetadata;
+    newFieldMetadata[id] = { isSelected: true };
+    handleFieldMetadata(newFieldMetadata);
+    onResetFields([]);
+    let formInfo = formMetadata || [];
+    formInfo[id] = value;
+    setFormMetadata(formInfo);
     this.props.onChange(event, defaultSelected);
   }
 
