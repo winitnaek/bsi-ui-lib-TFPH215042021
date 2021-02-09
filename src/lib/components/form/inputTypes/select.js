@@ -85,10 +85,10 @@ class CustomSelect extends Component {
   }
 
   updateDependentField(parentSelectedValue) {
-    const { fieldinfo, getFormData, updateFieldData } = this.props;
+    const { fieldinfo, getFormData, updateFieldData, formMetadata } = this.props;
     if (fieldinfo && fieldinfo.autoPopulateFields && fieldinfo.autoPopulateFields.length) {
       fieldinfo.autoPopulateFields.forEach((depentFieldId) => {
-        getFormData.getFormData(depentFieldId, parentSelectedValue).then((options) => {
+        getFormData.getFormData(depentFieldId, parentSelectedValue, formMetadata).then((options) => {
           let newOptions = [];
           options.forEach((option) => {
             if (option.id) {
@@ -310,7 +310,7 @@ class CustomSelect extends Component {
           setFieldValue(id, selectedOption.id);
         } else {
           this.props.onChange(id, selectedOptions, null);
-          setFieldValue(id, selectedOption.id);
+          setFieldValue(id, selectedOption[fieldinfo.fieldKey || "id"]);
         }
       }
       let newFieldMetadata = fieldMetadata;
@@ -325,7 +325,10 @@ class CustomSelect extends Component {
   }
 
   async componentDidMount() {
-    const { value, fieldinfo, id, updateFieldData, getFormData } = this.props;
+    const { value, fieldinfo, id, updateFieldData, getFormData, mode } = this.props;
+    if(mode === "New") {
+      this.resetFieldValue(true);
+    }
     this.setState({ defaultSelected: { id: value, label: value } });
     if (value && fieldinfo.isasync && fieldinfo.options && fieldinfo.options.length == 0) {
       this.setState({ isLoading: true });

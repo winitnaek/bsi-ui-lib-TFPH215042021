@@ -386,7 +386,7 @@ class ReusableGrid extends React.Component {
 
       console.log("griddata", updatedData);
      const dataAdapter = new $.jqx.dataAdapter(source);
-      $("#" + _id).jqxGrid({ source: dataAdapter, editable: true, editMode: true });
+      $("#" + _id).jqxGrid({ source: dataAdapter, editable: false, editMode: false });
       if(this.props.selectAllOutside) {
         this.props.selectAllOutside(false);
       }
