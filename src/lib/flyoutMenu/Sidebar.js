@@ -55,7 +55,7 @@ class Sidebar extends Component {
     return (
       <Row>
         <Col className="sidebar">
-          <p style={favoriteLinkStyle}> Favorite Links</p>
+          <p style={favoriteLinkStyle}> <span style={{fontSize:'125%'}}>Favorite Links</span></p>
           {displayFavorites ? <Container style={favoriteListStyle}>{displayFavorites.sort()}</Container> : <p> None</p>}
         </Col>
       </Row>
