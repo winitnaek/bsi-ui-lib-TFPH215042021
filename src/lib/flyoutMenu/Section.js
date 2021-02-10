@@ -48,7 +48,7 @@ class Section extends Component {
         <p className="mb-1 mt-2">
           {sectionHeader ? (
             <Fragment>
-              <i class={`fas fa-${sectionIcon}`} aria-hidden="true"></i> {sectionHeader}
+              <i class={`fas fa-${sectionIcon} fa-lg`} aria-hidden="true"></i> <span style={{fontSize:'125%'}}>{sectionHeader}</span>
             </Fragment>
           ) : null}
         </p>
