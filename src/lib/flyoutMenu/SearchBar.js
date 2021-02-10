@@ -28,9 +28,9 @@ class SearchBar extends Component {
     const { options, favorites, title, setFavorite, sectionLayout } = this.props;
     const { isOpen } = this.state;
     return (
-      <div style={{ position: "relative", zIndex: 200 }}>
-        <Row className="p-2 mb-3 bg-light" style={{ borderBottom: "1px solid #003764" }}>
-          <Col className='text-center'>
+      <div style={{ position: "relative", zIndex: 200 }} class="p-2 mb-5">
+        <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top no-padding separator" style={{ borderBottom: "1px solid #003764",marginTop:"52px" }}>
+          <Col className='text-center p-2'>
             <Button color="link" onClick={this.toggle}>
               <span className="d-inline-block mr-1"> {title} </span>
               <i className={`fas fa-caret-${isOpen ? "up" : "down"}`} aria-hidden="true"></i>
@@ -42,14 +42,14 @@ class SearchBar extends Component {
               setFavorite={setFavorite}
             />
           </Col>
-        </Row>
+        </nav>
         {isOpen ? (
           <div
             className="modal-content"
             style={{
               position: "absolute",
               zIndex: 99,
-              top: "56px",
+              top: "46px",
               left: "0",
               height: "calc(100vh - 134px)",
               overflowY: "auto"
