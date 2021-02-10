@@ -1,12 +1,6 @@
 import * as yup from "yup";
+import validateDate from "./validateDate";
 import moment from "moment";
-
-// yup.addMethod(yup.string, "matches", function(args) {
-//   const message = args["message"];
-//   const regex = args["input"];
-//   const requiredMsg = args["requiredMsg"];
-//   return yup.string().required(requiredMsg).test(`matches`,message, value => regex.test(value));
-// })
 
 yup.addMethod(yup.string, "matches", function (args) {
   const message = args["message"];
@@ -52,24 +46,31 @@ yup.addMethod(yup.date, "before", function (args) {
   });
 });
 
-// yup.addMethod(yup.string, "minLen", function(args) {
-//   const input = args["input"];
-//   const message = args["message"];
-//   yup.string().test('len', message, val => val.length === 45);
-//   return yup.string().required().test(`minLen`, message, function(value) {
-//     const { path, createError } = this;
-//     return !value || value.toString().length >= input || createError({ path, message });
-//   });
-// })
+yup.addMethod(yup.string, "isValidDate", function (args) {
+  const message = args["message"];
+  return this.test("validDate", message, function (value) {
+    if (!value) return true;
+    return validateDate(value);
+  });
+});
 
-// yup.addMethod(yup.string, "maxLen", function(args) {
-//   const input = args["input"];
-//   const message = args["message"];
-//   return yup.string().required().test(`maxLen`,message, function(value) {
-//     const { path, createError } = this;
-//     return !value || value.toString().length <= input || createError({ path, message });
-//   });
-// })
+yup.addMethod(yup.mixed, "minLen", function (args) {
+  const input = args["input"];
+  const message = args["message"];
+  return this.test("len", message, function (value) {
+    if (!value) return true;
+    return value.toString().length >= input;
+  });
+});
+
+yup.addMethod(yup.mixed, "maxLen", function (args) {
+  const input = args["input"];
+  const message = args["message"];
+  return this.test("len", message, function (value) {
+    if (!value) return true;
+    return value.toString().length <= input;
+  });
+});
 
 export function createYupSchema(schema, config) {
   let constraintParams = [];
