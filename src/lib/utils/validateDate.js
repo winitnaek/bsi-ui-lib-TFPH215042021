@@ -1,3 +1,4 @@
+import moment from "moment";
 function daysInMonth(m, y) {
   // m is 0 indexed: 0-11
   switch (m) {
@@ -18,9 +19,10 @@ function isValid(d, m, y) {
 }
 
 export default function validateDate(value) {
-  //YYYY-MM-DD
-  debugger;
-  let d = value.split("-");
-  let dateIsValid = isValid(d[2], d[1], d[0]);
+  var check = moment(value, "YYYY-MM-DD");
+  var month = check.format("M");
+  var day = check.format("D");
+  var year = check.format("YYYY");
+  let dateIsValid = isValid(day, month, year);
   return dateIsValid;
 }
