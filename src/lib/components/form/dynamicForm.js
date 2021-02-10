@@ -415,7 +415,6 @@ class DynamicForm extends Component {
     const fieldInfo = this.state.fieldData;
     let initialValues = {};
     if (mode == "Edit") {
-      debugger;
       initialValues = this.props.formData.data;
     } else {
       fieldInfo.forEach((item, index) => {

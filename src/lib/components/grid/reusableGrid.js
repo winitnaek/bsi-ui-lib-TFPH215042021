@@ -386,7 +386,7 @@ class ReusableGrid extends React.Component {
 
       console.log("griddata", updatedData);
      const dataAdapter = new $.jqx.dataAdapter(source);
-      $("#" + _id).jqxGrid({ source: dataAdapter, editable: true, editMode: true });
+      $("#" + _id).jqxGrid({ source: dataAdapter, editable: false, editMode: false });
       if(this.props.selectAllOutside) {
         this.props.selectAllOutside(false);
       }
@@ -549,7 +549,7 @@ class ReusableGrid extends React.Component {
         text: "Edit",
         datafield: "edit",
         align: "center",
-        width: "5%",
+        width: 'auto',
         sortable: false,
         filterable: false,
         resizable: false,
@@ -595,7 +595,7 @@ class ReusableGrid extends React.Component {
         text: columnHeader,
         datafield: pgid,
         align: "center",
-        width: "5%",
+        width: 'auto',
         sortable: false,
         filterable: false,
         resizable: false,
