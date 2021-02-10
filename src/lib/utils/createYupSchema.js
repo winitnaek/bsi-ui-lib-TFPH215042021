@@ -10,9 +10,7 @@ yup.addMethod(yup.string, "matches", function (args) {
     .string()
     .required(requiredMsg)
     .test(`matches`, message, function (value) {
-      debugger;
-      const { path, createError } = this;
-      return regex.test(value) || createError({ path, message });
+      return regex.test(value);
     });
 });
 
