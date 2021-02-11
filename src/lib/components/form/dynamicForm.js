@@ -594,7 +594,7 @@ class DynamicForm extends Component {
                     ) : null}
 
                     {viewAllBtnText && (
-                      <Button color="success" onClick={(e) => this.handleViewAll(e, props)}>
+                      <Button id="_viewAllBtnId" color="success">
                         {viewAllBtnText}
                       </Button>
                     )}
