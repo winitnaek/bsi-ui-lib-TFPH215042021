@@ -674,7 +674,7 @@ class ReusableGrid extends React.Component {
             <span>
               {this.state.parentConfig ? (
                 <span id="filter">
-                  <i class="fas fa-arrow-up" style={styles.filtericon} onClick={this.handleParentGrid} />
+                  <i class="fas fa-arrow-alt-circle-up" style={{paddingTop: "4px", color: "#4c7392", marginLeft: "10px", fontSize: "21px" }} onClick={this.handleParentGrid} />
                   <UncontrolledTooltip placement="right" target="filter">
                     Return to prior screen
                   </UncontrolledTooltip>

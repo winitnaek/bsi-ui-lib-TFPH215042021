@@ -239,7 +239,8 @@ class CustomSelect extends Component {
           id={name}
           name={name}
           placeholder={placeholder}
-          value={value}
+          value={defaultSelected ? defaultSelected.id : value}
+          defaultValue={defaultSelected ? defaultSelected.id : value}
           disabled={disabled}
           onChange={this.handleSelectFieldChange}
           invalid={error && touched}
@@ -325,7 +326,7 @@ class CustomSelect extends Component {
   }
 
   async componentDidMount() {
-    const { value, fieldinfo, id, updateFieldData, getFormData, mode } = this.props;
+    const { value, fieldinfo, id, updateFieldData, getFormData, mode, setFieldValue } = this.props;
     if(mode === "New") {
       this.resetFieldValue(true);
     }
@@ -336,7 +337,9 @@ class CustomSelect extends Component {
       updateFieldData(id, options);
       let defaultSelected =
         options.find((option) => (option && option.id === value) || option.label === value) || defaultSelected;
-      this.setState({ isLoading: false, options, defaultSelected });
+      this.setState({ isLoading: false, options, defaultSelected }, () => {
+        this.updateDependentField(value);
+      });
     } else if (value && !fieldinfo.isasync && fieldinfo.options.length) {
       let defaultSelected =
         fieldinfo.options &&
@@ -344,6 +347,13 @@ class CustomSelect extends Component {
           (option) => option && (option.id === value || option.label === value || option === value)
         );
       this.setState({ defaultSelected });
+    }
+
+    if(fieldinfo.options && fieldinfo.options.length && mode === "New") {
+      const defaultValue = fieldinfo.options[0];
+      this.setState({ defaultSelected: { id: defaultValue.id, label: defaultValue.label } }, () => {
+        setFieldValue(id, defaultValue.id);
+      });
     }
   }
 
