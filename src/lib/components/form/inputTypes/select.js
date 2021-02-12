@@ -239,8 +239,7 @@ class CustomSelect extends Component {
           id={name}
           name={name}
           placeholder={placeholder}
-          value={defaultSelected ? defaultSelected.id : value}
-          defaultValue={defaultSelected ? defaultSelected.id : value}
+          value={defaultSelected && defaultSelected.id ? defaultSelected.id : value}
           disabled={disabled}
           onChange={this.handleSelectFieldChange}
           invalid={error && touched}
@@ -331,6 +330,9 @@ class CustomSelect extends Component {
       this.resetFieldValue(true);
     }
     this.setState({ defaultSelected: { id: value, label: value } });
+    if(fieldinfo.isasync || fieldinfo.typeahead) {
+      updateFieldData(id, []);
+    }
     if (value && fieldinfo.isasync && fieldinfo.options && fieldinfo.options.length == 0) {
       this.setState({ isLoading: true });
       let options = await getFormData.getFormData(id, value);
