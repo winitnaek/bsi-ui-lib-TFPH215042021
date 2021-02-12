@@ -268,7 +268,8 @@ class DynamicForm extends Component {
     let currScreen = tftools.filter((tftool) => {
       if (tftool.id == pgid) return tftool;
     });
-    return currScreen[0].permissions || null;
+    if (currScreen && currScreen[0] && currScreen[0].permissions) return currScreen[0].permissions;
+    else return null;
   }
 
   disabledHandler(id) {
