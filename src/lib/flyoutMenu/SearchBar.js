@@ -29,8 +29,8 @@ class SearchBar extends Component {
     const { isOpen } = this.state;
     return (
       <div style={{ position: "relative", zIndex: 200 }}>
-        <Row className="p-2 mb-3 bg-light" style={{ borderBottom: "1px solid #003764" }}>
-          <Col className='text-center'>
+        <Row className="p-2 mb-3" style={{ borderBottom: "0px solid #003764" }}>
+          <Col className='text-center p-2'>
             <Button color="link" onClick={this.toggle}>
               <span className="d-inline-block mr-1"> {title} </span>
               <i className={`fas fa-caret-${isOpen ? "up" : "down"}`} aria-hidden="true"></i>
@@ -49,7 +49,7 @@ class SearchBar extends Component {
             style={{
               position: "absolute",
               zIndex: 99,
-              top: "56px",
+              top: "55px",
               left: "0",
               height: "calc(100vh - 134px)",
               overflowY: "auto"

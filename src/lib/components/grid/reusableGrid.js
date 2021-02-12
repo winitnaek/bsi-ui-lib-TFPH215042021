@@ -54,6 +54,7 @@ class ReusableGrid extends React.Component {
       viewPdfMode: false,
       isSaveSuccess: false,
       showConfirm: false,
+      hasGrandChild:metadata.pgdef.hasGrandChild && metadata.pgdef.hasGrandChild===true ? true:false,
       alertInfo: {
         showAlert: false,
         aheader: "",
@@ -142,6 +143,9 @@ class ReusableGrid extends React.Component {
         setFilterFormData(dataRecord);
         if(this.props.setParentInfo){//Do not remove this. To Handle New with values from parent
           this.props.setParentInfo(dataRecord);
+        }
+        if(this.props.setChildInfo && this.state.hasGrandChild){//Do not remove this. To Handle New with values from parent
+          this.props.setChildInfo(dataRecord);
         }
       }
       const pgData = tftools.find((tool) => tool.id === childId);
@@ -674,7 +678,7 @@ class ReusableGrid extends React.Component {
             <span>
               {this.state.parentConfig ? (
                 <span id="filter">
-                  <i class="fas fa-arrow-up" style={styles.filtericon} onClick={this.handleParentGrid} />
+                  <i class="fas fa-arrow-alt-circle-up" style={{paddingTop: "4px", color: "#4c7392", marginLeft: "10px", fontSize: "21px" }} onClick={this.handleParentGrid} />
                   <UncontrolledTooltip placement="right" target="filter">
                     Return to prior screen
                   </UncontrolledTooltip>
