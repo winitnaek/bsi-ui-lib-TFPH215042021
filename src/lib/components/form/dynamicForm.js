@@ -111,12 +111,20 @@ class DynamicForm extends Component {
         const formValues = this.getFilteredValues(Object.assign({}, values));
         saveGridData.saveGridData(pgid, values, mode).then((saveStatus) => {
           if (saveStatus.status === "SUCCESS") {
-            formProps.renderMe(pgid, formValues, saveStatus);
             let message = saveStatus.message;
-            alert(message);
+            if(this.props.showActionMessage){
+              formProps.showActionMessage('alert','Save',message,pgid, formValues, saveStatus);
+            }else{
+              formProps.renderMe(pgid, formValues, saveStatus);
+              alert(message);
+            }
           } else if (saveStatus.status === "ERROR") {
             let message = saveStatus.message;
-            alert(message);
+            if(this.props.showActionMessage){
+              this.props.showActionMessage('alert','Save',message);
+            }else{
+              alert(message);
+            }
           }
         });
         actions.resetForm({});
@@ -246,7 +254,11 @@ class DynamicForm extends Component {
       } else if (response.status === "ERROR") {
         let message = response.message;
         this.generateButton.disabled = false;
-        alert(message);
+        if(this.props.showActionMessage){
+          this.props.showActionMessage('alert','Save',message);
+        }else{
+          alert(message);
+        }
       }
     });
   }
