@@ -70,8 +70,8 @@ class ExtendedGrid extends BaseGrid {
         formatData: this.formatData,
         beforeLoadComplete: function (records, responseData) {
           compRef.updateDropdownFilters(filterdef, responseData);
-          source.data.initialLoad = false;
-          compRef.setState({ initialLoad: false });
+          // source.data.initialLoad = false;
+          // compRef.setState({ initialLoad: false });
         },
         downloadComplete: function (data, status, xhr) {
           if (data != null && data.candidateRecords.length > 0) {
@@ -104,9 +104,9 @@ class ExtendedGrid extends BaseGrid {
   render() {
     const { styles, metadata, formProps } = this.props;
     const { pgdef, griddef } = metadata;
-    const { filterObj } = this.state;
+    const { filtersMetadata } = this.state;
     let dataAdapter = this.buildDataAdapter();
-    let newColumns = columnModifier(griddef, filterObj);
+    let newColumns = columnModifier(griddef, filtersMetadata);
     if (pgdef.childConfig && Array.isArray(pgdef.childConfig) && pgdef.childConfig.length) {
       const childColumns = pgdef.childConfig.map(({ pgid, columnHeader = "View" }) =>
         getChildColumn(columnHeader, pgid)
