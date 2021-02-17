@@ -61,11 +61,20 @@ class ReusableGrid extends React.Component {
         abody: "",
         abtnlbl: "Ok",
       },
+      alertMsgInfo: {
+        showAlert: false,
+        aheader: "",
+        abody: "",
+        abtnlbl: "Ok",
+      },
       fieldData: this.props.fieldData,
       hasChildData: false,
       isSaveAs: false,
       pdfData: {},
       addtionalcheckbox: false,
+      apgid:'',
+      aformValues:[],
+      aSaveStatus:''
     };
 
     this.editClick = (index, pgid) => {
@@ -217,12 +226,18 @@ class ReusableGrid extends React.Component {
       const { saveGridData } = this.props;
       saveGridData.saveGridData(pgid, payload, mode).then((saveStatus) => {
         if (saveStatus.status === "SUCCESS") {
+          if(this.props.showActionMessage){
+            this.props.showActionMessage('alert','Save',saveStatus.message);
+          }else{
+            alert(saveStatus.message);
+          }
           this.renderMe(pgid, formValues, saveStatus);
-          let message = saveStatus.message;
-          alert(message);
         } else if (saveStatus.status === "ERROR") {
-          let message = saveStatus.message;
-          alert(message);
+          if(this.props.showActionMessage){
+            this.props.showActionMessage('alert','Save',saveStatus.message);
+          }else{
+            alert(saveStatus.message);
+          }
         }
       });
       actions.resetForm({});
@@ -257,9 +272,17 @@ class ReusableGrid extends React.Component {
       deleteGridData.deleteGridData(pgid, this.props.formData.data, "Edit").then((deleteStatus) => {
         if (deleteStatus.status === "SUCCESS") {
           $("#" + _id).jqxGrid("deleterow", rowid);
-          alert(deleteStatus.message);
+          if(this.props.showActionMessage){
+            this.props.showActionMessage('alert','Delete',deleteStatus.message);
+          }else{
+            alert(deleteStatus.message);
+          }
         } else if (deleteStatus.status === "ERROR") {
-          alert(deleteStatus.message);
+          if(this.props.showActionMessage){
+            this.props.showActionMessage('alert','Delete',deleteStatus.message);
+          }else{
+            alert(deleteStatus.message);
+          }
         }
       });
     };
@@ -311,6 +334,10 @@ class ReusableGrid extends React.Component {
       const { pgid } = this.state;
       this.renderMe(pgid, filter, false);
     };
+    this.handleAlertMsgOk= () => {
+      const { apgid, aformValues,aSaveStatus } = this.state;
+      this.renderMe(apgid,aformValues,aSaveStatus);
+    };
 
     this.renderMe = (pgid, values, filter) => {
       const { setFilterFormData, setFormData, tftools, renderGrid } = this.props;
@@ -326,7 +353,15 @@ class ReusableGrid extends React.Component {
       });
       renderGrid(data[0]);
     };
-
+    this.showActionMessage =(type,action,message,pgid, formValues, saveStatus) => {
+      const { alertMsgInfo } = this.state;
+      this.setState({
+        alertMsgInfo: Object.assign({}, alertMsgInfo, {aheader:action, abody: message, showAlert: true }),
+        apgid:pgid,
+        aformValues:formValues,
+        aSaveStatus:saveStatus
+      });
+    };
     this.selectAll = (event) => {
       event.preventDefault();
       const isModal = this.props.hideModal;
@@ -456,7 +491,7 @@ class ReusableGrid extends React.Component {
       },
       () => {
         window.setTimeout(() => {
-          this.setState({ showClipboard: false });
+          this.setState({ showClipboard: false});
         }, 2000);
       }
     );
@@ -611,7 +646,7 @@ class ReusableGrid extends React.Component {
     }
 
     const { title, cruddef, isfilterform, pgid, subtitle, noResultsFoundTxt, isOpen, griddef } = this.state;
-    const { handleDelete, renderMe, handleSubmit, handleFilters } = this;
+    const { handleDelete, renderMe, handleSubmit, handleFilters,showActionMessage } = this;
     let filter;
     if (isfilterform) filter = true;
     const close = this.toggle;
@@ -624,6 +659,7 @@ class ReusableGrid extends React.Component {
       //handleSubmit,
       //handleFilters,
       renderMe,
+      showActionMessage,
     };
 
     module.exports = this.handleChildGrid;
@@ -965,6 +1001,7 @@ class ReusableGrid extends React.Component {
             saveAndRefresh={this.saveAndRefresh}
             deleteAndRefresh={this.deleteRow}
             fillParentInfo ={this.props.fillParentInfo}
+            showActionMessage={this.props.showActionMessage}
           />
         </ReusableModal>
         {metadata.confirmdef ? (
@@ -977,6 +1014,9 @@ class ReusableGrid extends React.Component {
         ) : null}
         {this.state.alertInfo.showAlert ? (
           <ReusableAlert {...this.state.alertInfo} handleClick={this.handleAlertOk} />
+        ) : null}
+        {this.state.alertMsgInfo.showAlert ? (
+          <ReusableAlert {...this.state.alertMsgInfo} handleClick={this.handleAlertMsgOk} />
         ) : null}
       </Fragment>
     );
