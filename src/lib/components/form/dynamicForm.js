@@ -112,17 +112,17 @@ class DynamicForm extends Component {
         saveGridData.saveGridData(pgid, values, mode).then((saveStatus) => {
           if (saveStatus.status === "SUCCESS") {
             let message = saveStatus.message;
-            if(this.props.showActionMessage){
-              formProps.showActionMessage('alert','Save',message,pgid, formValues, saveStatus);
-            }else{
+            if (this.props.showActionMessage) {
+              formProps.showActionMessage("alert", "Save", message, pgid, formValues, saveStatus);
+            } else {
               formProps.renderMe(pgid, formValues, saveStatus);
               alert(message);
             }
           } else if (saveStatus.status === "ERROR") {
             let message = saveStatus.message;
-            if(this.props.showActionMessage){
-              this.props.showActionMessage('alert','Save',message);
-            }else{
+            if (this.props.showActionMessage) {
+              this.props.showActionMessage("alert", "Save", message);
+            } else {
               alert(message);
             }
           }
@@ -254,9 +254,9 @@ class DynamicForm extends Component {
       } else if (response.status === "ERROR") {
         let message = response.message;
         this.generateButton.disabled = false;
-        if(this.props.showActionMessage){
-          this.props.showActionMessage('alert','Save',message);
-        }else{
+        if (this.props.showActionMessage) {
+          this.props.showActionMessage("alert", "Save", message);
+        } else {
           alert(message);
         }
       }
@@ -447,6 +447,9 @@ class DynamicForm extends Component {
               break;
             } else if (constraints[key].type == "currentDate") {
               initialValues[id] = moment(new Date()).format(constraints[key].format || "YYYY-MM-DD");
+              break;
+            } else if (constraints[key].type == "currentYear") {
+              initialValues[id] = moment(new Date()).format(constraints[key].format || "YYYY");
               break;
             } else {
               initialValues[id] = item.value || "";

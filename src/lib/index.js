@@ -15,6 +15,7 @@ export { default as ViewPDF } from "./components/pdf/viewPDF.js";
 export { default as Progress } from "./components/progress/progress.js";
 export { default as ClipboardToast } from "./components/toast/clipboardToast.js";
 export { default as Usage } from "./components/usage/usage.js";
+export { default as FilterValues } from "./components/header/filterValues";
 
 export { default as appError } from "./utils/appError";
 export { default as generateUrl } from "./utils/generateUrl";
