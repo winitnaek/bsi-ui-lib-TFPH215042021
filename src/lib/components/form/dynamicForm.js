@@ -565,7 +565,7 @@ class DynamicForm extends Component {
                         </Button>
                         <Button
                           onClick={this.handleReset}
-                          color="secondary"
+                          color="warning"
                           className="btn btn-primary mr-auto"
                           type="reset"
                         >
