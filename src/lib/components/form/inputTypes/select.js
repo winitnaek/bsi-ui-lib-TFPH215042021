@@ -103,20 +103,34 @@ class CustomSelect extends Component {
 
   //clears the current and the dependent input fields as well as formik state
   clearInput() {
-    const { setValues, id, fieldinfo, formValues, onResetFields, handleFieldMetadata, fieldMetadata } = this.props;
+    const {
+      setValues,
+      id,
+      fieldinfo,
+      formMetadata,
+      setFormMetadata,
+      formValues,
+      onResetFields,
+      handleFieldMetadata,
+      fieldMetadata,
+    } = this.props;
     const { resetFields } = fieldinfo;
+    debugger;
 
     let fieldData = {};
     fieldData[id] = "";
+    if (formMetadata[id]) delete formMetadata[id];
     let newFieldMetadata = fieldMetadata;
     newFieldMetadata[id] = { isSelected: false };
     resetFields &&
       resetFields.map((item) => {
         fieldData[item] = "";
         newFieldMetadata[item] = { isSelected: false };
+        if (formMetadata[item]) delete formMetadata[item];
       });
     resetFields && onResetFields(resetFields);
     handleFieldMetadata(newFieldMetadata);
+    setFormMetadata(formMetadata);
     let newFieldValues = Object.assign(formValues, fieldData);
     Object.keys(newFieldValues).map((k) => (newFieldValues[k] = newFieldValues[k].trim()));
     this.setState({ isSelected: false, query: "", defaultSelected: "" }, this.resetFieldValue({ clearInput: true }));
@@ -326,11 +340,11 @@ class CustomSelect extends Component {
 
   async componentDidMount() {
     const { value, fieldinfo, id, updateFieldData, getFormData, mode, setFieldValue } = this.props;
-    if(mode === "New") {
+    if (mode === "New") {
       this.resetFieldValue(true);
     }
     this.setState({ defaultSelected: { id: value, label: value } });
-    if(fieldinfo.isasync || fieldinfo.typeahead) {
+    if (fieldinfo.isasync || fieldinfo.typeahead) {
       updateFieldData(id, []);
     }
     if (value && fieldinfo.isasync && fieldinfo.options && fieldinfo.options.length == 0) {
@@ -351,7 +365,7 @@ class CustomSelect extends Component {
       this.setState({ defaultSelected });
     }
 
-    if(fieldinfo.options && fieldinfo.options.length && mode === "New") {
+    if (fieldinfo.options && fieldinfo.options.length && mode === "New") {
       const defaultValue = fieldinfo.options[0];
       this.setState({ defaultSelected: { id: defaultValue.id, label: defaultValue.label } }, () => {
         setFieldValue(id, defaultValue.id);
