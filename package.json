@@ -10,7 +10,7 @@
   "description": "BSIUILib",
   "main": "/src/lib/index.js",
   "scripts": {
-    "build-dev": "NODE_ENV=builddev webpack --watch --config ./webpack.dev.js",
+    "build-dev": "NODE_ENV=builddev webpack --config ./webpack.dev.js",
     "start-dev": "NODE_ENV=development webpack --watch --config ./webpack.dev.js",
     "build-prod": "NODE_ENV=buildprod webpack --config ./webpack.prod.js",
     "start-prod": "NODE_ENV=production webpack --watch --config ./webpack.prod.js",
