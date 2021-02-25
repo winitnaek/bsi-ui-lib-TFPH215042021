@@ -6,12 +6,12 @@ import Select from "./inputTypes/select";
 import Radio from "./inputTypes/radio";
 import Checkbox from "./inputTypes/checkbox";
 import Password from "./inputTypes/password";
-import moment from "moment";
 //import MappedInput from "./inputTypes/mappedInput";
 import Date from "./inputTypes/date";
 import FileUpload from "./inputTypes/fileUpload";
 import Usage from "../usage/usage";
 import PopupGrid from "../modal/popupGrid";
+import InitializeFieldValues from "../../utils/initializeFieldValues";
 import { createYupSchema } from "../../utils/createYupSchema";
 import * as yup from "yup";
 
@@ -137,7 +137,7 @@ class DynamicForm extends Component {
     // like to show or hide clear buttons
     this.handleReset = () => {
       fieldMetadata = {};
-      this.setState({ isResetAll: true });
+      this.setState({ isResetAll: true, formMetadata: [] });
     };
 
     this.renderMe = (pgid, values, filter) => {
@@ -409,19 +409,8 @@ class DynamicForm extends Component {
   }
 
   render() {
-    const {
-      formProps,
-      tftools,
-      getFormData,
-      fieldData,
-      formId,
-      setFormData,
-      formActions,
-      metadata,
-      formFilterData,
-    } = this.props;
-    //const { close, pgid, filter, handleSubmit, handleFilters } = formProps;
-    const { pgid, filter, close, permissions, handleDelete, handleSubmit, handleFilters, renderMe } = formProps;
+    const { formProps, tftools, getFormData, formId, setFormData, formActions, metadata } = this.props;
+    const { pgid, filter, close } = formProps;
     const { mode } = this.props.formData;
     const { popupGrids } = metadata.pgdef;
     //DO NOT UPDATE BELOW LINE
@@ -430,36 +419,7 @@ class DynamicForm extends Component {
     if (mode == "Edit") {
       initialValues = this.props.formData.data;
     } else {
-      fieldInfo.forEach((item, index) => {
-        const { validation, value, id } = item;
-        if (validation && validation.constraint) {
-          let constraints = validation.constraint;
-          for (let key in constraints) {
-            if (constraints[key].type == "startOfMonth") {
-              initialValues[id] = moment()
-                .startOf("month")
-                .format(constraints[key].format || "YYYY-MM-DD");
-              break;
-            } else if (constraints[key].type == "endOfMonth") {
-              initialValues[id] = moment()
-                .endOf("month")
-                .format(constraints[key].format || "YYYY-MM-DD");
-              break;
-            } else if (constraints[key].type == "currentDate") {
-              initialValues[id] = moment(new Date()).format(constraints[key].format || "YYYY-MM-DD");
-              break;
-            } else if (constraints[key].type == "currentYear") {
-              initialValues[id] = moment(new Date()).format(constraints[key].format || "YYYY");
-              break;
-            } else {
-              initialValues[id] = item.value || "";
-              break;
-            }
-          }
-        } else {
-          initialValues[id] = item.value || "";
-        }
-      });
+      initialValues = InitializeFieldValues(fieldInfo);
     }
 
     this.displayForm = () => {
