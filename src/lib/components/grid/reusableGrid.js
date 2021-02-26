@@ -11,7 +11,6 @@ import ConfirmModal from "../modal/confirmModal";
 import ReusableAlert from "../modal/reusableAlert";
 import Grid from "../../../deps/jqwidgets-react/react_jqxgrid";
 import ViewPDF from "../pdf/viewPDF";
-
 class ReusableGrid extends React.Component {
   constructor(props) {
     super(props);
@@ -139,7 +138,17 @@ class ReusableGrid extends React.Component {
      console.log("save Success")
     }
 
-    this.handleChildGrid = (childId, rowIndex) => {
+    this.handleChildGrid = async (childId, rowIndex) => {
+      if(childId === "home") {
+        const { saveGridData } = this.props;
+        let _id = document.querySelector("div[role='grid']").id;
+        let dataRecord = $("#" + _id).jqxGrid("getrowdata", rowIndex);
+        const dataSetId = dataRecord.dataSetId;
+        const payload = await saveGridData.setDataSet(dataSetId).then((data) => {
+          this.props.updateDataSet(data);
+        });
+        return;
+      }
       const { setFilterFormData, tftools, renderGrid } = this.props;
       const { isDateFilter, fieldData } = this.state;
       if (rowIndex !== undefined) {
@@ -180,7 +189,7 @@ class ReusableGrid extends React.Component {
     this.handleNewForm = (e, formProps, isSaveAs) => {
       e.preventDefault();
       const { values = {} } = formProps || {};
-      const payload = { data: values, mode: "New" };
+      const payload = { formData: values, mode: "New" };
       const { setFormData } = this.props;
       setFormData(payload);
       this.setState({ isOpen: true, isSaveAs: isSaveAs });
@@ -319,13 +328,13 @@ class ReusableGrid extends React.Component {
     };
 
     this.mapToolUsage = (id, successMessage, errorMessage) => {
-      const { mapToolUsage } = this.props;
+      const { mapToolUsage, formFilterData } = this.props;
       const { pgid } = this.state;
       // TODO: Check for request payload format
-      mapToolUsage.createDefaultMapping(pgid, { id }).then((res) => {
+      mapToolUsage.createDefaultMapping(id, { id, formFilterData }).then((res) => {
         const { alertInfo } = this.state;
         this.setState({
-          alertInfo: Object.assign({}, alertInfo, { abody: successMessage, showAlert: true }),
+          alertInfo: Object.assign({}, alertInfo, { abody: res.message, showAlert: true }),
         });
       });
     };
@@ -582,7 +591,7 @@ class ReusableGrid extends React.Component {
     let newColumns = this.addColLinks(columns);
     if (this.state.recordEdit) {
       const editCellsRenderer = (rowIndex) => {
-        return ` <div id='edit-${rowIndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${rowIndex})}> <i class="fas fa-pencil-alt  fa-1x" color="primary"/> </div>`;
+        return ` <div id='edit-${rowIndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${rowIndex})}> <i class="fas fa-edit  fa-1x" color="primary"/> </div>`;
       };
       const editColumn = {
         text: "Edit",
@@ -631,7 +640,6 @@ class ReusableGrid extends React.Component {
         return `<div id='edit-${rowIndex}' style="text-align:center; margin-top: 10px; color: #4C7392" onClick="handleChildGrid('${columnField}', '${rowIndex}')"> <i class="fas fa-search  fa-1x" color="primary"/> </div>`;
       };
       const childColumns = pgdef.childConfig.map(({ pgid, columnHeader = "View" }) => ({
-        text: columnHeader,
         datafield: pgid,
         align: "center",
         width: 'auto',
@@ -892,6 +900,8 @@ class ReusableGrid extends React.Component {
             columnsresize={true}
             editable={griddef.editable}
             editmode={griddef.editmode || ""}
+            enableellipsis={true}
+            enabletooltips={true}
           />
         </Row>
 
