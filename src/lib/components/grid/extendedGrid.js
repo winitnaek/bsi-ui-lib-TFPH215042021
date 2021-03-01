@@ -70,7 +70,7 @@ class ExtendedGrid extends BaseGrid {
         formatData: this.formatData,
         beforeLoadComplete: function (records, responseData) {
           compRef.updateDropdownFilters(filterdef, responseData);
-          source.data.initialLoad = false;
+          // source.data.initialLoad = false;
           // compRef.setState({ initialLoad: false });
         },
         downloadComplete: function (data, status, xhr) {
