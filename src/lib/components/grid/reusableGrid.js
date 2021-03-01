@@ -372,7 +372,9 @@ class ReusableGrid extends React.Component {
       });
     };
     this.selectAll = (event) => {
+      if(event) {
       event.preventDefault();
+      }
       const isModal = this.props.hideModal;
       this.setState({ allSelected: true, addtionalcheckbox: true });
       let _id = isModal ?  document.querySelectorAll("div[role='grid']")[1].id : document.querySelector("div[role='grid']").id;
@@ -641,6 +643,7 @@ class ReusableGrid extends React.Component {
       };
       const childColumns = pgdef.childConfig.map(({ pgid, columnHeader = "View" }) => ({
         datafield: pgid,
+        text: columnHeader,
         align: "center",
         width: 'auto',
         sortable: false,
