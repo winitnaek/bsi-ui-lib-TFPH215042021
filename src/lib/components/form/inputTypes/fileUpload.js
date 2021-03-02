@@ -18,6 +18,7 @@ class CustomFile extends Component {
       onChange,
       onBlur,
       index,
+      accept,
     } = this.props;
     return (
       <FormGroup>
@@ -33,6 +34,7 @@ class CustomFile extends Component {
             onBlur={onBlur}
             invalid={error && touched}
             disabled={disabled}
+            accept={accept}
           />
           <FieldMessage error={error} touched={touched} description={description} />
         </Col>
