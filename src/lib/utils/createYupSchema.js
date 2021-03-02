@@ -77,6 +77,7 @@ export function createYupSchema(schema, config) {
   if (!yup[validation.type]) return schema;
   let validator = yup[validation.type]();
   if (validation.required) validator = validator["required"]([config.errmsg]);
+  else validator = validator.nullable();
   if (validation.constraint) {
     validation.constraint.forEach((valdt) => {
       const { type, input, message, dependentField, range } = valdt;
