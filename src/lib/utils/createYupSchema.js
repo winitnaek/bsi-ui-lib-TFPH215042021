@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import validateDate from "./validateDate";
+import * as vldt from "./validate";
 import moment from "moment";
 
 yup.addMethod(yup.string, "matches", function (args) {
@@ -10,6 +10,8 @@ yup.addMethod(yup.string, "matches", function (args) {
     .string()
     .required(requiredMsg)
     .test(`matches`, message, function (value) {
+      if (!value) return true;
+      if (!(value && value.trim())) return true;
       return regex.test(value);
     });
 });
@@ -48,7 +50,15 @@ yup.addMethod(yup.string, "isValidDate", function (args) {
   const message = args["message"];
   return this.test("validDate", message, function (value) {
     if (!value) return true;
-    return validateDate(value);
+    return value.toString().length <= 10;
+  });
+});
+
+yup.addMethod(yup.string, "isValidRoutingNumber", function (args) {
+  const message = args["message"];
+  return this.test("isValidRoutingNumber", message, function (value) {
+    if (!value) return true;
+    return vldt.validateRoutingNumber(value);
   });
 });
 
