@@ -253,7 +253,7 @@ class CustomSelect extends Component {
           id={name}
           name={name}
           placeholder={placeholder}
-          value={defaultSelected && defaultSelected.id ? defaultSelected.id : value}
+          value={value}
           disabled={disabled}
           onChange={this.handleSelectFieldChange}
           invalid={error && touched}
