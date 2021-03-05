@@ -13,6 +13,7 @@ import Usage from "../usage/usage";
 import PopupGrid from "../modal/popupGrid";
 import InitializeFieldValues from "../../utils/initializeFieldValues";
 import { createYupSchema } from "../../utils/createYupSchema";
+import FormActionButtons from "./formActionButtons";
 import * as yup from "yup";
 
 var fieldMetadata = {};
@@ -431,6 +432,7 @@ class DynamicForm extends Component {
         hideReset,
         submitButtonText,
         hasGenerate,
+        formButtonsOnTop,
         generateButtonText,
       } = metadata.formdef;
       const { saveAsMode, showDelete, showSave, formMetadata } = this.state;
@@ -471,6 +473,19 @@ class DynamicForm extends Component {
           {(props) => (
             <Form>
               <Container>
+                {formButtonsOnTop && (
+                  <FormActionButtons
+                    formActions={formActions}
+                    hideReset={hideReset}
+                    close={close}
+                    handleReset={this.handleReset}
+                    showDelete={showDelete}
+                    showSave={showSave}
+                    deleteHandler={this.deleteHandler}
+                    values={props.values}
+                    metadata={metadata}
+                  />
+                )}
                 <ModalBody>
                   <Form
                     onSubmit={this.props.submit}
@@ -534,7 +549,7 @@ class DynamicForm extends Component {
                       </Fragment>
                     )}
                     {showDelete && (
-                      <Button onClick={(e) => this.deleteHandler(props.values, props)} color="danger">
+                      <Button onClick={(e) => this.deleteHandler(props.values)} color="danger">
                         Delete
                       </Button>
                     )}

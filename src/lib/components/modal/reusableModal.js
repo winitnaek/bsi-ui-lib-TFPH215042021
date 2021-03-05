@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Modal, ModalHeader} from "reactstrap";
+import { Modal, ModalHeader } from "reactstrap";
 
 class ReusableModal extends Component {
   constructor(props) {
@@ -8,17 +8,13 @@ class ReusableModal extends Component {
   }
 
   render() {
-    const {styles} = this.props;
+    const { styles, title, subtitle, cruddef, open, close } = this.props;
     return (
-      <Modal
-        isOpen={this.props.open}
-        size="lg"
-        style={styles.modal}
-      >
-        <ModalHeader toggle={e => this.props.close()}>
-          <span> {this.props.title} </span>
+      <Modal isOpen={open} size="lg" style={styles.modal}>
+        <ModalHeader toggle={(e) => close()}>
+          <span> {title} </span>
         </ModalHeader>
-        <p style={styles.subTitle}> { this.props.subtitle && this.props.cruddef.subtitle} </p>
+        {subtitle && cruddef.subtitle && <p style={styles.subTitle}> {subtitle && cruddef.subtitle} </p>}
         {this.props.children}
       </Modal>
     );
