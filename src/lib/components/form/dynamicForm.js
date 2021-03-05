@@ -13,7 +13,6 @@ import Usage from "../usage/usage";
 import PopupGrid from "../modal/popupGrid";
 import InitializeFieldValues from "../../utils/initializeFieldValues";
 import { createYupSchema } from "../../utils/createYupSchema";
-import FormActionButtons from "./formActionButtons";
 import * as yup from "yup";
 
 var fieldMetadata = {};
@@ -410,7 +409,7 @@ class DynamicForm extends Component {
   }
 
   render() {
-    const { formProps, tftools, getFormData, formId, setFormData, formActions, metadata } = this.props;
+    const { formProps, tftools, getFormData, formId, setFormData, styles, formActions, metadata } = this.props;
     const { pgid, filter, close } = formProps;
     const { mode } = this.props.formData;
     const { popupGrids } = metadata.pgdef;
@@ -473,20 +472,7 @@ class DynamicForm extends Component {
           {(props) => (
             <Form>
               <Container>
-                {formButtonsOnTop && (
-                  <FormActionButtons
-                    formActions={formActions}
-                    hideReset={hideReset}
-                    close={close}
-                    handleReset={this.handleReset}
-                    showDelete={showDelete}
-                    showSave={showSave}
-                    deleteHandler={this.deleteHandler}
-                    values={props.values}
-                    metadata={metadata}
-                  />
-                )}
-                <ModalBody>
+                <ModalBody style={styles.modalBody} id="formModalBody">
                   <Form
                     onSubmit={this.props.submit}
                     style={{
