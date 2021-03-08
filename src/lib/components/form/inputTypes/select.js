@@ -56,11 +56,10 @@ class CustomSelect extends Component {
   }
 
   handleSelectFieldChange(event) {
-    const { id, onResetFields, handleFieldMetadata, fieldMetadata, formMetadata, setFormMetadata } = this.props;
+    const { id, onResetFields, handleFieldMetadata, fieldMetadata, formMetadata, setFormMetadata, fieldinfo } = this.props;
     const { value } = event.target;
-    const { options } = this.state;
     let { defaultSelected } = this.state;
-    options.forEach((option) => {
+    (fieldinfo.options || []).forEach((option) => {
       if (option.id === value) {
         defaultSelected = option;
       }
@@ -73,14 +72,17 @@ class CustomSelect extends Component {
     }
 
     this.updateDependentField(value);
+    if(fieldMetadata) {
+      let newFieldMetadata = fieldMetadata;
+      newFieldMetadata[id] = { isSelected: true };
+      handleFieldMetadata(newFieldMetadata);
+      onResetFields([]);
+      let formInfo = formMetadata || [];
+      formInfo[id] = value;
+      setFormMetadata(formInfo);
+    }
 
-    let newFieldMetadata = fieldMetadata;
-    newFieldMetadata[id] = { isSelected: true };
-    handleFieldMetadata(newFieldMetadata);
-    onResetFields([]);
-    let formInfo = formMetadata || [];
-    formInfo[id] = value;
-    setFormMetadata(formInfo);
+   
     this.props.onChange(event, defaultSelected);
   }
 
@@ -152,6 +154,7 @@ class CustomSelect extends Component {
       placeholder,
       onChange,
       id,
+      style,
     } = this.props;
     if (fieldinfo.typeahead) {
       let filterByFields = [];
@@ -344,13 +347,13 @@ class CustomSelect extends Component {
       this.resetFieldValue(true);
     }
     this.setState({ defaultSelected: { id: value, label: value } });
-    if (fieldinfo.isasync || fieldinfo.typeahead) {
+    if ((fieldinfo.isasync || fieldinfo.typeahead) && updateFieldData) {
       updateFieldData(id, []);
     }
     if (value && fieldinfo.isasync && fieldinfo.options && fieldinfo.options.length == 0) {
       this.setState({ isLoading: true });
       let options = await getFormData.getFormData(id, value);
-      updateFieldData(id, options);
+      updateFieldData && updateFieldData(id, options);
       let defaultSelected =
         options.find((option) => (option && option.id === value) || option.label === value) || defaultSelected;
       this.setState({ isLoading: false, options, defaultSelected }, () => {
@@ -398,18 +401,21 @@ class CustomSelect extends Component {
       isResetAll,
       fieldHeader,
       resetFields,
+      wrapperClass,
+      style = {},
+      labelStyle
     } = this.props;
     if (isResetAll) this.resetFieldValue();
-    else if (resetFields.length && fieldinfo.typeahead) {
+    else if (resetFields && resetFields.length && fieldinfo.typeahead) {
       resetFields.map((field) => {
         if (field == name) this.resetFieldValue();
       });
     }
     return (
       <FormGroup>
-        <Col>
+        <Col sm={wrapperClass} style={style}>
           {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
-          {label && <FieldLabel label={label} required={required} />}
+          {label && <FieldLabel style={labelStyle} label={label} required={required} />}
           {this.renderFormElement()}
           <FieldMessage error={error} touched={touched} description={description} />
         </Col>

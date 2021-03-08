@@ -16,9 +16,9 @@ export class FieldMessage extends Component {
 
 export class FieldLabel extends Component {
     render() {
-        const {label, required} = this.props;
+        const {label, required, style} = this.props;
         return (
-            <Label>{label}
+            <Label style={style}>{label}
                 {required && <Label style={{color:'red', fontSize: 20}}>{" *"}</Label> }
             </Label>
         )

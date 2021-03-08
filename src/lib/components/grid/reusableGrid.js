@@ -7,6 +7,7 @@ import { Col, Row, UncontrolledTooltip, Badge } from "reactstrap";
 import ReusableModal from "../modal/reusableModal";
 import DynamicForm from "../form/dynamicForm";
 import CustomDate from "../form/inputTypes/date";
+import Select from "../form/inputTypes/select";
 import ConfirmModal from "../modal/confirmModal";
 import ReusableAlert from "../modal/reusableAlert";
 import Grid from "../../../deps/jqwidgets-react/react_jqxgrid";
@@ -43,6 +44,7 @@ class ReusableGrid extends React.Component {
       parentConfig: metadata.pgdef.parentConfig,
       isfilter: metadata.griddef.isfilter,
       isDateFilter: metadata.griddef.isDateFilter,
+      isSelectFilter: metadata.griddef.isSelectFilter,
       hasFilter: metadata.griddef.hasFilter,
       mockData: [],
       child: this.props.child,
@@ -116,14 +118,16 @@ class ReusableGrid extends React.Component {
         } else  {
           payload = await saveGridData.saveGridData(childPageId || pgid, values, mode);
         }
-        const pgData = tftools.find(tool => tool.id === pgid);
+        const pgData = tftools.find(tool => tool.id === (pgid || childPageId));
         renderGrid(pgData);
       }
     };
 
-    this.saveSelectedData = async (event) => {
+    this.saveSelectedData = async (event, isNotModal) => {
+      if(event) {
       event.preventDefault();
-      const modalGridId = document.querySelectorAll("div[role='grid']")[1].id;
+      }
+      const modalGridId = isNotModal ? document.querySelectorAll("div[role='grid']")[0].id :  document.querySelectorAll("div[role='grid']")[1].id;
       const griddata = $("#" + modalGridId).jqxGrid("getdatainformation");
       const payload = [];
       for (let i = 0; i < griddata.rowscount; i++) {
@@ -132,6 +136,9 @@ class ReusableGrid extends React.Component {
        if(rowData[checkBoxKey]) {
         payload.push(rowData);
        }
+       if(Array.isArray(checkBoxKey)) {
+         payload.push(rowData);
+      }
       }
      
     const saveSuccessFull = await this.saveAndRefresh(this.props.parentPageid, payload, undefined, this.props.pageid);
@@ -148,6 +155,10 @@ class ReusableGrid extends React.Component {
           this.props.updateDataSet(data);
         });
         return;
+      }
+      if(childId === "permissions") {
+        const userDataSet = JSON.parse(sessionStorage.getItem('up') || '{}').dataset
+        sessionStorage.setItem('newDataName', userDataSet);
       }
       const { setFilterFormData, tftools, renderGrid } = this.props;
       const { isDateFilter, fieldData } = this.state;
@@ -333,9 +344,14 @@ class ReusableGrid extends React.Component {
       // TODO: Check for request payload format
       mapToolUsage.createDefaultMapping(id, { id, formFilterData }).then((res) => {
         const { alertInfo } = this.state;
+        if(res.message) {
         this.setState({
           alertInfo: Object.assign({}, alertInfo, { abody: res.message, showAlert: true }),
         });
+        } else {
+          this.handleAlertOk();
+        }
+     
       });
     };
 
@@ -371,12 +387,12 @@ class ReusableGrid extends React.Component {
         aSaveStatus:saveStatus
       });
     };
-    this.selectAll = (event) => {
+    this.selectAll = (event, fromOutside) => {
       if(event) {
       event.preventDefault();
       }
       const isModal = this.props.hideModal;
-      this.setState({ allSelected: true, addtionalcheckbox: true });
+      this.setState({ allSelected: fromOutside ? this.state.allSelected : true, addtionalcheckbox: true });
       let _id = isModal ?  document.querySelectorAll("div[role='grid']")[1].id : document.querySelector("div[role='grid']").id;
       $("#" + _id).jqxGrid("selectallrows");
 
@@ -386,8 +402,8 @@ class ReusableGrid extends React.Component {
       const rowData = $("#" + _id).jqxGrid("getrenderedrowdata", i);
       Object.keys(rowData).forEach(k => {
         if(typeof rowData[k] === "boolean" || rowData[k] === undefined) {
-          rowData[k] = true;
-          rowData.disabled = true;
+          rowData[k] = k === "auditPermission" ? rowData[k] : true;
+          rowData.disabled =  k === "auditPermission" ? rowData.flag : true;
         }
       });
       updatedData.push(rowData);
@@ -403,15 +419,18 @@ class ReusableGrid extends React.Component {
 
       console.log("griddata", updatedData);
      const dataAdapter = new $.jqx.dataAdapter(source);
-      $("#" + _id).jqxGrid({ source: dataAdapter, editable: false, editMode: false });
+      $("#" + _id).jqxGrid({ source: dataAdapter });
       if(this.props.selectAllOutside) {
         this.props.selectAllOutside(true);
       }
     };
 
-    this.unselectAll = (event) => {
+    this.unselectAll = (event, fromOutside) => {
+      if(event) {
       event.preventDefault();
-      this.setState({ allSelected: false, addtionalcheckbox: false });
+      }
+     
+      this.setState({ allSelected: fromOutside ? this.state.allSelected : false, addtionalcheckbox: false });
       const isModal = this.props.hideModal;
       let _id = isModal ?  document.querySelectorAll("div[role='grid']")[1].id : document.querySelector("div[role='grid']").id;
       $("#" + _id).jqxGrid("clearselection");
@@ -422,7 +441,7 @@ class ReusableGrid extends React.Component {
       Object.keys(rowData).forEach(k => {
         if(typeof rowData[k] === "boolean" || rowData[k] === undefined) {
           rowData[k] = false;
-          rowData.disabled = false;
+          rowData.disabled = k === "auditPermission" ? rowData.flag : false;
         }
       });
       updatedData.push(rowData);
@@ -436,7 +455,7 @@ class ReusableGrid extends React.Component {
 
       console.log("griddata", updatedData);
      const dataAdapter = new $.jqx.dataAdapter(source);
-      $("#" + _id).jqxGrid({ source: dataAdapter, editable: false, editMode: false });
+      $("#" + _id).jqxGrid({ source: dataAdapter });
       if(this.props.selectAllOutside) {
         this.props.selectAllOutside(false);
       }
@@ -453,7 +472,15 @@ class ReusableGrid extends React.Component {
     this.onDateFilterChange = this.onDateFilterChange.bind(this);
     this.handlePdfView = this.handlePdfView.bind(this);
     this.additionalCheckBox = this.additionalCheckBox.bind(this);
+    this.updateFieldData = this.updateFieldData.bind(this);
+    this.selectChange = this.selectChange.bind(this);
   }
+
+  selectChange(event, selected) {
+    console.log("on change")
+    this.props.handleChange(`${this.props.pageid}`, this.props.metadata.griddef, selected.id);
+  }
+
 
   onDateFilterChange(event) {
     const { fieldData } = this.state;
@@ -481,6 +508,27 @@ class ReusableGrid extends React.Component {
   componentDidMount() {
     if (!this.props.griddata) {
       this.setState({ noResultsFoundTxt: this.props.metadata.griddef.noResultsFoundTxt });
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if((this.props.isSelectAll !== nextProps.isSelectAll)) {
+      if(nextProps.isSelectAll === false) {
+       this.unselectAll(undefined, true)
+      }
+      if(nextProps.isSelectAll === true) {
+        this.selectAll(undefined, true);
+      }
+    }
+    if(!this.state.allSelected) {
+      var list = document.querySelectorAll('[role="gridcell"]');
+      list.forEach(ele => {
+        ele.classList.remove('jqx-fill-state-pressed')
+      })
+    }
+
+    if(this.props.saveSelected !== nextProps.saveSelected) {
+      this.saveSelectedData(undefined, true);
     }
   }
 
@@ -580,17 +628,53 @@ class ReusableGrid extends React.Component {
     console.log(formMetaData);
   }
 
+  updateFieldData(fieldId, options) {
+    const { fieldData } = this.state;
+    const updatedFieldData = fieldData.map((field) => {
+      if (field.id === fieldId && field.fieldinfo) {
+        field.fieldinfo.options = options;
+      }
+      return field;
+    });
+    this.setState({
+      fieldData: updatedFieldData,
+    });
+  }
+
   render() {
     let metadata = this.props.metadata;
     const { pgdef } = this.state;
-    const { hasDeleteAll, extraLinks } = pgdef;
+    const { hasDeleteAll, extraLinks, topLink } = pgdef;
     let dataAdapter = this.buildDataAdapter();
 
     // Check to see if permissions allow for edit & delete.  If no, then remove column
     let permissions = this.props.permissions(this.props.pid);
     const { columns, showClipboard, isSaveSuccess } = this.state;
 
-    let newColumns = this.addColLinks(columns);
+    const cellbegineditCallbck = (row, datafield, columntype, value) => {
+      let _id = document.querySelector("div[role='grid']").id;
+      const rowData = $("#" + _id).jqxGrid("getrenderedrowdata", row);
+      if(rowData.flag === false && datafield === "auditPermission") {
+        return false;
+      }
+      if(!this.state.allSelected) {
+        setTimeout(() => {
+          var list = document.querySelectorAll('[role="gridcell"]');
+          list.forEach(ele => {
+            ele.classList.remove('jqx-fill-state-pressed')
+          })
+        }, 0);
+      }
+      return true;
+    }
+
+    const modifiedColumns = columns.map((column) => {
+      const col = Object.assign(column, { cellbeginedit: cellbegineditCallbck });
+      return col;
+     
+    });
+
+    let newColumns = this.addColLinks(modifiedColumns);
     if (this.state.recordEdit) {
       const editCellsRenderer = (rowIndex) => {
         return ` <div id='edit-${rowIndex}'style="text-align:center; margin-top: 10px; color: #4C7392" onClick={editClick(${rowIndex})}> <i class="fas fa-edit  fa-1x" color="primary"/> </div>`;
@@ -682,6 +766,8 @@ class ReusableGrid extends React.Component {
 
     module.exports = this.setGridData;
     window.exports = this.setGridData;
+
+   
 
     const {
       styles,
@@ -779,6 +865,52 @@ class ReusableGrid extends React.Component {
             formFilterData={this.props.formFilterData}
           />
         ) : null}
+
+{this.state.isSelectFilter ?   
+          <div style={{ display: 'flex', alignItems: 'center'}}>
+            <Select
+              {...this.state.fieldData[0]}
+              value={sessionStorage.getItem('newDataName')}
+              onChange={this.selectChange}
+              classNames="row"
+              setFormMetadata={this.setFormMetadata}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              labelStyle={{
+                width: '40%',
+                marginLeft: '-28px',
+                marginBottom: 0,
+              }}
+              formData={formData}
+              formProps={formProps}
+              fieldData={this.state.fieldData}
+              tftools={tftools}
+              metadata={metadata}
+              getFormData={getFormData}
+              formFilterData={this.props.formFilterData}
+              updateFieldData={this.updateFieldData}
+            />
+            <span style={{
+              fontSize: '10px',
+              marginTop: '-15px',
+              marginLeft: '-20px'
+            }}>
+              {(topLink || []).map(link => {
+                return (
+                  <a
+                    href="#"
+                    id={link.id}
+                    onClick={(event) => { event.preventDefault(); this.mapToolUsage(link.id) }}
+                    style={styles.gridLinkStyle}
+                  > <i class={`fas ${link.icon} fa-lg fa-2x`}></i></a>
+                )
+              })}
+            </span>
+          </div>
+         : null}
 
         {filterComp}
 
