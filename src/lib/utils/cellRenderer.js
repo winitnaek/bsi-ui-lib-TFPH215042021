@@ -50,6 +50,7 @@ export function getEditColumn() {
     datafield: "edit",
     align: "center",
     width: "5%",
+    filterable: false,
     cellsrenderer: editCellRenderer,
     rendered: toolTipRenderer,
   };
@@ -62,6 +63,7 @@ export function getChildColumn(columnHeader, pgid) {
     datafield: pgid,
     align: "center",
     width: "5%",
+    filterable: false,
     cellsrenderer: childCellRenderer,
     rendered: toolTipRenderer,
   };
