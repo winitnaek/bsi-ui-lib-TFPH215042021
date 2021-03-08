@@ -10,6 +10,7 @@ yup.addMethod(yup.string, "matches", function (args) {
     .string()
     .required(requiredMsg)
     .test(`matches`, message, function (value) {
+      debugger;
       if (!value) return true;
       if (!(value && value.trim())) return true;
       return regex.test(value);

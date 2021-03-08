@@ -38,6 +38,7 @@ class ExtendedGrid extends BaseGrid {
 
   // Handles filter and sort events for the grid.
   buildDataAdapter() {
+    debugger;
     const { source } = this.props;
     if (source) {
       source.filter = () => this.updateGrid("filter");
@@ -70,8 +71,8 @@ class ExtendedGrid extends BaseGrid {
         formatData: this.formatData,
         beforeLoadComplete: function (records, responseData) {
           compRef.updateDropdownFilters(filterdef, responseData);
-          // source.data.initialLoad = false;
-          // compRef.setState({ initialLoad: false });
+          //source.data.initialLoad = false;
+          compRef.setState({ initialLoad: false });
         },
         downloadComplete: function (data, status, xhr) {
           if (data != null && data.candidateRecords.length > 0) {

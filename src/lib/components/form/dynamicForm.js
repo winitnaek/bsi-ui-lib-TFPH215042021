@@ -472,7 +472,7 @@ class DynamicForm extends Component {
           {(props) => (
             <Form>
               <Container>
-                <ModalBody style={styles.modalBody ? styles.modalBody : {}} id="formModalBody">
+                <ModalBody style={styles && styles.modalBody ? styles.modalBody : {}} id="formModalBody">
                   <Form
                     onSubmit={this.props.submit}
                     style={{
