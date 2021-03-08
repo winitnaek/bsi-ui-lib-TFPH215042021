@@ -1147,6 +1147,7 @@ class ReusableGrid extends React.Component {
             deleteAndRefresh={this.deleteRow}
             fillParentInfo ={this.props.fillParentInfo}
             showActionMessage={this.props.showActionMessage}
+            styles={this.props.styles}
           />
         </ReusableModal>
         {metadata.confirmdef ? (
