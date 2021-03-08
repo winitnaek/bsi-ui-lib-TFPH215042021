@@ -409,7 +409,7 @@ class DynamicForm extends Component {
   }
 
   render() {
-    const { formProps, tftools, getFormData, formId, setFormData, formActions, metadata } = this.props;
+    const { formProps, tftools, getFormData, formId, setFormData, styles, formActions, metadata } = this.props;
     const { pgid, filter, close } = formProps;
     const { mode } = this.props.formData;
     const { popupGrids } = metadata.pgdef;
@@ -431,6 +431,7 @@ class DynamicForm extends Component {
         hideReset,
         submitButtonText,
         hasGenerate,
+        formButtonsOnTop,
         generateButtonText,
       } = metadata.formdef;
       const { saveAsMode, showDelete, showSave, formMetadata } = this.state;
@@ -471,7 +472,7 @@ class DynamicForm extends Component {
           {(props) => (
             <Form>
               <Container>
-                <ModalBody>
+                <ModalBody style={styles.modalBody} id="formModalBody">
                   <Form
                     onSubmit={this.props.submit}
                     style={{
@@ -534,7 +535,7 @@ class DynamicForm extends Component {
                       </Fragment>
                     )}
                     {showDelete && (
-                      <Button onClick={(e) => this.deleteHandler(props.values, props)} color="danger">
+                      <Button onClick={(e) => this.deleteHandler(props.values)} color="danger">
                         Delete
                       </Button>
                     )}

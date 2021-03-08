@@ -9,8 +9,9 @@ class Sidebar extends Component {
   }
 
   removeFavorite(fav) {
+    const favorite = this.props.favorites.filter(option => option.id == fav.id);
     const favorites = this.props.favorites.filter(option => option.id !== fav.id);
-    this.props.setFavorite(favorites);
+    this.props.setFavorite(favorites,favorite,0);
   }
 
   render() {

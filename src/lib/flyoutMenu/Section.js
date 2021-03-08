@@ -11,13 +11,15 @@ class Section extends Component {
 
   setFavorite(fav) {
     if (!this.props.favorites.some((favItem) => favItem.id === fav.id)) {
-      this.props.setFavorite([...this.props.favorites, fav]);
+      this.props.setFavorite([...this.props.favorites, fav],fav,1);
     }
   }
 
+
   setUnFavorite(fav) {
+    const favorite = this.props.favorites.filter((option) => option.id == fav.id);
     const favorites = this.props.favorites.filter((option) => option.id !== fav.id);
-    this.props.setFavorite(favorites);
+    this.props.setFavorite(favorites,favorite,0);
   }
 
   GetSortOrder(prop) {
