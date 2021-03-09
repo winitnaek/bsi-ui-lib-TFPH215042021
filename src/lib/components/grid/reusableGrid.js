@@ -221,7 +221,7 @@ class ReusableGrid extends React.Component {
       const { formFilterData } = this.props;
       const payload = {
         formData: formFilterData,
-        mode: "Edit",
+        mode: "New",
         index: null,
       };
       const { setFormData } = this.props;
@@ -1025,6 +1025,7 @@ class ReusableGrid extends React.Component {
               if (serverPaging) this.dispatchGridData(obj);
               return obj.data;
             }}
+           
             selectionmode={griddef.selectionmode || "multiplerows"}
             style={styles.gridStyle}
             sortable={true}
