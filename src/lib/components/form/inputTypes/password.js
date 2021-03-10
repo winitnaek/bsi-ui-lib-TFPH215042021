@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Input, Col, FormGroup } from "reactstrap";
 import { FieldLabel, FieldMessage, FieldHeader } from "../field";
+import { FocusOnErrorField } from "../../../utils/appErrorEvent";
 
 class CustomPassword extends Component {
   constructor(props) {
@@ -8,6 +9,21 @@ class CustomPassword extends Component {
     this.state = {};
     this.handleChange = this.handleChange.bind(this);
     this.onClick = this.onClick.bind(this);
+  }
+
+  componentDidUpdate() {
+    this.props.currentRef = this[`${this.props.name}_ref`];
+    FocusOnErrorField(this.props);
+  }
+
+  shouldComponentUpdate(nextProps) {
+    const { error, touched, disabled, value, hidden } = this.props;
+    if (nextProps.error !== error) return true;
+    if (nextProps.touched !== touched) return true;
+    if (nextProps.disabled !== disabled) return true;
+    if (nextProps.value !== value) return true;
+    if (nextProps.hidden !== hidden) return true;
+    return false;
   }
 
   handleChange(e) {
@@ -24,6 +40,12 @@ class CustomPassword extends Component {
       onDisableField(fieldsToDisable || []);
     }
   }
+
+  componentDidUpdate() {
+    this.props.currentRef = this[`${this.props.name}_ref`];
+    FocusOnErrorField(this.props);
+  }
+
   render() {
     const {
       name,

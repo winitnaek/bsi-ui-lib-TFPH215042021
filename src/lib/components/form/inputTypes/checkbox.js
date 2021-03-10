@@ -24,7 +24,16 @@ class CustomCheckbox extends Component {
 
   handleChange(event) {
     const { currentTarget: target } = event;
-    const { fieldinfo, value, onChange, id, fieldsToDisable, onDisableField, fieldsToEnable, onEnableField } = this.props;
+    const {
+      fieldinfo,
+      value,
+      onChange,
+      id,
+      fieldsToDisable,
+      onDisableField,
+      fieldsToEnable,
+      onEnableField,
+    } = this.props;
     let valueArray = value || [];
 
     if (this.isSingleCheckBox(fieldinfo)) {
@@ -56,7 +65,19 @@ class CustomCheckbox extends Component {
   }
 
   render() {
-    const { error, id, description, required, fieldHeader, value, label, fieldinfo, touched, index, disabled } = this.props;
+    const {
+      error,
+      id,
+      description,
+      required,
+      fieldHeader,
+      value,
+      label,
+      fieldinfo,
+      touched,
+      index,
+      disabled,
+    } = this.props;
 
     const isChecked = this.isSingleCheckBox(fieldinfo) && value;
 
@@ -87,10 +108,12 @@ class CustomCheckbox extends Component {
     return (
       <Col>
         <Label check>
-          {disabled 
-          ? <Input disabled type="checkbox" name={id} id={id} value={value} onChange={onChange} checked={checked} /> 
-          : <Input type="checkbox" name={id} id={id} value={value} onChange={onChange} checked={checked} />}
-        
+          {disabled ? (
+            <Input disabled type="checkbox" name={id} id={id} value={value} onChange={onChange} checked={checked} />
+          ) : (
+            <Input type="checkbox" name={id} id={id} value={value} onChange={onChange} checked={checked} />
+          )}
+
           {label}
         </Label>
       </Col>
