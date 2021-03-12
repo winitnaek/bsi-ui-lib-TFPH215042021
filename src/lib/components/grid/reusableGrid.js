@@ -110,7 +110,7 @@ class ReusableGrid extends React.Component {
       const { saveGridData, renderGrid, tftools, renderAdditionalInfo, metadata } = this.props;
       let payload;
       if(metadata.griddef.hasAlert) {
-        renderAdditionalInfo(childPageId || pgid, values, mode);
+        renderAdditionalInfo(childPageId || pgid, values, { allSelected: this.state.allSelected });
       } else {
         if(this.state.isSaveAs) {
           payload = await saveGridData.saveAsGridData(childPageId || pgid, values, mode);
@@ -654,7 +654,7 @@ class ReusableGrid extends React.Component {
     const cellbegineditCallbck = (row, datafield, columntype, value) => {
       let _id = document.querySelector("div[role='grid']").id;
       const rowData = $("#" + _id).jqxGrid("getrenderedrowdata", row);
-      if(rowData.flag === false && datafield === "auditPermission") {
+      if(rowData && rowData.flag === false && datafield === "auditPermission") {
         return false;
       }
       if(!this.state.allSelected) {
@@ -900,12 +900,17 @@ class ReusableGrid extends React.Component {
             }}>
               {(topLink || []).map(link => {
                 return (
+                  <Fragment>
                   <a
                     href="#"
                     id={link.id}
                     onClick={(event) => { event.preventDefault(); this.mapToolUsage(link.id) }}
                     style={styles.gridLinkStyle}
                   > <i class={`fas ${link.icon} fa-lg fa-2x`}></i></a>
+                   <UncontrolledTooltip placement="right" target={link.id}>
+                      <span> {link.description} </span>
+                    </UncontrolledTooltip>
+                  </Fragment>
                 )
               })}
             </span>
@@ -1025,7 +1030,6 @@ class ReusableGrid extends React.Component {
               if (serverPaging) this.dispatchGridData(obj);
               return obj.data;
             }}
-           
             selectionmode={griddef.selectionmode || "multiplerows"}
             style={styles.gridStyle}
             sortable={true}
@@ -1088,7 +1092,7 @@ class ReusableGrid extends React.Component {
             {this.state.hasSave && (
               <a href="#" style={styles.gridLinkStyle}>
                 <span id="saveGrid">
-                  <span onClick={(event) => this.saveSelectedData(event,this.state.pgid)}>
+                  <span onClick={(event) => this.saveSelectedData(event, false)}>
                     <i className="fas fa-save fa-lg fa-2x" />
                   </span>
                 </span>
