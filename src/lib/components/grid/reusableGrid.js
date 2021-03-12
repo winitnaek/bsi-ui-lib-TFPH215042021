@@ -705,11 +705,11 @@ class ReusableGrid extends React.Component {
         };
       }
 
-      if (!permissions.SAVE) {
+      /*if (!permissions.SAVE) {
         newColumns = newColumns.filter((item) => {
           return item.text !== "Edit";
         });
-      }
+      }*/
 
       if (!permissions.DELETE) {
         newColumns = newColumns.filter((item) => {
@@ -1149,6 +1149,7 @@ class ReusableGrid extends React.Component {
             fillParentInfo ={this.props.fillParentInfo}
             showActionMessage={this.props.showActionMessage}
             styles={this.props.styles}
+            permissions ={this.props.permissions}
           />
         </ReusableModal>
         {metadata.confirmdef ? (
