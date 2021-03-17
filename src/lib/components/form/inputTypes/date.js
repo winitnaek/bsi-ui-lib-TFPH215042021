@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Input, Col, FormGroup, Label } from "reactstrap";
 import { FieldLabel, FieldMessage, FieldHeader } from "../field";
+import { FocusOnErrorField } from "../../../utils/appErrorEvent";
 import moment from "moment";
 
 class CustomDate extends Component {
@@ -20,6 +21,22 @@ class CustomDate extends Component {
       setFormMetadata(formInfo);
       onChange(e);
     };
+  }
+
+  componentDidUpdate() {
+    debugger;
+    this.props.currentRef = this[`${this.props.name}_ref`];
+    FocusOnErrorField(this.props);
+  }
+
+  shouldComponentUpdate(nextProps) {
+    const { error, touched, disabled, value, hidden } = this.props;
+    if (nextProps.error !== error) return true;
+    if (nextProps.touched !== touched) return true;
+    if (nextProps.disabled !== disabled) return true;
+    if (nextProps.value !== value) return true;
+    if (nextProps.hidden !== hidden) return true;
+    return false;
   }
 
   render() {
@@ -45,6 +62,7 @@ class CustomDate extends Component {
           {label && <FieldLabel label={label} required={required} />}
           <Input
             type={"date"}
+            ref={(dateInput) => (this[`${name}_ref`] = dateInput)}
             name={name}
             placeholder={placeholder}
             value={this.getValue(value)}
