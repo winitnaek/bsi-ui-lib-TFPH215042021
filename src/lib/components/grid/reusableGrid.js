@@ -77,7 +77,7 @@ class ReusableGrid extends React.Component {
       aformValues:[],
       aSaveStatus:''
     };
-
+    this.copyToClipboardHandler = this.copyToClipboardHandler.bind(this);
     this.editClick = (index, pgid) => {
       let _id = document.querySelector("div[role='grid']").id;
       let dataRecord = $("#" + _id).jqxGrid("getrowdata", index);
@@ -542,7 +542,7 @@ class ReusableGrid extends React.Component {
 
   copyToClipboardHandler(event) {
     event.preventDefault();
-    var numOfRows = copyToClipboard();
+    var numOfRows = copyToClipboard(this.state.pgid);
     this.setState(
       {
         showClipboard: true,
