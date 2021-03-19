@@ -27,7 +27,6 @@ class CustomInput extends Component {
   }
 
   componentDidUpdate() {
-    debugger;
     this.props.currentRef = this[`${this.props.name}_ref`];
     FocusOnErrorField(this.props);
   }
