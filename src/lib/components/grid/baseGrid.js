@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import { Row } from "reactstrap";
 import { columnModifier, getChildColumn } from "../../utils/cellRenderer";
 import Grid from "../../../../src/deps/jqwidgets-react/react_jqxgrid";
+import Aggregates from "../../../../res/js/jqwidgets/jqxgrid.aggregates";
 
 // Component used to handle non-server side paginated functionality.
 class BaseGrid extends React.Component {
@@ -66,7 +67,7 @@ class BaseGrid extends React.Component {
 
   //Binds with juxGrid.aggregates to display totals for individual columns
   componentDidMount() {
-    if (this.refs.extendedGrid) jqxGrid.aggregates = Aggregates;
+    if (this.refs.baseGrid) jqxGrid.aggregates = Aggregates;
   }
 
   // Renders the Grid
