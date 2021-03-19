@@ -6,15 +6,27 @@ yup.addMethod(yup.string, "matches", function (args) {
   const message = args["message"];
   const regex = new RegExp(unescape(args["input"]));
   const requiredMsg = args["requiredMsg"];
-  return yup
-    .string()
-    .required(requiredMsg)
-    .test(`matches`, message, function (value) {
-      debugger;
-      if (!value) return true;
-      if (!(value && value.trim())) return true;
-      return regex.test(value);
-    });
+  const isRequired = args["isRequired"];
+  if (isRequired) {
+    return yup
+      .string()
+      .required(requiredMsg)
+      .test(`matches`, message, function (value) {
+        if (!value) return true;
+        if (!(value && value.trim()) && !isRequired) return true;
+        return regex.test(value);
+      })
+      .nullable();
+  } else {
+    return yup
+      .string()
+      .test(`matches`, message, function (value) {
+        if (!value) return true;
+        if (!(value && value.trim()) && !isRequired) return true;
+        return regex.test(value);
+      })
+      .nullable();
+  }
 });
 
 yup.addMethod(yup.date, "range", function (args) {
@@ -88,7 +100,7 @@ export function createYupSchema(schema, config) {
   if (!yup[validation.type]) return schema;
   let validator = yup[validation.type]();
   if (validation.required) validator = validator["required"]([config.errmsg]);
-  else validator = validator.nullable();
+  validator = validator.nullable();
   if (validation.constraint) {
     validation.constraint.forEach((valdt) => {
       const { type, input, message, dependentField, range } = valdt;
@@ -97,6 +109,7 @@ export function createYupSchema(schema, config) {
       constraintParams["message"] = message;
       constraintParams["dependentField"] = dependentField;
       constraintParams["requiredMsg"] = config.errmsg;
+      constraintParams["isRequired"] = validation.required;
       validator = validator[type](constraintParams);
     });
   }
