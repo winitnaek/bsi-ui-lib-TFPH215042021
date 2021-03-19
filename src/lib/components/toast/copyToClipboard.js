@@ -17,7 +17,7 @@ export function copyToClipboard(pageid) {
     }
     var colData = "";
     for (var x in cols) {
-        if(cols[x].datafield != "edit" && cols[x].datafield != "delete" && cols[x].text!='View' && cols[x].datafield!=pageid && cols[x].exportable !=false && cols[x].hidden !=true){
+        if(cols[x].datafield != "edit" && cols[x].datafield != "delete" && cols[x].text!='View' && cols[x].datafield!=pageid && cols[x].exportable !=false && cols[x].hidden !="true" && cols[x].hidden !=true){
             colData += cols[x].text + '  \t';
             numOfCols ++;
         }

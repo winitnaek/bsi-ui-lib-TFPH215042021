@@ -533,11 +533,36 @@ class ReusableGrid extends React.Component {
   }
 
   exportToExcel() {
-    this.refs.reusableGrid.exportdata("xls", this.state.pgid);
+    let rows = this.getSelectedRows();
+    if (rows && rows.length > 0) {
+      this.refs.reusableGrid.exportdata("xls", this.state.pgid, true, rows);
+    } else {
+      this.refs.reusableGrid.exportdata("xls", this.state.pgid);
+    }
   }
 
   exportToCsv() {
-    this.refs.reusableGrid.exportdata("csv", this.state.pgid);
+    let rows = this.getSelectedRows();
+    if (rows && rows.length > 0) {
+      this.refs.reusableGrid.exportdata("csv", this.state.pgid, true, rows);
+    } else {
+      this.refs.reusableGrid.exportdata("csv", this.state.pgid);
+    }
+  }
+
+  getSelectedRows() {
+    let _id = document.querySelector("div[role='grid']").id;
+    let rows = [];
+    var selrowsindx = $("#" + _id).jqxGrid("selectedrowindexes");
+    if (selrowsindx && selrowsindx.length > 0) {
+      for (var s = 0; s < selrowsindx.length; s++) {
+        var rowdata = $("#" + _id).jqxGrid("getrowdata", selrowsindx[s]);
+        rows.push(rowdata);
+      }
+      return rows;
+    }else{
+      return rows;
+    }
   }
 
   copyToClipboardHandler(event) {
