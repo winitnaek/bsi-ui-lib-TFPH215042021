@@ -77,7 +77,7 @@ class ReusableGrid extends React.Component {
       aformValues:[],
       aSaveStatus:''
     };
-
+    this.copyToClipboardHandler = this.copyToClipboardHandler.bind(this);
     this.editClick = (index, pgid) => {
       let _id = document.querySelector("div[role='grid']").id;
       let dataRecord = $("#" + _id).jqxGrid("getrowdata", index);
@@ -110,7 +110,7 @@ class ReusableGrid extends React.Component {
       const { saveGridData, renderGrid, tftools, renderAdditionalInfo, metadata } = this.props;
       let payload;
       if(metadata.griddef.hasAlert) {
-        renderAdditionalInfo(childPageId || pgid, values, mode);
+        renderAdditionalInfo(childPageId || pgid, values, { allSelected: this.state.allSelected });
       } else {
         if(this.state.isSaveAs) {
           payload = await saveGridData.saveAsGridData(childPageId || pgid, values, mode);
@@ -221,7 +221,7 @@ class ReusableGrid extends React.Component {
       const { formFilterData } = this.props;
       const payload = {
         formData: formFilterData,
-        mode: "Edit",
+        mode: "New",
         index: null,
       };
       const { setFormData } = this.props;
@@ -533,16 +533,41 @@ class ReusableGrid extends React.Component {
   }
 
   exportToExcel() {
-    this.refs.reusableGrid.exportdata("xls", this.state.pgid);
+    let rows = this.getSelectedRows();
+    if (rows && rows.length > 0) {
+      this.refs.reusableGrid.exportdata("xls", this.state.pgid, true, rows);
+    } else {
+      this.refs.reusableGrid.exportdata("xls", this.state.pgid);
+    }
   }
 
   exportToCsv() {
-    this.refs.reusableGrid.exportdata("csv", this.state.pgid);
+    let rows = this.getSelectedRows();
+    if (rows && rows.length > 0) {
+      this.refs.reusableGrid.exportdata("csv", this.state.pgid, true, rows);
+    } else {
+      this.refs.reusableGrid.exportdata("csv", this.state.pgid);
+    }
+  }
+
+  getSelectedRows() {
+    let _id = document.querySelector("div[role='grid']").id;
+    let rows = [];
+    var selrowsindx = $("#" + _id).jqxGrid("selectedrowindexes");
+    if (selrowsindx && selrowsindx.length > 0) {
+      for (var s = 0; s < selrowsindx.length; s++) {
+        var rowdata = $("#" + _id).jqxGrid("getrowdata", selrowsindx[s]);
+        rows.push(rowdata);
+      }
+      return rows;
+    }else{
+      return rows;
+    }
   }
 
   copyToClipboardHandler(event) {
     event.preventDefault();
-    var numOfRows = copyToClipboard();
+    var numOfRows = copyToClipboard(this.state.pgid);
     this.setState(
       {
         showClipboard: true,
@@ -654,7 +679,7 @@ class ReusableGrid extends React.Component {
     const cellbegineditCallbck = (row, datafield, columntype, value) => {
       let _id = document.querySelector("div[role='grid']").id;
       const rowData = $("#" + _id).jqxGrid("getrenderedrowdata", row);
-      if(rowData.flag === false && datafield === "auditPermission") {
+      if(rowData && rowData.flag === false && datafield === "auditPermission") {
         return false;
       }
       if(!this.state.allSelected) {
@@ -687,6 +712,7 @@ class ReusableGrid extends React.Component {
         sortable: false,
         filterable: false,
         resizable: false,
+        exportable: false,
         cellsrenderer: editCellsRenderer,
         menu: false,
         rendered: this.toolTipRenderer,
@@ -705,11 +731,11 @@ class ReusableGrid extends React.Component {
         };
       }
 
-      if (!permissions.SAVE) {
+      /*if (!permissions.SAVE) {
         newColumns = newColumns.filter((item) => {
           return item.text !== "Edit";
         });
-      }
+      }*/
 
       if (!permissions.DELETE) {
         newColumns = newColumns.filter((item) => {
@@ -733,6 +759,7 @@ class ReusableGrid extends React.Component {
         sortable: false,
         filterable: false,
         resizable: false,
+        exportable: false,
         cellsrenderer: childCellsRenderer,
         menu: false,
         rendered: this.toolTipRenderer,
@@ -900,12 +927,17 @@ class ReusableGrid extends React.Component {
             }}>
               {(topLink || []).map(link => {
                 return (
+                  <Fragment>
                   <a
                     href="#"
                     id={link.id}
                     onClick={(event) => { event.preventDefault(); this.mapToolUsage(link.id) }}
                     style={styles.gridLinkStyle}
                   > <i class={`fas ${link.icon} fa-lg fa-2x`}></i></a>
+                   <UncontrolledTooltip placement="right" target={link.id}>
+                      <span> {link.description} </span>
+                    </UncontrolledTooltip>
+                  </Fragment>
                 )
               })}
             </span>
@@ -1087,7 +1119,7 @@ class ReusableGrid extends React.Component {
             {this.state.hasSave && (
               <a href="#" style={styles.gridLinkStyle}>
                 <span id="saveGrid">
-                  <span onClick={(event) => this.saveSelectedData(event,this.state.pgid)}>
+                  <span onClick={(event) => this.saveSelectedData(event, false)}>
                     <i className="fas fa-save fa-lg fa-2x" />
                   </span>
                 </span>
@@ -1147,6 +1179,8 @@ class ReusableGrid extends React.Component {
             deleteAndRefresh={this.deleteRow}
             fillParentInfo ={this.props.fillParentInfo}
             showActionMessage={this.props.showActionMessage}
+            styles={this.props.styles}
+            permissions ={this.props.permissions}
           />
         </ReusableModal>
         {metadata.confirmdef ? (

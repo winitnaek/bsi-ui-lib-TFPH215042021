@@ -1,15 +1,23 @@
 
-export function copyToClipboard() {
+export function copyToClipboard(pageid) {
     let _id = document.querySelector("div[role='grid']").id;
     let value = [];
     let numOfCols = 0;
     
     let cols = $('#' + _id).jqxGrid('columns').records;
-    let rows = $('#' + _id).jqxGrid('getrows');
-
+    let rows = [];
+    var selrowsindx =$('#' + _id).jqxGrid("selectedrowindexes");
+    if (selrowsindx && selrowsindx.length > 0) {
+        for (var s = 0; s < selrowsindx.length; s++) {
+        var rowdata = $('#' + _id).jqxGrid("getrowdata", selrowsindx[s]);
+        rows.push(rowdata);
+        }
+    } else {
+        rows = $('#' + _id).jqxGrid("getrows");
+    }
     var colData = "";
     for (var x in cols) {
-        if(cols[x].datafield != "edit" && cols[x].datafield != "delete"){
+        if(cols[x].datafield != "edit" && cols[x].datafield != "delete" && cols[x].text!='View' && cols[x].datafield!=pageid && cols[x].exportable !=false && cols[x].hidden !="true" && cols[x].hidden !=true){
             colData += cols[x].text + '  \t';
             numOfCols ++;
         }

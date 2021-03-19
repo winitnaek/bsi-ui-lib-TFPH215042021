@@ -400,7 +400,7 @@ class DynamicForm extends Component {
     const { formData, tftools, metadata, formProps } = this.props;
     const hasDelete = metadata.formdef.hasDelete;
     const mode = formData.mode;
-    let permissions = this.getPermissions(tftools, formProps.pgid);
+    let permissions = formProps.permissions;
     let isEdit = mode === "Edit" ? true : false;
     if (permissions) this.setState({ showDelete: permissions.DELETE && isEdit, showSave: permissions.SAVE });
     else this.setState({ showDelete: hasDelete && isEdit });
@@ -561,7 +561,7 @@ class DynamicForm extends Component {
                       </Button>
                     )}
 
-                    {hasSaveAs && !saveAsMode && mode === "Edit" ? (
+                    {formProps.permissions && formProps.permissions.SAVE && hasSaveAs && !saveAsMode && mode === "Edit" ? (
                       <Button id="saveAsNew" color="success" onClick={(e) => this.handleSaveAs(e, props)}>
                         Save As New
                         <UncontrolledTooltip placement="right" target="saveAsNew">

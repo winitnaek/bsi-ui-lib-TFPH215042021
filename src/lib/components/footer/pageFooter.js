@@ -35,9 +35,13 @@ export default class PageFooter extends React.Component {
     if (exportAll) exportHandler(type);
     else {
       let _id = document.querySelector("div[role='grid']").id;
-      $("#" + _id).jqxGrid("exportdata", type, pgid);
+      $("#" + _id).jqxGrid('exportdata', type, pgid, true, null, true, '/dataexport.php');
+
+      // TESTING ONLY!!
+      // $("#" + _id).jqxGrid('exportdata', type, pgid, true, null, true, 'https://dev1w1v.bsihq.com:41001/dataexport.php');
+      // END TESTING ONLY!!
     }
-  }
+  } 
 
   // Renders the export and copy to clipboard buttons.
   render() {
