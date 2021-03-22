@@ -131,7 +131,7 @@ class ReusableGrid extends React.Component {
       const griddata = $("#" + modalGridId).jqxGrid("getdatainformation");
       const payload = [];
       for (let i = 0; i < griddata.rowscount; i++) {
-       const rowData = $("#" + modalGridId).jqxGrid("getrenderedrowdata", i);
+       const rowData = $("#" + modalGridId).jqxGrid("getrowdata", i) || {};
        const checkBoxKey = Object.keys(rowData).filter(k => rowData[k] === true);
        if(rowData[checkBoxKey]) {
         payload.push(rowData);
@@ -320,7 +320,7 @@ class ReusableGrid extends React.Component {
       const griddata = $("#" + _id).jqxGrid("getdatainformation");
       const rows = [];
       for (let i = 0; i < griddata.rowscount; i++) {
-        rows.push($("#" + _id).jqxGrid("getrenderedrowdata", i));
+        rows.push($("#" + _id).jqxGrid("getrowdata", i));
       }
 
       // TODO: Check with API team which method to call to delete all rows
@@ -397,9 +397,10 @@ class ReusableGrid extends React.Component {
       $("#" + _id).jqxGrid("selectallrows");
 
       const griddata = $("#" + _id).jqxGrid("getdatainformation");
+      const pagenum = griddata.paginginformation.pagenum;
       const updatedData = [];
       for (let i = 0; i < griddata.rowscount; i++) {
-      const rowData = $("#" + _id).jqxGrid("getrenderedrowdata", i);
+      const rowData = $("#" + _id).jqxGrid("getrowdata", i) || {};
       Object.keys(rowData).forEach(k => {
         if(typeof rowData[k] === "boolean" || rowData[k] === undefined) {
           rowData[k] = k === "auditPermission" ? rowData[k] : true;
@@ -420,6 +421,8 @@ class ReusableGrid extends React.Component {
       console.log("griddata", updatedData);
      const dataAdapter = new $.jqx.dataAdapter(source);
       $("#" + _id).jqxGrid({ source: dataAdapter });
+      $("#" + _id).jqxGrid('gotopage',pagenum);
+      this.props.rowTicked && this.props.rowTicked(true);
       if(this.props.selectAllOutside) {
         this.props.selectAllOutside(true);
       }
@@ -429,15 +432,15 @@ class ReusableGrid extends React.Component {
       if(event) {
       event.preventDefault();
       }
-     
       this.setState({ allSelected: fromOutside ? this.state.allSelected : false, addtionalcheckbox: false });
       const isModal = this.props.hideModal;
       let _id = isModal ?  document.querySelectorAll("div[role='grid']")[1].id : document.querySelector("div[role='grid']").id;
       $("#" + _id).jqxGrid("clearselection");
       const griddata = $("#" + _id).jqxGrid("getdatainformation");
+      const pagenum = griddata.paginginformation.pagenum;
       const updatedData = [];
       for (let i = 0; i < griddata.rowscount; i++) {
-      const rowData = $("#" + _id).jqxGrid("getrenderedrowdata", i);
+      const rowData = $("#" + _id).jqxGrid("getrowdata", i) || {};
       Object.keys(rowData).forEach(k => {
         if(typeof rowData[k] === "boolean" || rowData[k] === undefined) {
           rowData[k] = false;
@@ -456,6 +459,8 @@ class ReusableGrid extends React.Component {
       console.log("griddata", updatedData);
      const dataAdapter = new $.jqx.dataAdapter(source);
       $("#" + _id).jqxGrid({ source: dataAdapter });
+      $("#" + _id).jqxGrid('gotopage',pagenum);
+      this.props.rowTicked && this.props.rowTicked(false);
       if(this.props.selectAllOutside) {
         this.props.selectAllOutside(false);
       }
@@ -653,7 +658,7 @@ class ReusableGrid extends React.Component {
 
     const cellbegineditCallbck = (row, datafield, columntype, value) => {
       let _id = document.querySelector("div[role='grid']").id;
-      const rowData = $("#" + _id).jqxGrid("getrenderedrowdata", row);
+      const rowData = $("#" + _id).jqxGrid("getrowdata", row);
       if(rowData && rowData.flag === false && datafield === "auditPermission") {
         return false;
       }
@@ -665,6 +670,13 @@ class ReusableGrid extends React.Component {
           })
         }, 0);
       }
+
+      // wait for value to be updte before calling function
+      setTimeout(() => {
+        if(columntype === "checkbox" && this.props.pageid === "customdataRestore") {
+          this.props.rowTicked && this.props.rowTicked(false);
+        }
+      }, 0)
       return true;
     }
 
