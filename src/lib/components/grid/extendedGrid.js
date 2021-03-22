@@ -81,11 +81,13 @@ class ExtendedGrid extends BaseGrid {
         },
         loadComplete: function (data, status) {
           const { filtersMetadata } = compRef.state;
-          let _id = document.querySelector("div[role='grid']").id;
+          compRef.refs.extendedGrid.on("pagechanged", (event) => {
+            compRef.refs.extendedGrid.clearselection();
+          });
           filtersMetadata &&
             filtersMetadata.map((filter) => {
               let columnName = filter.mapping.columnName;
-              $("#" + _id).jqxGrid("setcolumnproperty", columnName, "filteritems", filter.localdata);
+              compRef.refs.extendedGrid.setcolumnproperty(columnName, "filteritems", filter.localdata);
             });
         },
         loadError: function (xhr, status, error) {

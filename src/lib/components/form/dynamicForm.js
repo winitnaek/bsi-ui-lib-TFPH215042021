@@ -561,7 +561,7 @@ class DynamicForm extends Component {
                       </Button>
                     )}
 
-                    {formProps.permissions.SAVE && hasSaveAs && !saveAsMode && mode === "Edit" ? (
+                    {formProps.permissions && formProps.permissions.SAVE && hasSaveAs && !saveAsMode && mode === "Edit" ? (
                       <Button id="saveAsNew" color="success" onClick={(e) => this.handleSaveAs(e, props)}>
                         Save As New
                         <UncontrolledTooltip placement="right" target="saveAsNew">

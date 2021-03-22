@@ -77,7 +77,7 @@ class ReusableGrid extends React.Component {
       aformValues:[],
       aSaveStatus:''
     };
-
+    this.copyToClipboardHandler = this.copyToClipboardHandler.bind(this);
     this.editClick = (index, pgid) => {
       let _id = document.querySelector("div[role='grid']").id;
       let dataRecord = $("#" + _id).jqxGrid("getrowdata", index);
@@ -538,16 +538,41 @@ class ReusableGrid extends React.Component {
   }
 
   exportToExcel() {
-    this.refs.reusableGrid.exportdata("xls", this.state.pgid);
+    let rows = this.getSelectedRows();
+    if (rows && rows.length > 0) {
+      this.refs.reusableGrid.exportdata("xls", this.state.pgid, true, rows);
+    } else {
+      this.refs.reusableGrid.exportdata("xls", this.state.pgid);
+    }
   }
 
   exportToCsv() {
-    this.refs.reusableGrid.exportdata("csv", this.state.pgid);
+    let rows = this.getSelectedRows();
+    if (rows && rows.length > 0) {
+      this.refs.reusableGrid.exportdata("csv", this.state.pgid, true, rows);
+    } else {
+      this.refs.reusableGrid.exportdata("csv", this.state.pgid);
+    }
+  }
+
+  getSelectedRows() {
+    let _id = document.querySelector("div[role='grid']").id;
+    let rows = [];
+    var selrowsindx = $("#" + _id).jqxGrid("selectedrowindexes");
+    if (selrowsindx && selrowsindx.length > 0) {
+      for (var s = 0; s < selrowsindx.length; s++) {
+        var rowdata = $("#" + _id).jqxGrid("getrowdata", selrowsindx[s]);
+        rows.push(rowdata);
+      }
+      return rows;
+    }else{
+      return rows;
+    }
   }
 
   copyToClipboardHandler(event) {
     event.preventDefault();
-    var numOfRows = copyToClipboard();
+    var numOfRows = copyToClipboard(this.state.pgid);
     this.setState(
       {
         showClipboard: true,
@@ -699,6 +724,7 @@ class ReusableGrid extends React.Component {
         sortable: false,
         filterable: false,
         resizable: false,
+        exportable: false,
         cellsrenderer: editCellsRenderer,
         menu: false,
         rendered: this.toolTipRenderer,
@@ -745,6 +771,7 @@ class ReusableGrid extends React.Component {
         sortable: false,
         filterable: false,
         resizable: false,
+        exportable: false,
         cellsrenderer: childCellsRenderer,
         menu: false,
         rendered: this.toolTipRenderer,
