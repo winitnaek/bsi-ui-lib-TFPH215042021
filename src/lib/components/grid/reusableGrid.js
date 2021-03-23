@@ -540,18 +540,18 @@ class ReusableGrid extends React.Component {
   exportToExcel() {
     let rows = this.getSelectedRows();
     if (rows && rows.length > 0) {
-      this.refs.reusableGrid.exportdata("xls", this.state.pgid, true, rows);
+      this.refs.reusableGrid.exportdata("xls", this.state.pgid, true, rows,true,"/dataexport.php");
     } else {
-      this.refs.reusableGrid.exportdata("xls", this.state.pgid);
+      this.refs.reusableGrid.exportdata("xls", this.state.pgid,true,null,true,"/dataexport.php");
     }
   }
 
   exportToCsv() {
     let rows = this.getSelectedRows();
     if (rows && rows.length > 0) {
-      this.refs.reusableGrid.exportdata("csv", this.state.pgid, true, rows);
+      this.refs.reusableGrid.exportdata("csv", this.state.pgid, true, rows,true,"/dataexport.php");
     } else {
-      this.refs.reusableGrid.exportdata("csv", this.state.pgid);
+      this.refs.reusableGrid.exportdata("csv", this.state.pgid,true,null,true,"/dataexport.php");
     }
   }
 
