@@ -869,7 +869,7 @@ class ReusableGrid extends React.Component {
 
         {this.state.subtitle ? (
           <Row>
-            <p>{this.state.subtitle}</p>
+            <p>{this.props.pgSubtitle || this.state.subtitle}</p>
           </Row>
         ) : null}
 
