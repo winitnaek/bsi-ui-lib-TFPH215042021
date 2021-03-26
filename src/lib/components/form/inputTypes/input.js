@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Input, Col, FormGroup } from "reactstrap";
 import { FieldLabel, FieldMessage, FieldHeader } from "../field";
+import { FocusOnErrorField } from "../../../utils/appErrorEvent";
 
 class CustomInput extends Component {
   constructor(props) {
@@ -19,12 +20,27 @@ class CustomInput extends Component {
   }
 
   onClick(event) {
-      const {  fieldsToDisable, onDisableField } = this.props;
-      if(fieldsToDisable) { 
-        onDisableField(fieldsToDisable || []);
-      }
-     
+    const { fieldsToDisable, onDisableField } = this.props;
+    if (fieldsToDisable) {
+      onDisableField(fieldsToDisable || []);
+    }
   }
+
+  componentDidUpdate() {
+    this.props.currentRef = this[`${this.props.name}_ref`];
+    FocusOnErrorField(this.props);
+  }
+
+  shouldComponentUpdate(nextProps) {
+    const { error, touched, disabled, value, hidden } = this.props;
+    if (nextProps.error !== error) return true;
+    if (nextProps.touched !== touched) return true;
+    if (nextProps.disabled !== disabled) return true;
+    if (nextProps.value !== value) return true;
+    if (nextProps.hidden !== hidden) return true;
+    return false;
+  }
+
   render() {
     const {
       name,
@@ -37,7 +53,6 @@ class CustomInput extends Component {
       disabled,
       placeholder,
       value,
-      onChange,
       onBlur,
       index,
       maxLength,
@@ -50,6 +65,7 @@ class CustomInput extends Component {
           {label && <FieldLabel label={label} required={required} hidden={hidden ? "hidden" : ""} />}
           <Input
             id={name}
+            ref={(textInput) => (this[`${name}_ref`] = textInput)}
             type={"input"}
             name={name}
             placeholder={placeholder}

@@ -265,7 +265,7 @@ class DynamicForm extends Component {
   updateFieldData(fieldId, options) {
     const { fieldData } = this.state;
     const updatedFieldData = fieldData.map((field) => {
-      if (field.id === fieldId && field.fieldinfo) {
+      if (field.id === fieldId && field.fieldinfo && field.fieldinfo.options) {
         field.fieldinfo.options = options;
       }
       return field;
@@ -310,7 +310,9 @@ class DynamicForm extends Component {
 
   renderFormElements(props, fieldInfo, popupGrids, getFormData, setFormData, mode) {
     if (this.state.isResetAll) this.setState({ isResetAll: false });
+    const { formMetadata, isResetAll } = this.state;
     const { values } = props;
+    var errFld = { id: "", index: -1 };
     return fieldInfo.map((item, index) => {
       const fieldMap = {
         text: Input,
@@ -326,7 +328,9 @@ class DynamicForm extends Component {
       let error = props.errors.hasOwnProperty(item.id) && props.errors[item.id];
       let touched = props.touched.hasOwnProperty(item.id) && props.touched[item.id];
       let show = true;
-
+      if ((!errFld.id || errFld.index > index) && error && touched) errFld = { id: item.id, index: index };
+      else if ((errFld.id && props.errors && !props.errors[errFld.id]) || (errFld.id && !props.errors))
+        errFld = { id: "", index: -1 };
       if (item.show) {
         const keys = Object.keys(item.show);
         for (let length = keys.length - 1; length >= 0; length--) {
@@ -363,7 +367,7 @@ class DynamicForm extends Component {
             popupGrids={popupGrids}
             getFormData={getFormData}
             setFormData={setFormData}
-            formMetadata={this.state.formMetadata}
+            formMetadata={formMetadata}
             setFormMetadata={this.setFormMetadata}
             formValues={props.values}
             fieldsToDisable={item.disable}
@@ -378,7 +382,8 @@ class DynamicForm extends Component {
             onBlur={props.handleBlur}
             error={error}
             touched={touched}
-            isResetAll={this.state.isResetAll}
+            errFld={errFld}
+            isResetAll={isResetAll}
             resetFields={resetFields}
             onResetFields={this.onResetFields}
             maxLength={item.fieldlength && item.fieldlength.maxlength}
@@ -561,7 +566,11 @@ class DynamicForm extends Component {
                       </Button>
                     )}
 
-                    {formProps.permissions && formProps.permissions.SAVE && hasSaveAs && !saveAsMode && mode === "Edit" ? (
+                    {formProps.permissions &&
+                    formProps.permissions.SAVE &&
+                    hasSaveAs &&
+                    !saveAsMode &&
+                    mode === "Edit" ? (
                       <Button id="saveAsNew" color="success" onClick={(e) => this.handleSaveAs(e, props)}>
                         Save As New
                         <UncontrolledTooltip placement="right" target="saveAsNew">
