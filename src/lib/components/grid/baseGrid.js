@@ -31,14 +31,15 @@ class BaseGrid extends React.Component {
       const decodedCell = decodeURIComponent(cell);
       const cellInfo = JSON.parse(decodedCell);
       let dataRecord = this.getSelectedRow(cellInfo.index);
-      const data = { data: dataRecord, mode: "Edit", cell: cellInfo };
+      const data = { row: dataRecord, mode: "Edit", cell: cellInfo };
       await gridSelectionHandler(pageid, "Edit", data);
     };
 
     // Navigates to the child grid when click on a row in a grid.
     this.handleChildGrid = async (index) => {
       const { pageid, gridSelectionHandler } = this.props;
-      let data = this.getSelectedRow(index);
+      let dataRecord = this.getSelectedRow(index);
+      const data = { row: dataRecord };
       await gridSelectionHandler(pageid, "renderChild", data);
     };
 
