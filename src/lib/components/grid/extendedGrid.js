@@ -38,7 +38,6 @@ class ExtendedGrid extends BaseGrid {
 
   // Handles filter and sort events for the grid.
   buildDataAdapter() {
-    debugger;
     const { source } = this.props;
     if (source) {
       source.filter = () => this.updateGrid("filter");

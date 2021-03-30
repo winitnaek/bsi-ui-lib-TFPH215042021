@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Input, Col, FormGroup, InputGroup, InputGroupAddon, Button, Row } from "reactstrap";
 import { AsyncTypeahead, Typeahead } from "react-bootstrap-typeahead";
 import { FieldLabel, FieldMessage, FieldHeader } from "../field";
+import { FocusOnErrorField } from "../../../utils/appErrorEvent";
 
 class CustomSelect extends Component {
   constructor(props) {
@@ -28,35 +29,42 @@ class CustomSelect extends Component {
   // if default value is present it resets to default value
   resetFieldValue(clearInput) {
     const { defaultSelected } = this.state;
-    const { mode } = this.props;
+    const { mode, name } = this.props;
+    let currRef = this[`${name}_ref`];
     if (mode == "Edit" && defaultSelected && defaultSelected.id && defaultSelected.label && !clearInput) {
-      this.typeahead && this.typeahead.getInstance()._updateSelected(defaultSelected);
-      this.asynctypeahead && this.asynctypeahead.getInstance()._updateSelected(defaultSelected);
+      currRef && typeof currRef.getInstance !== "undefined" && currRef.getInstance()._updateSelected(defaultSelected);
     } else {
-      this.typeahead && this.typeahead.getInstance().clear();
-      this.asynctypeahead && this.asynctypeahead.getInstance().clear();
+      currRef && typeof currRef.getInstance !== "undefined" && currRef.getInstance().clear();
     }
   }
 
   // performs a global search with parameter as ""(empty value) to bring all the records
   async globalSearchHandler() {
-    const { getFormData, id, formMetadata, fieldinfo } = this.props;
+    const { getFormData, id, formMetadata, fieldinfo, name } = this.props;
     const { showAllOptions } = this.state;
     if (!showAllOptions && fieldinfo.isasync) {
       this.setState({ isLoading: true });
       let options = await getFormData.getFormData(id, "", formMetadata);
       this.setState({ isLoading: false, options: options, showAllOptions: !showAllOptions });
-      this.typeahead.focus();
+      this[`${name}_ref`].focus();
     } else if (fieldinfo.options) {
       this.setState({ showAllOptions: !showAllOptions, options: fieldinfo.options });
-      this.typeahead.focus();
+      this[`${name}_ref`].focus();
     } else {
       this.setState({ showAllOptions: !showAllOptions });
     }
   }
 
   handleSelectFieldChange(event) {
-    const { id, onResetFields, handleFieldMetadata, fieldMetadata, formMetadata, setFormMetadata, fieldinfo } = this.props;
+    const {
+      id,
+      onResetFields,
+      handleFieldMetadata,
+      fieldMetadata,
+      formMetadata,
+      setFormMetadata,
+      fieldinfo,
+    } = this.props;
     const { value } = event.target;
     let { defaultSelected } = this.state;
     (fieldinfo.options || []).forEach((option) => {
@@ -72,7 +80,7 @@ class CustomSelect extends Component {
     }
 
     this.updateDependentField(value);
-    if(fieldMetadata) {
+    if (fieldMetadata) {
       let newFieldMetadata = fieldMetadata;
       newFieldMetadata[id] = { isSelected: true };
       handleFieldMetadata(newFieldMetadata);
@@ -82,7 +90,6 @@ class CustomSelect extends Component {
       setFormMetadata(formInfo);
     }
 
-   
     this.props.onChange(event, defaultSelected);
   }
 
@@ -141,21 +148,8 @@ class CustomSelect extends Component {
 
   // renders a form element of type select and switches from asynctypehead to typehead on global search
   renderFormElement() {
-    const { isLoading, options, showAllOptions, defaultSelected } = this.state;
-    const {
-      name,
-      error,
-      touched,
-      value,
-      defaultSet,
-      fieldMetadata,
-      fieldinfo,
-      disabled,
-      placeholder,
-      onChange,
-      id,
-      style,
-    } = this.props;
+    const { isLoading, options, showAllOptions } = this.state;
+    const { name, error, touched, value, defaultSet, fieldMetadata, fieldinfo, disabled, placeholder, id } = this.props;
     if (fieldinfo.typeahead) {
       let filterByFields = [];
       if (fieldinfo.labelMapping && showAllOptions)
@@ -175,7 +169,7 @@ class CustomSelect extends Component {
                 labelKey={(option) => `${option[primaryId]}`}
                 defaultInputValue={value || ""}
                 filterBy={filterByFields}
-                ref={(typeahead) => (this.asynctypeahead = typeahead)}
+                ref={(typeahead) => (this[`${name}_ref`] = typeahead)}
                 minLength={fieldinfo.minLength || 2}
                 placeholder={placeholder}
                 renderMenuItemChildren={(option) => (
@@ -206,7 +200,7 @@ class CustomSelect extends Component {
             ) : (
               <Typeahead
                 id={id}
-                ref={(typeahead) => (this.typeahead = typeahead)}
+                ref={(typeahead) => (this[`${name}_ref`] = typeahead)}
                 labelKey={(option) => `${option[primaryId]}`}
                 filterBy={filterByFields}
                 onChange={this.handleChange}
@@ -253,6 +247,7 @@ class CustomSelect extends Component {
       return (
         <Input
           type="select"
+          ref={(selectInput) => (this[`${name}_ref`] = selectInput)}
           id={name}
           name={name}
           placeholder={placeholder}
@@ -347,9 +342,9 @@ class CustomSelect extends Component {
       this.resetFieldValue(true);
     }
     this.setState({ defaultSelected: { id: value, label: value } });
-    if ((fieldinfo.isasync || fieldinfo.typeahead) && updateFieldData) {
-      updateFieldData(id, []);
-    }
+    // if ((fieldinfo.isasync || fieldinfo.typeahead) && updateFieldData) {
+    //   updateFieldData(id, []);
+    // }
     if (value && fieldinfo.isasync && fieldinfo.options && fieldinfo.options.length == 0) {
       this.setState({ isLoading: true });
       let options = await getFormData.getFormData(id, value, formValues);
@@ -359,7 +354,7 @@ class CustomSelect extends Component {
       this.setState({ isLoading: false, options, defaultSelected }, () => {
         this.updateDependentField(value);
       });
-    } else if (value && !fieldinfo.isasync && fieldinfo.options.length) {
+    } else if (value && !fieldinfo.isasync && fieldinfo.options && fieldinfo.options.length) {
       let defaultSelected =
         fieldinfo.options &&
         fieldinfo.options.find(
@@ -374,6 +369,11 @@ class CustomSelect extends Component {
         setFieldValue(id, defaultValue.id);
       });
     }
+  }
+
+  componentDidUpdate() {
+    this.props.currentRef = this[`${this.props.name}_ref`];
+    FocusOnErrorField(this.props);
   }
 
   // onSearchHandler is triggered on asynctypehead search.
