@@ -113,8 +113,9 @@ class DynamicForm extends Component {
         saveGridData.saveGridData(pgid, values, mode).then((saveStatus) => {
           if (saveStatus.status === "SUCCESS") {
             let message = saveStatus.message;
+            let action = mode && mode==='Edit'? 'Update':'Save';
             if (this.props.showActionMessage) {
-              formProps.showActionMessage("alert", "Save", message, pgid, formValues, saveStatus);
+              formProps.showActionMessage("alert", action, message, pgid, formValues, saveStatus);
             } else {
               formProps.renderMe(pgid, formValues, saveStatus);
               alert(message);
