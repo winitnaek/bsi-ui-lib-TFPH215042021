@@ -9,6 +9,7 @@ import Password from "./inputTypes/password";
 //import MappedInput from "./inputTypes/mappedInput";
 import Date from "./inputTypes/date";
 import FileUpload from "./inputTypes/fileUpload";
+import Tabs from "./inputTypes/tabs";
 import Usage from "../usage/usage";
 import PopupGrid from "../modal/popupGrid";
 import InitializeFieldValues from "../../utils/initializeFieldValues";
@@ -322,6 +323,7 @@ class DynamicForm extends Component {
         radio: Radio,
         fileUpload: FileUpload,
         password: Password,
+        tabs: Tabs,
         //mappedInput:MappedInput
       };
       const Component = fieldMap[item.fieldtype];
