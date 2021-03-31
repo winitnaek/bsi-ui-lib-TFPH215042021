@@ -337,7 +337,7 @@ class CustomSelect extends Component {
   }
 
   async componentDidMount() {
-    const { value, fieldinfo, id, updateFieldData, getFormData, mode, setFieldValue } = this.props;
+    const { value, fieldinfo, id, updateFieldData, getFormData, mode, setFieldValue, formValues } = this.props;
     if (mode === "New") {
       this.resetFieldValue(true);
     }
@@ -347,7 +347,7 @@ class CustomSelect extends Component {
     // }
     if (value && fieldinfo.isasync && fieldinfo.options && fieldinfo.options.length == 0) {
       this.setState({ isLoading: true });
-      let options = await getFormData.getFormData(id, value);
+      let options = await getFormData.getFormData(id, value, formValues);
       updateFieldData && updateFieldData(id, options);
       let defaultSelected =
         options.find((option) => (option && option.id === value) || option.label === value) || defaultSelected;
@@ -404,8 +404,9 @@ class CustomSelect extends Component {
       wrapperClass,
       style = {},
       labelStyle,
+      disabled
     } = this.props;
-    if (isResetAll) this.resetFieldValue();
+    if (isResetAll && !disabled) this.resetFieldValue();
     else if (resetFields && resetFields.length && fieldinfo.typeahead) {
       resetFields.map((field) => {
         if (field == name) this.resetFieldValue();
