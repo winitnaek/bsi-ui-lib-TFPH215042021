@@ -22,7 +22,7 @@ class CustomFile extends Component {
     } = this.props;
     return (
       <FormGroup>
-        <Col>
+        <Col className="pl-0 pr-0">
           {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
           {label && <FieldLabel label={label} required={required} />}
           <Input

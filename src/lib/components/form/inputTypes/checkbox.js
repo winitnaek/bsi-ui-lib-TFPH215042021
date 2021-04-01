@@ -82,7 +82,7 @@ class CustomCheckbox extends Component {
     const isChecked = this.isSingleCheckBox(fieldinfo) && value;
 
     return (
-      <Col>
+      <Col className="pl-0 pr-0">
         <FormGroup>
           {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
           {label && fieldinfo && fieldinfo.options && <FieldLabel label={label} required={required} />}

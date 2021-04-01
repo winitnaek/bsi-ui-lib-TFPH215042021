@@ -161,7 +161,7 @@ class CustomSelect extends Component {
       let mappedFieldLength = (fieldinfo.labelMapping && fieldinfo.fieldDisplayInfo.length) || 0;
       return (
         <InputGroup>
-          <Col style={{ margin: 0, padding: 0 }}>
+          <Col className="m-0 p-0">
             {!showAllOptions ? (
               <AsyncTypeahead
                 id={id}
@@ -404,7 +404,7 @@ class CustomSelect extends Component {
       wrapperClass,
       style = {},
       labelStyle,
-      disabled
+      disabled,
     } = this.props;
     if (isResetAll && !disabled) this.resetFieldValue();
     else if (resetFields && resetFields.length && fieldinfo.typeahead) {
@@ -414,7 +414,7 @@ class CustomSelect extends Component {
     }
     return (
       <FormGroup>
-        <Col sm={wrapperClass} style={style}>
+        <Col sm={wrapperClass} className="pl-0 pr-0">
           {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
           {label && <FieldLabel style={labelStyle} label={label} required={required} />}
           {this.renderFormElement()}

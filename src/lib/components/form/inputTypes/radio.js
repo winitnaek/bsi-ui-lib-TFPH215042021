@@ -42,7 +42,7 @@ class CustomRadio extends Component {
       name,
     } = this.props;
     return (
-      <Col>
+      <Col className="pl-0 pr-0">
         <FormGroup tag="fieldset">
           {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={index} />}
           {label && fieldinfo && fieldinfo.options && <FieldLabel label={label} required={required} />}
@@ -59,9 +59,17 @@ class CustomRadio extends Component {
   }
   RadioItem(id, cid, value, label, onChange, disabled, name) {
     return (
-      <Col>
+      <Col className="pl-0 pr-0">
         <Label check>
-          <Input disabled={disabled} type="radio" name={name || id} id={cid ? cid : id} value={value} onChange={this.handleChange} /> {label ? label : id}
+          <Input
+            disabled={disabled}
+            type="radio"
+            name={name || id}
+            id={cid ? cid : id}
+            value={value}
+            onChange={this.handleChange}
+          />{" "}
+          {label ? label : id}
         </Label>
       </Col>
     );

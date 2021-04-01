@@ -490,7 +490,9 @@ class DynamicForm extends Component {
                     }}
                     id="myform"
                   >
-                    <Col>{this.renderFormElements(props, fieldInfo, popupGrids, getFormData, setFormData, mode)}</Col>
+                    <Col className="pl-0 pr-0">
+                      {this.renderFormElements(props, fieldInfo, popupGrids, getFormData, setFormData, mode)}
+                    </Col>
                   </Form>
                   {metadata.formdef && metadata.formdef.note && (
                     <FormGroup row>

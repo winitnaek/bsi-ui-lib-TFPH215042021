@@ -20,7 +20,7 @@ class CustomTabs extends Component {
     let lastIndex = (options && options.length - 1) || -1;
     return (
       <FormGroup>
-        <Col>
+        <Col className="pl-0 pr-0">
           {fieldHeader && <FieldHeader fieldHeader={fieldHeader} index={1} />}
           {label && <FieldLabel label={label} required={required} hidden={hidden ? "hidden" : ""} />}
           <InputGroup id={name} hidden={hidden ? "hidden" : ""} style={{ flex: 1 }}>
