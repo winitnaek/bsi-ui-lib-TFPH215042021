@@ -20,8 +20,9 @@ class Sidebar extends Component {
       return (
         <Row key={item.label} className="selected" key={item.id}>
           <Col style={linkColStyle}>
-            <Button color="link" className="d-block p-0" id={`jumpto-${item.id}`} onClick={e => this.props.renderApplication(item)}>
-              {item.label}
+            <Button color="link" className="d-block p-0" id={`jumpto-${item.id}`} onClick={() => item.type === "externallink" && item.href
+                  ? window.open(item.href, "_blank") : this.props.renderApplication(item)}>
+              {item.label.length <= 30 ? item.label : item.label.substring(0,27)+'...'}
             </Button>
             <UncontrolledTooltip placement="top" target={`jumpto-${item.id}`}>
               Jump to {item.label}

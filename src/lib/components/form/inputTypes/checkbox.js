@@ -53,14 +53,22 @@ class CustomCheckbox extends Component {
 
     if (valueArray.length || valueArray) {
       if (fieldsToDisable) {
+        onEnableField([]);
         onDisableField(fieldsToDisable);
       }
       if (fieldsToEnable) {
+        onDisableField([]);
         onEnableField(fieldsToEnable);
       }
     } else {
-      onDisableField([]);
-      onEnableField([]);
+      if (fieldsToEnable) {
+        onEnableField([]);
+        onDisableField(fieldsToEnable);
+      }
+      if(fieldsToDisable) {
+        onDisableField([]);
+        onEnableField(fieldsToDisable);
+      }
     }
   }
 
