@@ -71,6 +71,7 @@ class CustomPassword extends Component {
           {label && <FieldLabel label={label} required={required} hidden={hidden ? "hidden" : ""} />}
           <Input
             id={name}
+            ref={(textInput) => (this[`${name}_ref`] = textInput)}
             type={"password"}
             name={name}
             placeholder={placeholder}
