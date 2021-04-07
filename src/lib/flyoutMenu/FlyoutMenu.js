@@ -7,7 +7,7 @@ class FlyoutMenu extends Component {
   render() {
     const { showSideMenu, options, favorites = [], setFavorite, renderApplication, sectionLayout } = this.props;
     return (
-      <Row>
+      <Row style={{ height: '100%'}}>
         {showSideMenu ? (
           <Col xs="3" className="border-right border-dark">
             <Sidebar renderApplication={renderApplication} favorites={favorites} setFavorite={setFavorite} />
