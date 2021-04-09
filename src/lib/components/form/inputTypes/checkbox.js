@@ -9,13 +9,21 @@ class CustomCheckbox extends Component {
     this.CheckBoxItem = this.CheckBoxItem.bind(this);
   }
   componentDidMount() {
-    const { value, fieldsToDisable = [], onDisableField, fieldinfo, fieldsToEnable = [], onEnableField } = this.props;
+    const { value, fieldsToDisable = [], onDisableField, fieldinfo, fieldsToEnable = [], onEnableField, mode } = this.props;
     const isSingleCheck = this.isSingleCheckBox(fieldinfo);
     if ((isSingleCheck && value) || (value && value.length && fieldsToDisable && fieldsToDisable.length)) {
       onDisableField(fieldsToDisable);
     }
     if ((isSingleCheck && value) || (value && value.length && fieldsToEnable && fieldsToEnable.length)) {
       onEnableField(fieldsToEnable);
+    }
+
+    if((fieldsToDisable.toString() == fieldsToEnable.toString())) {
+      if(value) {
+        onEnableField(fieldsToEnable)
+      } else {
+        onDisableField(fieldsToDisable)
+      }
     }
   }
   isSingleCheckBox(fieldinfo) {
@@ -61,11 +69,17 @@ class CustomCheckbox extends Component {
         onEnableField(fieldsToEnable);
       }
     } else {
-      if (fieldsToEnable) {
+      if(fieldsToDisable.toString() == fieldsToEnable.toString()) {
+        if(fieldsToDisable) {
+          onEnableField([]);
+          onDisableField(fieldsToEnable);
+        }
+      }
+      else if(fieldsToEnable) {
         onEnableField([]);
         onDisableField(fieldsToEnable);
       }
-      if(fieldsToDisable) {
+      else if(fieldsToDisable) {
         onDisableField([]);
         onEnableField(fieldsToDisable);
       }
