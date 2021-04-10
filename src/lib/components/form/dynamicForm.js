@@ -538,6 +538,7 @@ class DynamicForm extends Component {
                       close={close}
                       getFormData={getFormData}
                       recentUsage={this.props.recentUsage}
+                      renderUsageData={this.props.renderUsageData}
                     />
                   )}
                   {metadata.formdef && metadata.formdef.hasPopupGrid && (
@@ -569,7 +570,7 @@ class DynamicForm extends Component {
                       </Fragment>
                     )}
                     {showDelete && (
-                      <Button onClick={(e) => this.deleteHandler(props.values)} color="danger">
+                      <Button id="_frmDelete" onClick={(e) => this.deleteHandler(props.values)} color="danger">
                         Delete
                       </Button>
                     )}

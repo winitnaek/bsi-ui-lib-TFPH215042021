@@ -16,6 +16,10 @@ class Usage extends Component {
     let recentUsageData;
     if (recentUsage) {
       recentUsageData = await recentUsage(pgid, data, mode);
+      if(recentUsageData && recentUsageData.usageDataPages && recentUsageData.usageDataPages.length >0){
+        let element = document.querySelector("#_frmDelete")
+        element.style.display = 'none';
+      }
     } else {
       recentUsageData = await getFormData.getFormData(pgid, data, mode);
     }
@@ -30,8 +34,11 @@ class Usage extends Component {
     });
   }
 
-  handleLink(data) {
-    renderTFApplication("pageContainer", data);
+  handleLink(data,item) {
+    if(this.props.renderUsageData){
+      this.props.renderUsageData("pageContainer", data,item);
+    }
+    //renderTFApplication("pageContainer", data);
     this.props.close();
   }
 
@@ -52,7 +59,7 @@ class Usage extends Component {
                   if (tftools[x].id == item.pageId) {
                     return (
                       <li>
-                        <a href="#" onClick={() => this.handleLink(tftools[x])}>
+                        <a href="#" onClick={() => this.handleLink(tftools[x],item)}>
                           {tftools[x].label}
                         </a>
                       </li>

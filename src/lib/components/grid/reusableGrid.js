@@ -817,6 +817,7 @@ class ReusableGrid extends React.Component {
       getFormData,
       renderGrid,
       recentUsage,
+      renderUsageData,
       griddata,
       serverPaging,
       filterComp = null, // If no filter component then render nothing
@@ -1193,6 +1194,7 @@ class ReusableGrid extends React.Component {
             showActionMessage={this.props.showActionMessage}
             styles={this.props.styles}
             permissions ={this.props.permissions}
+            renderUsageData={this.props.renderUsageData}
           />
         </ReusableModal>
         {metadata.confirmdef ? (
