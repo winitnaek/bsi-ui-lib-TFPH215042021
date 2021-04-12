@@ -94,10 +94,11 @@ class CustomSelect extends Component {
   }
 
   updateDependentField(parentSelectedValue) {
-    const { fieldinfo, getFormData, updateFieldData, formMetadata } = this.props;
+    const { fieldinfo, getFormData, updateFieldData, formMetadata, formValues } = this.props;
+    const autoCompletePayload = formMetadata && formMetadata.length ? formMetadata : formValues
     if (fieldinfo && fieldinfo.autoPopulateFields && fieldinfo.autoPopulateFields.length) {
       fieldinfo.autoPopulateFields.forEach((depentFieldId) => {
-        getFormData.getFormData(depentFieldId, parentSelectedValue, formMetadata).then((options) => {
+        getFormData.getFormData(depentFieldId, parentSelectedValue, autoCompletePayload).then((options) => {
           let newOptions = [];
           options.forEach((option) => {
             if (option.id) {
@@ -348,10 +349,16 @@ class CustomSelect extends Component {
     if (value && fieldinfo.isasync && fieldinfo.options && fieldinfo.options.length == 0) {
       this.setState({ isLoading: true });
       let options = await getFormData.getFormData(id, value, formValues);
-      updateFieldData && updateFieldData(id, options);
+      let newOptions = [];
+        options.forEach((option) => {
+          if (option.id) {
+            newOptions.push({ id: option.id, label: option.label });
+          }
+        });
+      updateFieldData && updateFieldData(id, newOptions);
       let defaultSelected =
-        options.find((option) => (option && option.id === value) || option.label === value) || defaultSelected;
-      this.setState({ isLoading: false, options, defaultSelected }, () => {
+        newOptions.find((option) => (option && option.id === value) || option.label === value) || defaultSelected;
+      this.setState({ isLoading: false, options: newOptions, defaultSelected }, () => {
         this.updateDependentField(value);
       });
     } else if (value && !fieldinfo.isasync && fieldinfo.options && fieldinfo.options.length) {
