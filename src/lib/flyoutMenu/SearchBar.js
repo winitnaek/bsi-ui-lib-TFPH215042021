@@ -51,7 +51,7 @@ class SearchBar extends Component {
               zIndex: 99,
               top: "55px",
               left: "0",
-              height: "calc(100vh - 134px)",
+              height: "700px",
               overflowY: "auto"
             }}
           >
@@ -61,7 +61,7 @@ class SearchBar extends Component {
               </button>
             </div>
             <div className="modal-body">
-              <div className="row">
+              <div className="row" style={{ height: '100%' }}>
                 <div className="col">
                   <FlyoutMenu
                     favorites={favorites}

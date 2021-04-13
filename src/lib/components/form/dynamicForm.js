@@ -24,12 +24,13 @@ class DynamicForm extends Component {
     super(props);
     const { fieldData, formData } = props;
     let fieldDataCopy = [...fieldData];
-    if (props.formData.mode == "Edit" && fieldData[0].hasSkipFields) {
+    const indexFound = fieldData.findIndex(item => item.hasSkipFields);
+    if (props.formData.mode == "Edit" && indexFound !== -1) {
       const payType = (
-        formData.data[fieldData[0].dynamicFormKey] || formData.data[fieldData[0].dynamicFormKey.toLowerCase()]
+        formData.data[fieldData[indexFound || 0].dynamicFormKey] || formData.data[fieldData[indexFound || 0].dynamicFormKey.toLowerCase()]
       ).charAt(0);
-      const otherFields = fieldData[fieldData.length - 1][payType];
-      fieldDataCopy = [].concat([fieldData[0], ...otherFields]);
+      const otherFields = fieldData[fieldData.length - 1][payType] || [];
+      fieldDataCopy = fieldData.concat(otherFields);
     }
     this.state = {
       showDelete: false,
@@ -41,6 +42,7 @@ class DynamicForm extends Component {
       enabledFields: [],
       formMetadata: [],
       fieldData: fieldDataCopy,
+      skipInitialValue: false,
     };
 
     this.updateFieldData = this.updateFieldData.bind(this);
@@ -148,11 +150,23 @@ class DynamicForm extends Component {
 
     // list of field id's that needs to be disabled
     this.onDisableField = (fields) => {
-      this.setState({ disabledFields: fields });
+      const filteredEnabledFields = this.state.enabledFields.filter((field) => fields.indexOf(field) === -1);
+      const enabledFields = filteredEnabledFields;
+      const disabledFields = [...this.state.disabledFields , ...fields];
+      this.setState({
+        enabledFields: enabledFields,
+        disabledFields:disabledFields,
+      })
     };
     // list of field id's that needs to be enabled
     this.onEnableField = (fields) => {
-      this.setState({ enabledFields: fields });
+      const filteredDisabledFields = this.state.disabledFields.filter((field) => fields.indexOf(field) === -1);
+      const disabledFields = filteredDisabledFields;
+      const enabledFields = [...this.state.enabledFields, ...fields];
+      this.setState({
+        enabledFields:enabledFields,
+        disabledFields: disabledFields,
+      })
     };
 
     this.handleClose = () => {
@@ -224,13 +238,23 @@ class DynamicForm extends Component {
       let { fieldData } = this.state;
 
       if (item.hasSkipFields) {
+        const indexFound = fieldData.findIndex(item => item.hasSkipFields);
         const payType = (
-          selected[0][fieldData[0].dynamicFormKey] || selected[0][fieldData[0].dynamicFormKey.toLowerCase()]
+          selected[0][fieldData[indexFound || 0].dynamicFormKey] || selected[0][fieldData[indexFound || 0].dynamicFormKey.toLowerCase()]
         ).charAt(0);
-        const otherFields = this.props.fieldData[this.props.fieldData.length - 1][payType];
-        this.props.fieldData[0].value = selected[0].label;
-        fieldData = [].concat([this.props.fieldData[0], ...otherFields]);
-      }
+        const otherFields = this.props.fieldData[this.props.fieldData.length - 1][payType] || [];
+        this.props.fieldData.forEach(field => {
+          field.value = props.values[field.id];
+        })
+        this.props.fieldData[indexFound || 0].value = selected[0].id;
+        fieldData = this.props.fieldData.concat(otherFields);
+       
+        this.setState({
+          skipInitialValue: true,
+        })
+     } 
+
+     
 
       // DO NOT UPDATE BELOW CODE
       this.setState({
@@ -442,8 +466,8 @@ class DynamicForm extends Component {
         formButtonsOnTop,
         generateButtonText,
       } = metadata.formdef;
-      const { saveAsMode, showDelete, showSave, formMetadata } = this.state;
-      if (mode === "New" && this.props.fillParentInfo) {
+      const { saveAsMode, showDelete, showSave, formMetadata, skipInitialValue } = this.state;
+      if (mode === "New" && this.props.fillParentInfo && !skipInitialValue) {
         //Do not remove this. To Handle New with values from parent
         initialValues = this.props.fillParentInfo(fieldInfo, initialValues, pgid);
       }
@@ -514,6 +538,7 @@ class DynamicForm extends Component {
                       close={close}
                       getFormData={getFormData}
                       recentUsage={this.props.recentUsage}
+                      renderUsageData={this.props.renderUsageData}
                     />
                   )}
                   {metadata.formdef && metadata.formdef.hasPopupGrid && (
@@ -545,7 +570,7 @@ class DynamicForm extends Component {
                       </Fragment>
                     )}
                     {showDelete && (
-                      <Button onClick={(e) => this.deleteHandler(props.values)} color="danger">
+                      <Button id="_frmDelete" onClick={(e) => this.deleteHandler(props.values)} color="danger">
                         Delete
                       </Button>
                     )}
