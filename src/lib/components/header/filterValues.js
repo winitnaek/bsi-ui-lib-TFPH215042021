@@ -15,7 +15,7 @@ export default function FilterValues({ fieldData = [], formFilterData }) {
         delete values[obj.datafield];
       }
       if (obj.fieldtype == "select") {
-        let selObj = obj.fieldinfo.options.filter((opt) => {
+        let selObj = obj.fieldinfo && obj.fieldinfo.options && obj.fieldinfo.options.filter((opt) => {
           if (opt.id == values[obj.id]) return opt;
         });
         if (selObj && selObj[0]) obj.displayText = selObj[0].label;

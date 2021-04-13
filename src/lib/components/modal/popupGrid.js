@@ -55,13 +55,13 @@ class PopupGrid extends Component {
     };
     let dataAdapter = new $.jqx.dataAdapter(source);
     return (
-      <Col>
+      <Col className="pl-0 pr-0">
         {isLoading ? (
-          <Row style={{ justifyContent: "center" }}>
+          <div style={{ justifyContent: "center" }} className="d-flex">
             <i class="fas fa-spinner fa-spin"></i>
-          </Row>
+          </div>
         ) : (
-          <Col>
+          <Col className="pl-0 pr-0">
             <div id="popupgrid">
               <Grid
                 width="100%"
@@ -76,31 +76,6 @@ class PopupGrid extends Component {
           </Col>
         )}
       </Col>
-      // <Col>
-      //     {gridData.length > 0 &&
-      //     <Col>
-      //     <Row>
-      //         <Col xs="4">
-      //             <Button color="link" onClick={this.toggle} className="float-left">More
-      //                 {!isOpen && <i class="fas fa-caret-right" style = {{marginTop:8, paddingLeft:4}}/>}
-      //                 {isOpen && <i class="fas fa-caret-down" style = {{marginTop:8, paddingLeft:4}} />}
-      //             </Button>
-      //         </Col>
-      //         {isOpen &&
-      //         <Col>
-      //             <Button color="link" onClick={this.deleteHandler} className="float-right" style={{marginTop:8}}>Delete</Button>
-      //         </Col>
-      //         }
-      //     </Row>
-      //     <Collapse isOpen={isOpen}>
-      //         <Grid width='100%' source={dataAdapter} pageable={gridData.length > 5 ? true:false}
-      //             enabletooltips={true} autoheight={true} columns={columns}
-      //             selectionmode="checkbox"
-      //         />
-      //     </Collapse>
-      //     </Col>
-      // }
-      // </Col>
     );
   }
 }
